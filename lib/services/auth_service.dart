@@ -10,3 +10,9 @@ class AuthService extends ChangeNotifier {
   User? get user => _user;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+    AuthService() {
+    _auth.authStateChanges().listen((User? user) {
+      _user = user;
+      notifyListeners();
+    });
+  }
