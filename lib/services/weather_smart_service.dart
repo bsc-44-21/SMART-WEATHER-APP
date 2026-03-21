@@ -48,3 +48,13 @@ class WeatherSmartService extends ChangeNotifier {
   Future<void> deletePlot(String plotId) async {
     await FirestoreService().deletePlot(plotId);
   }
+
+  void addLog(String activity) {
+    _activities.insert(0, {
+      'title': activity,
+      'time': DateFormat('h:mm a').format(DateTime.now()),
+    });
+    notifyListeners();
+  }
+}
+
