@@ -42,3 +42,22 @@ class _MainLayoutState extends State<MainLayout> {
             ),
           ],
         ),
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed, // Needed when >3 items
+          items: [
+            _buildNavItem(LucideIcons.layoutGrid, 'HOME', 0),
+            _buildNavItem(LucideIcons.map, 'PLOTS', 1),
+            _buildNavItem(LucideIcons.sparkles, 'ADVICE', 2),
+            _buildNavItem(LucideIcons.clipboardList, 'LOG', 3),
+            _buildNavItem(LucideIcons.user, 'PROFILE', 4),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: (index) => setState(() => _selectedIndex = index),
+          selectedFontSize: 10,
+          unselectedFontSize: 10,
+          selectedItemColor: AppTheme.primaryAccent,
+          unselectedItemColor: AppTheme.textMuted,
+        ),
+      ),
+    );
+  }
