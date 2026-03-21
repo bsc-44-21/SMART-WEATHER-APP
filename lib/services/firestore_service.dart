@@ -22,3 +22,12 @@ class FirestoreService {
       rethrow;
     }
   }
+  // Get a real-time stream of plots for a specific user
+  Stream<List<PlotModel>> getUserPlotsStream(String userId) {
+    return _db
+        .collection('plots')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => PlotModel.fromMap(doc.data(), doc.id))
+            .toList());
