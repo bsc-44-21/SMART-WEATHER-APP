@@ -1,4 +1,4 @@
-mport 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
 import '../models/plot.dart';
@@ -8,7 +8,7 @@ class FarmingCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
 
-  onst FarmingCard({
+  const FarmingCard({
     super.key,
     required this.child,
     this.padding,
@@ -189,3 +189,34 @@ class CustomTextField extends StatelessWidget {
     this.isPassword = false,
     this.onToggleVisibility,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: controller,
+          obscureText: obscureText,
+          decoration: InputDecoration(
+            hintText: hint,
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      obscureText ? LucideIcons.eye : LucideIcons.eyeOff,
+                      size: 20,
+                    ),
+                    onPressed: onToggleVisibility,
+                  )
+                : null,
+          ),
+        ),
+      ],
+    );
+  }
+}
