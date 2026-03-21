@@ -10,3 +10,7 @@ class AdvicePage extends StatefulWidget {
   @override
   State<AdvicePage> createState() => _AdvicePageState();
 }
+
+class _AdvicePageState extends State<AdvicePage> {
+  int _selectedFilter = 0;
+  final List<String> _filters = ['All', 'Weather Alerts', 'Pest Detection', 'Soil Health'];
