@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "916410886741",
+    "project_id": "weathersmart-2ab7c",
+    "storage_bucket": "weathersmart-2ab7c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:916410886741:android:ada82da425da7499e002dc",
+        "android_client_info": {
+          "package_name": "com.example.weather_smart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAby28iSTLK_0E21iPJTf0oV8JT_x3qSv4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
