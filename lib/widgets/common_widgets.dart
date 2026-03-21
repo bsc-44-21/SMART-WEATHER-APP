@@ -29,3 +29,32 @@ class FarmingCard extends StatelessWidget {
     );
   }
 }
+
+class AppLogo extends StatelessWidget {
+  final double size;
+  final Color? backgroundColor;
+
+  const AppLogo({super.key, this.size = 64, this.backgroundColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Hero(
+      tag: 'app_logo',
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: backgroundColor ?? AppTheme.primaryAccent,
+          shape: BoxShape.circle,
+        ),
+        child: Center(
+          child: Icon(
+            LucideIcons.sprout,
+            color: backgroundColor != null ? AppTheme.primaryAccent : Colors.white,
+            size: size * 0.5,
+          ),
+        ),
+      ),
+    );
+  }
+}
