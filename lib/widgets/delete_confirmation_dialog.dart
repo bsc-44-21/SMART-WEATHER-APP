@@ -3,26 +3,36 @@ import 'package:provider/provider.dart';
 import '../models/plot.dart';
 import '../services/weather_smart_service.dart';
 
-Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotModel plot}) async {
+Future<void> showDeleteConfirmationDialog(
+  BuildContext context, {
+  required PlotModel plot,
+}) async {
   final controller = TextEditingController();
   bool isSaving = false;
-    return showDialog(
+
+  return showDialog(
     context: context,
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setDialogState) {
           final bool isMatch = controller.text.trim() == plot.name;
-                    return AlertDialog(
+
+          return AlertDialog(
             title: Text('Delete ${plot.name}?'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                                const Text('This action cannot be undone. To confirm, type the plot name below:'),
+                const Text(
+                  'This action cannot be undone. To confirm, type the plot name below:',
+                ),
                 const SizedBox(height: 16),
                 Text(
                   plot.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -34,22 +44,27 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotMo
                   ),
                   onChanged: (_) => setDialogState(() {}),
                 ),
-                            ],
+              ],
+            ),
             actions: [
               TextButton(
                 onPressed: isSaving ? null : () => Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
-                            ElevatedButton(
+              ElevatedButton(
                 onPressed: (isMatch && !isSaving)
                     ? () async {
                         setDialogState(() => isSaving = true);
                         try {
-                          await context.read<WeatherSmartService>().deletePlot(plot.id);
+                          await context.read<WeatherSmartService>().deletePlot(
+                            plot.id,
+                          );
                           if (context.mounted) {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Plot "${plot.name}" deleted.')),
+                              SnackBar(
+                                content: Text('Plot "${plot.name}" deleted.'),
+                              ),
                             );
                           }
                         } catch (e) {
@@ -65,7 +80,7 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotMo
                         }
                       }
                     : null,
-                                    style: ElevatedButton.styleFrom(
+                style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
                 ),
