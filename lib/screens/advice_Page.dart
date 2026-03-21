@@ -21,3 +21,10 @@ class _AdvicePageState extends State<AdvicePage> {
     "🐛 Low risk of Fall Armyworm detected this week based on regional sensor data. Continue standard weekly scouting.\n\n🛡️ Preventative action: Consider applying neem oil spray to the perimeter of the field.",
     "🌱 Your crop's growth stage requires high nitrogen. Consider a top-dressing application of urea within the next 2 weeks.\n\n💧 Soil moisture levels are currently optimal at 68%.",
   ];
+
+  String _getFilteredAdvice(String fullAdvice) {
+    if (_selectedFilter == 0) {
+      return fullAdvice;
+    }
+    return _adviceContent[_selectedFilter];
+  }
