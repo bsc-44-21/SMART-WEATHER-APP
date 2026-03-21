@@ -188,3 +188,18 @@ class _SettingsTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, 
+                  color: AppTheme.textPrimary)),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 4),
+                    Text(subtitle!, style: TextStyle(fontSize: 13, color: AppTheme.textMuted)),
+                  ]
+                ],
+              ),
+            ),
+            if (isSwitch)
+              Switch(
+                value: switchValue,
+                onChanged: onChanged,
+                activeColor: AppTheme.primaryAccent,
+              )
+
