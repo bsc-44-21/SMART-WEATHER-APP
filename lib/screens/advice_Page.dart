@@ -88,3 +88,21 @@ class _AdvicePageState extends State<AdvicePage> {
                       }),
                     ),
                   ),
+                    const SizedBox(height: 16),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Text(
+                        _getFilteredAdvice(advice),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
