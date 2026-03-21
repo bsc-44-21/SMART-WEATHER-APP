@@ -38,3 +38,24 @@ final bool isEditing = existingPlot != null;
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(isEditing ? 'Edit Plot' : 'Create New Plot', style: 
+                    Theme.of(context).textTheme.headlineMedium),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: nameController,
+                      enabled: !isSaving,
+                      decoration: const InputDecoration(labelText: 'Plot Name (e.g. North Field)'),
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a plot name' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: locationController,
+                      enabled: !isSaving,
+                      decoration: const InputDecoration(labelText: 'Location (e.g. Sector 4)'),
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a location' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: sizeController,
+                      enabled: !isSaving,
+                      decoration: const InputDecoration(labelText: 'Size (e.g., 1.5 Ha)'),
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please 
