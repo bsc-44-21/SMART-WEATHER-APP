@@ -28,3 +28,17 @@ class _AdvicePageState extends State<AdvicePage> {
     }
     return _adviceContent[_selectedFilter];
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final plots = context.watch<WeatherSmartService>().plots;
+    final advice = context.watch<WeatherSmartService>().advice;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          if (plots.isNotEmpty)
+            PlotInfoCard(
+              plot: plots[0],
+            ),
