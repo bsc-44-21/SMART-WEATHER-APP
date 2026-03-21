@@ -76,5 +76,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           setState(() => _isPasswordVisible = !_isPasswordVisible),
                     ),
                     const SizedBox(height: 24),
+                                        Row(
+                      children: [
+                        Checkbox(
+                          value: _agreedToTerms,
+                          onChanged: (val) {
+                            setState(() {
+                              _agreedToTerms = val ?? false;
+                            });
+                          },
+                          activeColor: Theme.of(context).primaryColor,
+                        ),
+                        Expanded(
+                          child: Text(
+                            'I agree to the Terms & Conditions and Privacy Policy',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
   
 }
