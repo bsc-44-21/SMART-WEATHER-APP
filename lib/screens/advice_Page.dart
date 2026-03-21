@@ -59,3 +59,32 @@ class _AdvicePageState extends State<AdvicePage> {
                       const Icon(LucideIcons.refreshCw, size: 20),
                     ],
                   ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: List.generate(_filters.length, (index) {
+                        final isSelected = _selectedFilter == index;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ChoiceChip(
+                            label: Text(_filters[index]),
+                            selected: isSelected,
+                            onSelected: (selected) {
+                              setState(() {
+                                _selectedFilter = selected ? index : 0;
+                              });
+                            },
+                            showCheckmark: false,
+                            selectedColor: Theme.of(context).primaryColor,
+                            labelStyle: TextStyle(
+                              color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyMedium?.color,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontSize: 12,
+                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
