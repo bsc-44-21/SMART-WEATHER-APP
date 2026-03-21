@@ -9,3 +9,8 @@ import '../widgets/delete_confirmation_dialog.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+  
+  @override
+  Widget build(BuildContext context) {
+    final plots = context.watch<WeatherSmartService>().plots;
+    final bool hasPlots = plots.isNotEmpty;
