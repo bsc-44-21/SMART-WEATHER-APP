@@ -19,3 +19,20 @@ void main() async {
     ),
   );
 }
+
+class WeatherSmartApp extends StatelessWidget {
+  const WeatherSmartApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDarkMode = context.watch<WeatherSmartService>().isDarkMode;
+    return MaterialApp(
+      title: 'WeatherSmart',
+      theme: AppTheme.theme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      home: const AuthScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
