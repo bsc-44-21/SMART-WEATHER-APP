@@ -14,11 +14,11 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-    final _emailController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   bool _isPasswordVisible = false;
-    @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
@@ -27,14 +27,23 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-                            FarmingCard(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+              FarmingCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 48,
+                ),
                 child: Column(
                   children: [
                     const AppLogo(size: 80),
                     const SizedBox(height: 24),
-                    Text('WeatherSmart', style: Theme.of(context).textTheme.displayLarge),
-                    Text('Intelligent Farming Assistant', style: Theme.of(context).textTheme.labelSmall),
+                    Text(
+                      'WeatherSmart',
+                      style: Theme.of(context).textTheme.displayLarge,
+                    ),
+                    Text(
+                      'Intelligent Farming Assistant',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
                     const SizedBox(height: 48),
                     CustomTextField(
                       label: 'EMAIL',
@@ -55,26 +64,32 @@ class _AuthScreenState extends State<AuthScreen> {
                       },
                     ),
                     const SizedBox(height: 40),
-                                        Consumer<AuthService>(
+                    Consumer<AuthService>(
                       builder: (context, authService, child) {
                         return ElevatedButton(
-                                                    onPressed: authService.isLoading
+                          onPressed: authService.isLoading
                               ? null
                               : () async {
-                                  final success = await authService.signInWithEmailAndPassword(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                  );
+                                  final success = await authService
+                                      .signInWithEmailAndPassword(
+                                        _emailController.text,
+                                        _passwordController.text,
+                                      );
 
                                   if (success && context.mounted) {
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (_) => const MainLayout()),
+                                      MaterialPageRoute(
+                                        builder: (_) => const MainLayout(),
+                                      ),
                                     );
-                                  } else if (authService.errorMessage != null && context.mounted) {
+                                  } else if (authService.errorMessage != null &&
+                                      context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(authService.errorMessage!),
+                                        content: Text(
+                                          authService.errorMessage!,
+                                        ),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -100,3 +115,29 @@ class _AuthScreenState extends State<AuthScreen> {
                         );
                       },
                     ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                  );
+                },
+                child: Text(
+                  "Don't have an account? Sign Up",
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
