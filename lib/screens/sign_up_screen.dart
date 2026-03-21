@@ -44,5 +44,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                     const SizedBox(height: 40),
+                                        CustomTextField(
+                      label: 'FULL NAME',
+                      hint: 'John Doe',
+                      controller: _fullNameController,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      label: 'EMAIL',
+                      hint: 'example@gmail.com',
+                      controller: _emailController,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      label: 'PASSWORD',
+                      hint: '••••••••',
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
+                      isPassword: true,
+                      onToggleVisibility: () =>
+                          setState(() => _isPasswordVisible = !_isPasswordVisible),
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      label: 'CONFIRM PASSWORD',
+                      hint: '••••••••',
+                      controller: _confirmPasswordController,
+                      obscureText: !_isPasswordVisible,
+                      isPassword: true,
+                      onToggleVisibility: () =>
+                          setState(() => _isPasswordVisible = !_isPasswordVisible),
+                    ),
+                    const SizedBox(height: 24),
   
 }
