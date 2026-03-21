@@ -12,3 +12,9 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotMo
       return StatefulBuilder(
         builder: (context, setDialogState) {
           final bool isMatch = controller.text.trim() == plot.name;
+                    return AlertDialog(
+            title: Text('Delete ${plot.name}?'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
