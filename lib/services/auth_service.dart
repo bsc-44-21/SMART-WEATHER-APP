@@ -26,3 +26,59 @@ class AuthService extends ChangeNotifier {
     _errorMessage = message;
     notifyListeners();
   }
+    // Sign Up
+  Future<bool> signUpWithEmailAndPassword(String email, String password, String name) async {
+    _setLoading(true);
+    _setError(null);
+    try {
+      UserCredential credential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      await credential.user?.updateDisplayName(name);
+
+      _setLoading(false);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _setLoading(false);
+      _setError(_getFriendlyErrorMessage(e.code));
+      return false;
+    } catch (e) {
+      _setLoading(false);
+      _setError("An unexpected error occurred.");
+      return false;
+    }
+  }
+
+  // Sign In
+  Future<bool> signInWithEmailAndPassword(String email, String password) async {
+    _setLoading(true);
+    _setError(null);
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _setLoading(false);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _setLoading(false);
+      _setError(_getFriendlyErrorMessage(e.code));
+      return false;
+    } catch (e) {
+      _setLoading(false);
+      _setError("An unexpected error occurred.");
+      return false;
+    }
+  }
+
+  // Sign Out
+  Future<void> signOut() async {
+    _setLoading(true);
+    try {
+      await _auth.signOut();
+    } finally {
+      _setLoading(false);
+    }
+  }
