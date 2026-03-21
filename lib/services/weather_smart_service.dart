@@ -26,3 +26,13 @@ class WeatherSmartService extends ChangeNotifier {
       }
     });
   }
+
+   List<PlotModel> get plots => _plots;
+  List<Map<String, dynamic>> get logs => _activities;
+  String get advice => MockData.farmingAdvice;
+  bool get isDarkMode => _isDarkMode;
+
+  void toggleDarkMode(bool value) {
+    _isDarkMode = value;
+    notifyListeners();
+  }
