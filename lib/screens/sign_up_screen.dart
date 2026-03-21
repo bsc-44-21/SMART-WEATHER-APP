@@ -29,22 +29,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-                            FarmingCard(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+              FarmingCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 48,
+                ),
                 child: Column(
                   children: [
                     const AppLogo(size: 64),
                     const SizedBox(height: 24),
                     Text(
                       'Create Account',
-                      style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 32),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.displayLarge?.copyWith(fontSize: 32),
                     ),
                     Text(
                       'Join WeatherSmart today',
                       style: Theme.of(context).textTheme.labelSmall,
                     ),
                     const SizedBox(height: 40),
-                                        CustomTextField(
+                    CustomTextField(
                       label: 'FULL NAME',
                       hint: 'John Doe',
                       controller: _fullNameController,
@@ -62,8 +67,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
                       isPassword: true,
-                      onToggleVisibility: () =>
-                          setState(() => _isPasswordVisible = !_isPasswordVisible),
+                      onToggleVisibility: () => setState(
+                        () => _isPasswordVisible = !_isPasswordVisible,
+                      ),
                     ),
                     const SizedBox(height: 20),
                     CustomTextField(
@@ -72,11 +78,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       controller: _confirmPasswordController,
                       obscureText: !_isPasswordVisible,
                       isPassword: true,
-                      onToggleVisibility: () =>
-                          setState(() => _isPasswordVisible = !_isPasswordVisible),
+                      onToggleVisibility: () => setState(
+                        () => _isPasswordVisible = !_isPasswordVisible,
+                      ),
                     ),
                     const SizedBox(height: 24),
-                                        Row(
+                    Row(
                       children: [
                         Checkbox(
                           value: _agreedToTerms,
@@ -90,19 +97,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Expanded(
                           child: Text(
                             'I agree to the Terms & Conditions and Privacy Policy',
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelSmall
-                                ?.copyWith(fontSize: 12),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.labelSmall?.copyWith(fontSize: 12),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 24),
-                                        Consumer<AuthService>(
+                    Consumer<AuthService>(
                       builder: (context, authService, child) {
                         return ElevatedButton(
-                                                    onPressed: _agreedToTerms && !authService.isLoading
+                          onPressed: _agreedToTerms && !authService.isLoading
                               ? () async {
                                   if (_passwordController.text !=
                                       _confirmPasswordController.text) {
@@ -115,23 +121,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     return;
                                   }
 
-                                  final success =
-                                      await authService.signUpWithEmailAndPassword(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                    _fullNameController.text,
-                                  );
+                                  final success = await authService
+                                      .signUpWithEmailAndPassword(
+                                        _emailController.text,
+                                        _passwordController.text,
+                                        _fullNameController.text,
+                                      );
 
                                   if (success && context.mounted) {
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (_) => const AuthScreen()),
+                                        builder: (_) => const AuthScreen(),
+                                      ),
                                     );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                            'Account created! Plase log in again.'),
+                                          'Account created! Plase log in again.',
+                                        ),
                                         backgroundColor: Colors.green,
                                       ),
                                     );
@@ -139,8 +147,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content:
-                                            Text(authService.errorMessage!),
+                                        content: Text(
+                                          authService.errorMessage!,
+                                        ),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -167,5 +176,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         );
                       },
                     ),
-  
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const AuthScreen()),
+                  );
+                },
+                child: Text(
+                  'Already have an account? Log In',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
