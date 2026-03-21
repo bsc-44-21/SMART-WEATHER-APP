@@ -59,3 +59,80 @@ final bool isEditing = existingPlot != null;
                       enabled: !isSaving,
                       decoration: const InputDecoration(labelText: 'Size (e.g., 1.5 Ha)'),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please 
+                      enter the size' : null,
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isSaving 
+                          ? null 
+                          : () async {
+                              if (!formKey.currentState!.validate()) return;
+                              
+                              setModalState(() => isSaving = true);
+                              
+                              final user = context.read<AuthService>().user;
+                              if (user == null) {
+                                setModalState(() => isSaving = false);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Error: Not logged in')),
+                                );
+                                return;
+                              }
+
+                              final plotName = nameController.text.trim();
+                              final plot = PlotModel(
+                                id: isEditing ? existingPlot!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+                                name: plotName,
+                                location: locationController.text.trim(),
+                                size: sizeController.text.trim(),
+                                date: isEditing ? existingPlot!.date : DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                                userId: user.uid,
+                                status: isEditing ? existingPlot!.status : 'Active Growth',
+                              );
+                              
+                              try {
+                                if (isEditing) {
+                                  await context.read<WeatherSmartService>().updatePlot(plot);
+                                } else {
+                                  await context.read<WeatherSmartService>().addPlot(plot);
+                                }
+
+                                if (context.mounted) {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(isEditing ? 'Plot "$plotName" updated!' : 'Plot "$plotName" successfully created!'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                }
+                              } catch (e) {
+                                if (context.mounted) {
+                                  setModalState(() => isSaving = false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Failed to create plot: $e'), backgroundColor: Colors.red),
+                                                                      );
+                                }
+                              }
+                            },
+                        child: isSaving 
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
+                          : Text(isEditing ? 'Update Plot' : 'Save Plot'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
