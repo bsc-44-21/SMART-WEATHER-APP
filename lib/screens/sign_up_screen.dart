@@ -102,5 +102,70 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         Consumer<AuthService>(
                       builder: (context, authService, child) {
                         return ElevatedButton(
+                                                    onPressed: _agreedToTerms && !authService.isLoading
+                              ? () async {
+                                  if (_passwordController.text !=
+                                      _confirmPasswordController.text) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Passwords do not match'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  final success =
+                                      await authService.signUpWithEmailAndPassword(
+                                    _emailController.text,
+                                    _passwordController.text,
+                                    _fullNameController.text,
+                                  );
+
+                                  if (success && context.mounted) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (_) => const AuthScreen()),
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Account created! Plase log in again.'),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  } else if (authService.errorMessage != null &&
+                                      context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            Text(authService.errorMessage!),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
+                              : null,
+                          child: authService.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(LucideIcons.userPlus, size: 20),
+                                    SizedBox(width: 8),
+                                    Text('Sign Up'),
+                                  ],
+                                ),
+                        );
+                      },
+                    ),
   
 }
