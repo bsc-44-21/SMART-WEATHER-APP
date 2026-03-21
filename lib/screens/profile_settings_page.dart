@@ -202,4 +202,11 @@ class _SettingsTile extends StatelessWidget {
                 onChanged: onChanged,
                 activeColor: AppTheme.primaryAccent,
               )
-
+else
+              const Icon(LucideIcons.chevronRight, size: 20, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+}
