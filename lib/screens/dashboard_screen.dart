@@ -24,3 +24,21 @@ class _MainLayoutState extends State<MainLayout> {
     LogPage(),
     ProfileSettingsPage(),
   ];
+@override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: _pages[_selectedIndex],
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.only(top: 8, bottom: 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
