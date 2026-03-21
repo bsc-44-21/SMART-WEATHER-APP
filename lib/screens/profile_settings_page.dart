@@ -109,3 +109,12 @@ class ProfileSettingsPage extends StatelessWidget {
                     color: AppTheme.primaryAccent,
                     borderRadius: BorderRadius.circular(12),
                   ),
+                   child: const Text('Premium Plan', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
