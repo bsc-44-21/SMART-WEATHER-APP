@@ -32,3 +32,20 @@ class HomePage extends StatelessWidget {
                 onDelete: () => showDeleteConfirmationDialog(context, plot: plot),
               ),
             )),
+                        const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => showCreatePlotBottomSheet(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                foregroundColor: Theme.of(context).primaryColor,
+                elevation: 0,
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(LucideIcons.plus, size: 20),
+                  SizedBox(width: 8),
+                  Text('Add Another Plot'),
+                ],
+              ),
+            ),
