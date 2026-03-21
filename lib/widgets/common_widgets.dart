@@ -172,3 +172,20 @@ class PlotInfoCard extends StatelessWidget {
   }
 }
 
+class CustomTextField extends StatelessWidget {
+  final String label;
+  final String hint;
+  final TextEditingController controller;
+  final bool obscureText;
+  final bool isPassword;
+  final VoidCallback? onToggleVisibility;
+
+  const CustomTextField({
+    super.key,
+    required this.label,
+    required this.hint,
+    required this.controller,
+    this.obscureText = false,
+    this.isPassword = false,
+    this.onToggleVisibility,
+  });
