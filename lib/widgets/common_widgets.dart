@@ -70,3 +70,31 @@ class PlotInfoCard extends StatelessWidget {
     this.onEdit,
     this.onDelete,
   });
+
+   @override
+  Widget build(BuildContext context) {
+    return FarmingCard(
+      padding: const EdgeInsets.all(24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const AppLogo(size: 48, backgroundColor: Color(0xFFF0F0E8)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(child: Text(plot.name, style: Theme.of(context).textTheme.titleLarge)),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(LucideIcons.edit, size: 18),
+                          onPressed: onEdit,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          color: Theme.of(context).primaryColor,
+                          tooltip: 'Edit Plot',
+                        ),
