@@ -131,3 +131,37 @@ class ProfileSettingsPage extends StatelessWidget {
           ),
         ],
       ),
+      child: Column(
+        children: List.generate(tiles.length, (index) {
+          final tile = tiles[index];
+          return Column(
+            children: [
+              tile,
+              if (index < tiles.length - 1)
+                Divider(height: 1, thickness: 1, color: Colors.grey.shade100, indent: 64, endIndent: 24),
+            ],
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String? subtitle;
+  final VoidCallback? onTap;
+  final bool isSwitch;
+  final bool switchValue;
+  final ValueChanged<bool>? onChanged;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.title,
+    this.subtitle,
+    this.onTap,
+    this.isSwitch = false,
+    this.switchValue = false,
+    this.onChanged,
+  });
