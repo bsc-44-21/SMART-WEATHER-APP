@@ -52,3 +52,26 @@ class ProfileSettingsPage extends StatelessWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 foregroundColor: Colors.red,
               ),
+              onPressed: () async {
+                await context.read<AuthService>().signOut();
+                if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const AuthScreen()),
+                  );
+                }
+              },
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                   Icon(LucideIcons.logOut, size: 20),
+                   SizedBox(width: 8),
+                   Text('Log Out', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+        ],
+      ),
+    );
+  }
