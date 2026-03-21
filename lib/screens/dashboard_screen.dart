@@ -66,3 +66,14 @@ class _MainLayoutState extends State<MainLayout> {
     final bool isSelected = _selectedIndex == index;
     return BottomNavigationBarItem(
       icon: Container(
+         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.background : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Icon(icon, size: 24),
+      ),
+      label: label,
+    );
+  }
+}
