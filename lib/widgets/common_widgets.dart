@@ -98,3 +98,77 @@ class PlotInfoCard extends StatelessWidget {
                           color: Theme.of(context).primaryColor,
                           tooltip: 'Edit Plot',
                         ),
+
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(LucideIcons.trash2, size: 18),
+                          onPressed: onDelete,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          color: Colors.red.shade400,
+                          tooltip: 'Delete Plot',
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(LucideIcons.mapPin, size: 14, color: AppTheme.textMuted),
+                    const SizedBox(width: 4),
+                    Text(plot.location, style: Theme.of(context).textTheme.labelSmall),
+                    const SizedBox(width: 12),
+                    Icon(LucideIcons.calendar, size: 14, color: AppTheme.textMuted),
+                    const SizedBox(width: 4),
+                    Text(plot.date, style: Theme.of(context).textTheme.labelSmall),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(LucideIcons.ruler, size: 14, color: AppTheme.textMuted),
+                    const SizedBox(width: 4),
+                    Text(plot.size, style: Theme.of(context).textTheme.labelSmall),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE8F5E9),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFFC8E6C9)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF4CAF50),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        plot.status,
+                        style: const TextStyle(
+                          color: Color(0xFF2E7D32),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
