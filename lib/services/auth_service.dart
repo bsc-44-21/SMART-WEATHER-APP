@@ -6,3 +6,7 @@ class AuthService extends ChangeNotifier {
   User? _user;
   bool _isLoading = false;
   String? _errorMessage;
+    // Getters
+  User? get user => _user;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
