@@ -31,3 +31,15 @@ class FirestoreService {
         .map((snapshot) => snapshot.docs
             .map((doc) => PlotModel.fromMap(doc.data(), doc.id))
             .toList());
+             }
+
+  // Delete a plot
+  Future<void> deletePlot(String plotId) async {
+     try {
+      await _db.collection('plots').doc(plotId).delete();
+    } catch (e) {
+      print('Error deleting plot: $e');
+      rethrow;
+    }
+  }
+}
