@@ -67,4 +67,19 @@ class _LogPageState extends State<LogPage> {
                           decoration: InputDecoration(
                             hintText: 'Record an activity (e.g., Apple Harvest)',
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), 
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                             ),
+                          onSubmitted: (_) => _addActivity(context),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      InkWell(
+                        onTap: () => _addActivity(context),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryAccent,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(LucideIcons.plus, color: Colors.white), 
