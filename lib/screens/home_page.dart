@@ -32,7 +32,7 @@ class HomePage extends StatelessWidget {
                 onDelete: () => showDeleteConfirmationDialog(context, plot: plot),
               ),
             )),
-                        const SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () => showCreatePlotBottomSheet(context),
               style: ElevatedButton.styleFrom(
@@ -49,3 +49,21 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
+            ] else
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 48),
+                FarmingCard(
+                  padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 32),
+                  child: Column(
+                    children: [
+                      const AppLogo(size: 84, backgroundColor: Color(0xFFF0F0E8)),
+                      const SizedBox(height: 32),
+                      Text('Welcome to WeatherSmart', style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Create your first farming plot to start receiving intelligent weather-based advice and pest detection.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textMuted),
+                        textAlign: TextAlign.center,
+                      ),
