@@ -28,3 +28,28 @@ class _LogPageState extends State<LogPage> {
     // Dismiss keyboard
     FocusManager.instance.primaryFocus?.unfocus();
   }
+   @override
+  Widget build(BuildContext context) {
+    final plots = context.watch<WeatherSmartService>().plots;
+    final logs = context.watch<WeatherSmartService>().logs;
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          if (plots.isNotEmpty)
+            PlotInfoCard(
+              plot: plots[0],
+            ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: FarmingCard(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(LucideIcons.settings, size: 20),
+                      const SizedBox(width: 16),
+                      const AppLogo(size: 40, backgroundColor: 
