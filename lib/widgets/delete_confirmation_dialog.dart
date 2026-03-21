@@ -34,3 +34,9 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotMo
                   ),
                   onChanged: (_) => setDialogState(() {}),
                 ),
+                            ],
+            actions: [
+              TextButton(
+                onPressed: isSaving ? null : () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
