@@ -61,3 +61,8 @@ class _MainLayoutState extends State<MainLayout> {
       ),
     );
   }
+
+  BottomNavigationBarItem _buildNavItem(IconData icon, String label, int index) {
+    final bool isSelected = _selectedIndex == index;
+    return BottomNavigationBarItem(
+      icon: Container(
