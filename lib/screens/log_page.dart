@@ -52,4 +52,19 @@ class _LogPageState extends State<LogPage> {
                     children: [
                       const Icon(LucideIcons.settings, size: 20),
                       const SizedBox(width: 16),
-                      const AppLogo(size: 40, backgroundColor: 
+                      const AppLogo(size: 40, backgroundColor:
+                      Color(0xFFE3F2FD)),
+                      const SizedBox(width: 16),
+                      Text('Activity Log', style: Theme.of(context).textTheme.titleLarge),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _activityController,
+                          decoration: InputDecoration(
+                            hintText: 'Record an activity (e.g., Apple Harvest)',
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), 
