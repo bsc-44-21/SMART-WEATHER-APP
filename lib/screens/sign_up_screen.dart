@@ -29,5 +29,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+                            FarmingCard(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+                child: Column(
+                  children: [
+                    const AppLogo(size: 64),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Create Account',
+                      style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 32),
+                    ),
+                    Text(
+                      'Join WeatherSmart today',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                    const SizedBox(height: 40),
   
 }
