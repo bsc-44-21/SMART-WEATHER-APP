@@ -42,3 +42,13 @@ class ProfileSettingsPage extends StatelessWidget {
             _SettingsTile(icon: LucideIcons.fileText, title: 'Terms of Service', onTap: () {}),
             _SettingsTile(icon: LucideIcons.shield, title: 'Privacy Policy', onTap: () {}),
           ]),
+           const SizedBox(height: 32),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: const BorderSide(color: Colors.red, width: 2),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                foregroundColor: Colors.red,
+              ),
