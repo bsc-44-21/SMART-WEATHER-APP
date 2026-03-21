@@ -6,3 +6,10 @@ import 'plots_page.dart';
 import 'advice_page.dart';
 import 'log_page.dart';
 import 'profile_settings_page.dart';
+
+class MainLayout extends StatefulWidget {
+  const MainLayout({super.key});
+
+  @override
+  State<MainLayout> createState() => _MainLayoutState();
+}
