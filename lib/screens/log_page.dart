@@ -83,3 +83,26 @@ class _LogPageState extends State<LogPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Icon(LucideIcons.plus, color: Colors.white), 
+                          ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: logs.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(LucideIcons.clipboardList, size: 64, color: Colors.grey.shade400),
+                                const SizedBox(height: 24),
+                                Text('Ready to record', style: Theme.of(context).textTheme.titleLarge),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Log your farm activities to keep an accurate history.',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textMuted),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          )
