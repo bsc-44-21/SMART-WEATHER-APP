@@ -23,3 +23,22 @@ class ProfileSettingsPage extends StatelessWidget {
           _buildSettingsSection([
             _SettingsTile(icon: LucideIcons.bell, title: 'Notifications', onTap: () {}),
             _SettingsTile(icon: LucideIcons.globe, title: 'Language', subtitle: 'English',
+            onTap: () {}),
+            _SettingsTile(
+              icon: LucideIcons.moon, 
+              title: 'Dark Mode', 
+              isSwitch: true, 
+              switchValue: context.watch<WeatherSmartService>().isDarkMode, 
+              onChanged: (v) {
+                context.read<WeatherSmartService>().toggleDarkMode(v);
+              }
+            ),
+          ]),
+          const SizedBox(height: 32),
+          Text('Support', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 16),
+          _buildSettingsSection([
+            _SettingsTile(icon: LucideIcons.helpCircle, title: 'Help Center', onTap: () {}),
+            _SettingsTile(icon: LucideIcons.fileText, title: 'Terms of Service', onTap: () {}),
+            _SettingsTile(icon: LucideIcons.shield, title: 'Privacy Policy', onTap: () {}),
+          ]),
