@@ -99,5 +99,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ],
                     ),
                     const SizedBox(height: 24),
+                                        Consumer<AuthService>(
+                      builder: (context, authService, child) {
+                        return ElevatedButton(
   
 }
