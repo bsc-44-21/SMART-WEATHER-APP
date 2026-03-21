@@ -16,3 +16,13 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
     });
   }
+    // Setters for Loading & Errors
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void _setError(String? message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
