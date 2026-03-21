@@ -58,3 +58,15 @@ class AppLogo extends StatelessWidget {
     );
   }
 }
+
+class PlotInfoCard extends StatelessWidget {
+  final PlotModel plot;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const PlotInfoCard({
+    super.key,
+    required this.plot,
+    this.onEdit,
+    this.onDelete,
+  });
