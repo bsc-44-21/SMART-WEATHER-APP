@@ -13,3 +13,14 @@ class MainLayout extends StatefulWidget {
   @override
   State<MainLayout> createState() => _MainLayoutState();
 }
+
+class _MainLayoutState extends State<MainLayout> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _pages = [
+    HomePage(),
+    PlotsPage(),
+    AdvicePage(),
+    LogPage(),
+    ProfileSettingsPage(),
+  ];
