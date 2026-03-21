@@ -67,3 +67,19 @@ class HomePage extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textMuted),
                         textAlign: TextAlign.center,
                       ),
+                      const SizedBox(height: 48),
+                      ElevatedButton(
+                        onPressed: () => showCreatePlotBottomSheet(context),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(LucideIcons.plus, size: 20),
+                            SizedBox(width: 8),
+                            Text('Create Farming Plot'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
