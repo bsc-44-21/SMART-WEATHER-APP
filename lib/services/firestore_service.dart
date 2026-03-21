@@ -13,3 +13,12 @@ class FirestoreService {
       rethrow;
     }
   }
+  // Update an existing plot in Firestore
+  Future<void> updatePlot(PlotModel plot) async {
+    try {
+      await _db.collection('plots').doc(plot.id).update(plot.toMap());
+    } catch (e) {
+      print('Error updating plot: $e');
+      rethrow;
+    }
+  }
