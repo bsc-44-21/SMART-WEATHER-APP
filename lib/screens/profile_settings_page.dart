@@ -118,3 +118,16 @@ class ProfileSettingsPage extends StatelessWidget {
       ),
     );
   }
+   Widget _buildSettingsSection(List<_SettingsTile> tiles) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
