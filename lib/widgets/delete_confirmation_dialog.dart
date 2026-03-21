@@ -18,3 +18,19 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotMo
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                                const Text('This action cannot be undone. To confirm, type the plot name below:'),
+                const SizedBox(height: 16),
+                Text(
+                  plot.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  enabled: !isSaving,
+                  decoration: const InputDecoration(
+                    hintText: 'Type plot name here',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (_) => setDialogState(() {}),
+                ),
