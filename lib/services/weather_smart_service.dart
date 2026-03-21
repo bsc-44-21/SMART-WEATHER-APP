@@ -36,3 +36,15 @@ class WeatherSmartService extends ChangeNotifier {
     _isDarkMode = value;
     notifyListeners();
   }
+
+  Future<void> addPlot(PlotModel plot) async {
+    await FirestoreService().savePlot(plot);
+  }
+
+  Future<void> updatePlot(PlotModel plot) async {
+    await FirestoreService().updatePlot(plot);
+  }
+
+  Future<void> deletePlot(String plotId) async {
+    await FirestoreService().deletePlot(plotId);
+  }
