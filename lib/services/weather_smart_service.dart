@@ -11,3 +11,18 @@ class WeatherSmartService extends ChangeNotifier {
   final List<Map<String, dynamic>> _activities = List.from(MockData.activities);
   bool _isDarkMode = false;
   StreamSubscription? _plotsSubscription;
+
+ WeatherSmartService() {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      _plotsSubscription?.cancel();
+      if (user != null) {
+        _plotsSubscription = FirestoreService().getUserPlotsStream(user.uid).listen((plots) {
+          _plots = plots;
+          notifyListeners();
+        });
+      } else {
+        _plots = [];
+        notifyListeners();
+      }
+    });
+  }
