@@ -40,3 +40,28 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotMo
                 onPressed: isSaving ? null : () => Navigator.pop(context),
                 child: const Text('Cancel'),
               ),
+                            ElevatedButton(
+                onPressed: (isMatch && !isSaving)
+                    ? () async {
+                        setDialogState(() => isSaving = true);
+                        try {
+                          await context.read<WeatherSmartService>().deletePlot(plot.id);
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Plot "${plot.name}" deleted.')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            setDialogState(() => isSaving = false);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Delete failed: $e'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    : null,
