@@ -65,3 +65,25 @@ Future<void> showDeleteConfirmationDialog(BuildContext context, {required PlotMo
                         }
                       }
                     : null,
+                                    style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                child: isSaving
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Delete Plot'),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
