@@ -27,3 +27,32 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+                            FarmingCard(
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
+                child: Column(
+                  children: [
+                    const AppLogo(size: 80),
+                    const SizedBox(height: 24),
+                    Text('WeatherSmart', style: Theme.of(context).textTheme.displayLarge),
+                    Text('Intelligent Farming Assistant', style: Theme.of(context).textTheme.labelSmall),
+                    const SizedBox(height: 48),
+                    CustomTextField(
+                      label: 'EMAIL',
+                      hint: 'example@gmail.com',
+                      controller: _emailController,
+                    ),
+                    const SizedBox(height: 24),
+                    CustomTextField(
+                      label: 'PASSWORD',
+                      hint: '••••••••',
+                      controller: _passwordController,
+                      obscureText: !_isPasswordVisible,
+                      isPassword: true,
+                      onToggleVisibility: () {
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 40),
+                    
