@@ -165,3 +165,26 @@ class _SettingsTile extends StatelessWidget {
     this.switchValue = false,
     this.onChanged,
   });
+   @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: isSwitch ? () => onChanged?.call(!switchValue) : onTap,
+      borderRadius: BorderRadius.circular(24),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryAccent.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 20, color: AppTheme.primaryAccent),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, 
