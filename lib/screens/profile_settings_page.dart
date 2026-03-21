@@ -75,3 +75,37 @@ class ProfileSettingsPage extends StatelessWidget {
       ),
     );
   }
+   Widget _buildProfileHeader(BuildContext context) {
+    final user = context.watch<AuthService>().user;
+    
+    return FarmingCard(
+      padding: const EdgeInsets.all(24),
+      child: Row(
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              color: AppTheme.primaryAccent.withOpacity(0.1),
+              shape: BoxShape.circle,
+              border: Border.all(color: AppTheme.primaryAccent, width: 2),
+            ),
+            child: const Center(
+              child: Icon(LucideIcons.user, size: 40, color: AppTheme.primaryAccent),
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(user?.displayName ?? 'Smart Farmer', style: Theme.of(context).textTheme.headlineMedium),
+                const SizedBox(height: 4),
+                Text(user?.email ?? 'Loading...', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textMuted)),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
