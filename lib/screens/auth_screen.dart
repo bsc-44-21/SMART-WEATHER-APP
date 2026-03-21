@@ -55,4 +55,6 @@ class _AuthScreenState extends State<AuthScreen> {
                       },
                     ),
                     const SizedBox(height: 40),
-                    
+                                        Consumer<AuthService>(
+                      builder: (context, authService, child) {
+                        return ElevatedButton(
