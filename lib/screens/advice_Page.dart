@@ -42,3 +42,20 @@ class _AdvicePageState extends State<AdvicePage> {
             PlotInfoCard(
               plot: plots[0],
             ),
+             const SizedBox(height: 16),
+          Expanded(
+            child: FarmingCard(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const AppLogo(size: 40, backgroundColor: Color(0xFFFFF9C4)),
+                      const SizedBox(width: 16),
+                      Text('Farming Advice', style: Theme.of(context).textTheme.titleLarge),
+                      const Spacer(),
+                      const Icon(LucideIcons.refreshCw, size: 20),
+                    ],
+                  ),
