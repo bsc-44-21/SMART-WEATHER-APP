@@ -58,8 +58,7 @@ final bool isEditing = existingPlot != null;
                       controller: sizeController,
                       enabled: !isSaving,
                       decoration: const InputDecoration(labelText: 'Size (e.g., 1.5 Ha)'),
-                      validator: (value) => value == null || value.trim().isEmpty ? 'Please 
-                      enter the size' : null,
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter the size' : null,
                     ),
                     const SizedBox(height: 32),
                     SizedBox(
@@ -83,13 +82,13 @@ final bool isEditing = existingPlot != null;
 
                               final plotName = nameController.text.trim();
                               final plot = PlotModel(
-                                id: isEditing ? existingPlot!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+                                id: isEditing ? existingPlot.id : DateTime.now().millisecondsSinceEpoch.toString(),
                                 name: plotName,
                                 location: locationController.text.trim(),
                                 size: sizeController.text.trim(),
-                                date: isEditing ? existingPlot!.date : DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                                date: isEditing ? existingPlot.date : DateFormat('yyyy-MM-dd').format(DateTime.now()),
                                 userId: user.uid,
-                                status: isEditing ? existingPlot!.status : 'Active Growth',
+                                status: isEditing ? existingPlot.status : 'Active Growth',
                               );
                               
                               try {

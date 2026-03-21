@@ -9,7 +9,6 @@ class FirestoreService {
     try {
       await _db.collection('plots').doc(plot.id).set(plot.toMap());
     } catch (e) {
-      print('Error saving plot: $e');
       rethrow;
     }
   }
@@ -18,7 +17,6 @@ class FirestoreService {
     try {
       await _db.collection('plots').doc(plot.id).update(plot.toMap());
     } catch (e) {
-      print('Error updating plot: $e');
       rethrow;
     }
   }
@@ -38,7 +36,6 @@ class FirestoreService {
      try {
       await _db.collection('plots').doc(plotId).delete();
     } catch (e) {
-      print('Error deleting plot: $e');
       rethrow;
     }
   }
