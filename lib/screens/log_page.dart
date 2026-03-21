@@ -106,3 +106,25 @@ class _LogPageState extends State<LogPage> {
                               ],
                             ),
                           )
+                          : ListView.builder(
+                            itemCount: logs.length,
+                            itemBuilder: (context, index) {
+                              final log = logs[index];
+                              return ListTile(
+                                leading: const Icon(LucideIcons.checkSquare, color: AppTheme.primaryAccent),
+                                title: Text(log['title'] ?? ''),
+                                subtitle: Text(log['time'] ?? '', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                                contentPadding: EdgeInsets.zero,
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
