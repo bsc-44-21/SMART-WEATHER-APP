@@ -1,4 +1,4 @@
-mport 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
 import '../models/plot.dart';
@@ -8,7 +8,7 @@ class FarmingCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
 
-  onst FarmingCard({
+  const FarmingCard({
     super.key,
     required this.child,
     this.padding,
