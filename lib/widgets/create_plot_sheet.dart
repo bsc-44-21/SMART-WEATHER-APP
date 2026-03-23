@@ -82,13 +82,13 @@ final bool isEditing = existingPlot != null;
 
                               final plotName = nameController.text.trim();
                               final plot = PlotModel(
-                                id: isEditing ? existingPlot!.id : DateTime.now().millisecondsSinceEpoch.toString(),
+                                id: isEditing ? existingPlot.id : DateTime.now().millisecondsSinceEpoch.toString(),
                                 name: plotName,
                                 location: locationController.text.trim(),
                                 size: sizeController.text.trim(),
-                                date: isEditing ? existingPlot!.date : DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                                date: isEditing ? existingPlot.date : DateFormat('yyyy-MM-dd').format(DateTime.now()),
                                 userId: user.uid,
-                                status: isEditing ? existingPlot!.status : 'Active Growth',
+                                status: isEditing ? existingPlot.status : 'Active Growth',
                               );
                               
                               try {
