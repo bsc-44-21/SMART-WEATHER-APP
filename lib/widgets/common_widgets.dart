@@ -189,6 +189,7 @@ class CustomTextField extends StatelessWidget {
     this.isPassword = false,
     this.onToggleVisibility,
   });
+
   @override
   Widget build(BuildContext context) {
     return Column(
