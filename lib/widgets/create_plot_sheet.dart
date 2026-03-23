@@ -58,8 +58,7 @@ final bool isEditing = existingPlot != null;
                       controller: sizeController,
                       enabled: !isSaving,
                       decoration: const InputDecoration(labelText: 'Size (e.g., 1.5 Ha)'),
-                      validator: (value) => value == null || value.trim().isEmpty ? 'Please 
-                      enter the size' : null,
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter the size' : null,
                     ),
                     const SizedBox(height: 32),
                     SizedBox(

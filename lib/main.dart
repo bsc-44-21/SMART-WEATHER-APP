@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'core/theme.dart';
 import 'screens/auth_screen.dart';
+import 'screens/dashboard_screen.dart';
 import 'services/weather_smart_service.dart';
 import 'services/auth_service.dart';
 
@@ -26,13 +27,29 @@ class WeatherSmartApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = context.watch<WeatherSmartService>().isDarkMode;
+
     return MaterialApp(
       title: 'WeatherSmart',
       theme: AppTheme.theme,
       darkTheme: AppTheme.darkTheme,
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const AuthScreen(),
+      home: const AuthWrapper(),
       debugShowCheckedModeBanner: false,
     );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final user = context.watch<AuthService>().user;
+
+    if (user != null) {
+      return MainLayout();
+    } else {
+      return AuthScreen();
+    }
   }
 }
