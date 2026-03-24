@@ -77,3 +77,5 @@ class WeatherLocationService {
       return null;
     }
   }
+
+  static String getWeatherDescription(int weatherCode) {
