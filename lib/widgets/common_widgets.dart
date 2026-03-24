@@ -195,21 +195,21 @@ class CustomTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label.toUpperCase(),
-          style: Theme.of(context).textTheme.labelLarge,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(label, style: Theme.of(context).textTheme.labelLarge),
         ),
-        const SizedBox(height: 8),
         TextField(
           controller: controller,
           obscureText: obscureText,
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: TextStyle(color: Colors.grey.shade400),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
-                      obscureText ? LucideIcons.eye : LucideIcons.eyeOff,
-                      size: 20,
+                      obscureText ? LucideIcons.eyeOff : LucideIcons.eye,
+                      color: Colors.grey.shade500,
                     ),
                     onPressed: onToggleVisibility,
                   )
