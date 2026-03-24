@@ -109,3 +109,18 @@ class WeatherLocationService {
 
     return weatherDescriptions[weatherCode] ?? 'Unknown';
   }
+
+static String getWeatherEmoji(int weatherCode) {
+    if (weatherCode == 0) return '☀️';
+    if (weatherCode == 1 || weatherCode == 2) return '⛅';
+    if (weatherCode == 3) return '☁️';
+    if (weatherCode == 45 || weatherCode == 48) return '🌫️';
+    if (weatherCode >= 51 && weatherCode <= 55) return '🌧️';
+    if (weatherCode >= 61 && weatherCode <= 65) return '🌧️';
+    if (weatherCode >= 71 && weatherCode <= 77) return '❄️';
+    if (weatherCode >= 80 && weatherCode <= 82) return '🌧️';
+    if (weatherCode >= 85 && weatherCode <= 86) return '🌨️';
+    if (weatherCode >= 95 && weatherCode <= 99) return '⛈️';
+    return '🌤️';
+  }
+}
