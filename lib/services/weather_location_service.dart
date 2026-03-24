@@ -19,3 +19,20 @@ class WeatherLocationService {
           return null;
         }
       }
+
+      
+      if (permission == LocationPermission.deniedForever) {
+        return null;
+      }
+
+     
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      return position;
+    } catch (e) {
+      print('Error getting location: $e');
+      return null;
+    }
+  }
