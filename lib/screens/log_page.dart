@@ -37,11 +37,7 @@ class _LogPageState extends State<LogPage> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          if (plots.isNotEmpty)
-            PlotInfoCard(
-              plot: plots[0],
-            ),
-          const SizedBox(height: 16),
+
           Expanded(
             child: FarmingCard(
               padding: const EdgeInsets.all(24),
