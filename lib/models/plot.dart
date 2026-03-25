@@ -2,6 +2,8 @@ class PlotModel {
   final String id;
   final String name;
   final String location;
+  final String latitude;
+  final String longitude;
   final String fieldSize;
   final String userId;
   final String plantingDate;
@@ -15,6 +17,8 @@ class PlotModel {
     required this.id,
     required this.name,
     required this.location,
+    required this.latitude,
+    required this.longitude,
     required this.fieldSize,
     required this.plantingDate,
     required this.userId,
@@ -30,6 +34,8 @@ class PlotModel {
       'id': id,
       'name': name,
       'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
       'field_size': fieldSize,
       'user_id': userId,
       'planting_date': plantingDate,
@@ -44,16 +50,18 @@ class PlotModel {
   factory PlotModel.fromMap(Map<String, dynamic> map, String docId) {
     return PlotModel(
       id: docId,
-      name: map['name'] ?? '',
-      location: map['location'] ?? '',
-      fieldSize: map['field_size'] ?? map['size'] ?? '',
-      plantingDate: map['planting_date'] ?? map['date'] ?? '',
-      userId: map['user_id'] ?? map['userId'] ?? '',
-      cropId: map['crop_id'] ?? '',
-      cropName: map['crop_name'] ?? '',
-      createdAt: map['created_at'] ?? '',
-      modifiedAt: map['modified_at'] ?? '',
-      status: map['status'] ?? 'Active Growth',
+      name: (map['name'] ?? '').toString(),
+      location: (map['location'] ?? '').toString(),
+      latitude: (map['latitude'] ?? '').toString(),
+      longitude: (map['longitude'] ?? '').toString(),
+      fieldSize: (map['field_size'] ?? map['size'] ?? '').toString(),
+      plantingDate: (map['planting_date'] ?? map['date'] ?? '').toString(),
+      userId: (map['user_id'] ?? map['userId'] ?? '').toString(),
+      cropId: (map['crop_id'] ?? '').toString(),
+      cropName: (map['crop_name'] ?? '').toString(),
+      createdAt: (map['created_at'] ?? '').toString(),
+      modifiedAt: (map['modified_at'] ?? '').toString(),
+      status: (map['status'] ?? 'Active Growth').toString(),
     );
   }
 }

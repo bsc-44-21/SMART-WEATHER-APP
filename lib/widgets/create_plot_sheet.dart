@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/weather_smart_service.dart';
+import '../services/weather_location_service.dart';
 import '../services/auth_service.dart';
 import '../models/plot.dart';
 
@@ -21,6 +22,10 @@ final bool isEditing = existingPlot != null;
       bool isSaving = false;
       String? selectedCrop = existingPlot?.cropName;
       String? selectedCropId = existingPlot?.cropId;
+      String currentLat = existingPlot?.latitude ?? '';
+      String currentLong = existingPlot?.longitude ?? '';
+      bool isFetchingLocation = false;
+
       final List<Map<String, String>> crops = [
         {'id': '1', 'name': 'Maize'},
         {'id': '2', 'name': 'Tomato'},
@@ -57,9 +62,35 @@ final bool isEditing = existingPlot != null;
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: locationController,
-                      enabled: !isSaving,
-                      decoration: const InputDecoration(labelText: 'Location (e.g. Sector 4)'),
-                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a location' : null,
+                      enabled: !isSaving && !isFetchingLocation,
+                      decoration: InputDecoration(
+                        labelText: 'Location Name (e.g. Sector 4)',
+                        suffixIcon: isFetchingLocation 
+                          ? const SizedBox(width: 20, height: 20, child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator(strokeWidth: 2)))
+                          : IconButton(
+                              icon: const Icon(Icons.my_location),
+                              onPressed: () async {
+                                setModalState(() => isFetchingLocation = true);
+                                final pos = await WeatherLocationService.getLocationWithPermission();
+                                if (pos != null) {
+                                  setModalState(() {
+                                    currentLat = pos.latitude.toString();
+                                    currentLong = pos.longitude.toString();
+                                    isFetchingLocation = false;
+                                  });
+                                } else {
+                                  setModalState(() => isFetchingLocation = false);
+                                  if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Failed to get location. Ensure location services are enabled.')),
+                                  );
+                                  }
+                                }
+                              },
+                            ),
+                          helperText: currentLat.isNotEmpty ? 'Location Captured: $currentLat, $currentLong' : 'Tap icon to capture current location',
+                      ),
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a location name' : null,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -131,12 +162,32 @@ final bool isEditing = existingPlot != null;
                                 return;
                               }
 
+                                // Try to capture location if not already captured
+                                if (currentLat.isEmpty || currentLong.isEmpty) {
+                                  setModalState(() => isSaving = true); // Use isSaving to show progress
+                                   final pos = await WeatherLocationService.getLocationWithPermission();
+                                   if (pos != null) {
+                                     currentLat = pos.latitude.toString();
+                                     currentLong = pos.longitude.toString();
+                                   } else {
+                                     setModalState(() => isSaving = false);
+                                     if (context.mounted) {
+                                       ScaffoldMessenger.of(context).showSnackBar(
+                                         const SnackBar(content: Text('Could not capture location automatically. Please tap the location icon or enable GPS.')),
+                                       );
+                                     }
+                                     return;
+                                   }
+                                }
+
                               final now = DateTime.now().toIso8601String();
                               final plotName = nameController.text.trim();
                               final plot = PlotModel(
                                 id: isEditing ? existingPlot.id : DateTime.now().millisecondsSinceEpoch.toString(),
                                 name: plotName,
                                 location: locationController.text.trim(),
+                                latitude: currentLat,
+                                longitude: currentLong,
                                 fieldSize: sizeController.text.trim(),
                                 plantingDate: dateController.text.trim(),
                                 userId: user.uid,
