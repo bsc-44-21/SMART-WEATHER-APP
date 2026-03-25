@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/common_widgets.dart';
 import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
@@ -14,15 +15,32 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final plots = context.watch<WeatherSmartService>().plots;
     final bool hasPlots = plots.isNotEmpty;
+    final user = FirebaseAuth.instance.currentUser;
+    final username = user?.displayName ?? user?.email?.split('@')[0] ?? 'Farmer';
     
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'Welcome $username,',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          const Text(
+            'Here are your active plots!!',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 24),
           if (hasPlots) ...[
-            Text('Your Active Plots', style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 16),
+            const SizedBox(height: 0),
             ...plots.map((plot) => Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: PlotInfoCard(
