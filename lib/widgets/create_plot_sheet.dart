@@ -11,6 +11,8 @@ void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) 
   final locationController = TextEditingController(text: existingPlot?.location);
   final sizeController = TextEditingController(text: existingPlot?.fieldSize);
   final dateController = TextEditingController(text: existingPlot?.plantingDate);
+  final latController = TextEditingController(text: existingPlot?.latitude);
+  final lngController = TextEditingController(text: existingPlot?.longitude);
   final formKey = GlobalKey<FormState>();
 final bool isEditing = existingPlot != null;
 
@@ -22,8 +24,6 @@ final bool isEditing = existingPlot != null;
       bool isSaving = false;
       String? selectedCrop = existingPlot?.cropName;
       String? selectedCropId = existingPlot?.cropId;
-      String currentLat = existingPlot?.latitude ?? '';
-      String currentLong = existingPlot?.longitude ?? '';
       bool isFetchingLocation = false;
 
       final List<Map<String, String>> crops = [
@@ -74,8 +74,8 @@ final bool isEditing = existingPlot != null;
                                 final pos = await WeatherLocationService.getLocationWithPermission();
                                 if (pos != null) {
                                   setModalState(() {
-                                    currentLat = pos.latitude.toString();
-                                    currentLong = pos.longitude.toString();
+                                    latController.text = pos.latitude.toString();
+                                    lngController.text = pos.longitude.toString();
                                     isFetchingLocation = false;
                                   });
                                 } else {
@@ -88,9 +88,38 @@ final bool isEditing = existingPlot != null;
                                 }
                               },
                             ),
-                          helperText: currentLat.isNotEmpty ? 'Location Captured: $currentLat, $currentLong' : 'Tap icon to capture current location',
                       ),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a location name' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: latController,
+                            enabled: !isSaving,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            decoration: const InputDecoration(
+                              labelText: 'Latitude',
+                              hintText: 'e.g. -13.9',
+                            ),
+                            validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextFormField(
+                            controller: lngController,
+                            enabled: !isSaving,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            decoration: const InputDecoration(
+                              labelText: 'Longitude',
+                              hintText: 'e.g. 33.7',
+                            ),
+                            validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -162,18 +191,18 @@ final bool isEditing = existingPlot != null;
                                 return;
                               }
 
-                                // Try to capture location if not already captured
-                                if (currentLat.isEmpty || currentLong.isEmpty) {
-                                  setModalState(() => isSaving = true); // Use isSaving to show progress
+                                // Capture location if fields are empty
+                                if (latController.text.isEmpty || lngController.text.isEmpty) {
+                                  setModalState(() => isSaving = true);
                                    final pos = await WeatherLocationService.getLocationWithPermission();
                                    if (pos != null) {
-                                     currentLat = pos.latitude.toString();
-                                     currentLong = pos.longitude.toString();
+                                     latController.text = pos.latitude.toString();
+                                     lngController.text = pos.longitude.toString();
                                    } else {
                                      setModalState(() => isSaving = false);
                                      if (context.mounted) {
                                        ScaffoldMessenger.of(context).showSnackBar(
-                                         const SnackBar(content: Text('Could not capture location automatically. Please tap the location icon or enable GPS.')),
+                                         const SnackBar(content: Text('Could not capture location automatically. Please enter coordinates manually or tap the icon.')),
                                        );
                                      }
                                      return;
@@ -186,8 +215,8 @@ final bool isEditing = existingPlot != null;
                                 id: isEditing ? existingPlot.id : DateTime.now().millisecondsSinceEpoch.toString(),
                                 name: plotName,
                                 location: locationController.text.trim(),
-                                latitude: currentLat,
-                                longitude: currentLong,
+                                latitude: latController.text.trim(),
+                                longitude: lngController.text.trim(),
                                 fieldSize: sizeController.text.trim(),
                                 plantingDate: dateController.text.trim(),
                                 userId: user.uid,

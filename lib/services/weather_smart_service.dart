@@ -109,28 +109,34 @@ class WeatherSmartService extends ChangeNotifier {
 
   Future<void> fetchWeatherForPlots() async {
     for (var plot in _plots) {
-      if (plot.latitude.isNotEmpty && plot.longitude.isNotEmpty) {
-        try {
-          final lat = double.parse(plot.latitude);
-          final lng = double.parse(plot.longitude);
-          final weather = await WeatherLocationService.fetchWeather(lat, lng);
-          if (weather != null) {
-            _plotWeather[plot.id] = weather;
-            notifyListeners();
-          }
-        } catch (e) {
-          print('[WeatherSmartService] Error fetching weather for plot ${plot.id}: $e');
+      await fetchWeatherForPlot(plot);
+    }
+  }
+
+  Future<void> fetchWeatherForPlot(PlotModel plot) async {
+    if (plot.latitude.isNotEmpty && plot.longitude.isNotEmpty) {
+      try {
+        final lat = double.parse(plot.latitude);
+        final lng = double.parse(plot.longitude);
+        final weather = await WeatherLocationService.fetchWeather(lat, lng);
+        if (weather != null) {
+          _plotWeather[plot.id] = weather;
+          notifyListeners();
         }
+      } catch (e) {
+        print('[WeatherSmartService] Error fetching weather for plot ${plot.id}: $e');
       }
     }
   }
 
   Future<void> addPlot(PlotModel plot) async {
     await FirestoreService().savePlot(plot);
+    await fetchWeatherForPlot(plot);
   }
 
   Future<void> updatePlot(PlotModel plot) async {
     await FirestoreService().updatePlot(plot);
+    await fetchWeatherForPlot(plot);
   }
 
   Future<void> deletePlot(String plotId) async {
