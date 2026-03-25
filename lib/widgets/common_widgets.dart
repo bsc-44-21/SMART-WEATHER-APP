@@ -146,7 +146,7 @@ class PlotInfoCard extends StatelessWidget {
           if (weatherData != null) _buildWeatherGrid(context, current, weatherCode),
           
           // Footer Status
-          _buildStatusFooter(context),
+          _buildStatusFooter(context, weatherData),
         ],
       ),
     );
@@ -327,7 +327,7 @@ class PlotInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusFooter(BuildContext context) {
+  Widget _buildStatusFooter(BuildContext context, Map<String, dynamic>? weatherData) {
     return Container(
       padding: const EdgeInsets.all(24),
       child: Row(
