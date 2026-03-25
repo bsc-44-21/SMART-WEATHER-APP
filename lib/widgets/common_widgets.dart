@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import '../services/weather_smart_service.dart';
@@ -94,218 +95,216 @@ class PlotInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final weatherData = context.watch<WeatherSmartService>().getPlotWeather(plot.id);
-    final current = weatherData?['current'];
-    final weatherCode = current?['weather_code'] ?? 0;
-    
-    // Dynamic Gradient based on weather
-    final Decoration cardDecoration = _getWeatherDecoration(context, weatherCode);
+    final fetchedAt = weatherData?['fetched_at'];
+    final current = weatherData?['current'] as Map<String, dynamic>?;
 
     return FarmingCard(
-      padding: EdgeInsets.zero,
-      decoration: cardDecoration,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(44),
+        border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: AppTheme.primaryAccent.withOpacity(0.03),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Section
-          Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCropIcon(),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              plot.name,
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+          // Zone 1: Identity & Actions
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryAccent.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: Icon(LucideIcons.sprout, color: AppTheme.primaryAccent, size: 28),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryAccent.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            plot.cropName.toUpperCase(),
+                            style: GoogleFonts.inter(
+                              color: AppTheme.primaryAccent,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
                             ),
                           ),
-                          _buildActionButtons(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      plot.name,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: AppTheme.primaryAccent,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Options Menu
+              Theme(
+                data: Theme.of(context).copyWith(
+                  cardColor: Colors.white,
+                  splashColor: AppTheme.primaryAccent.withOpacity(0.1),
+                ),
+                child: PopupMenuButton<String>(
+                  icon: Icon(LucideIcons.moreVertical, color: Colors.grey.shade400, size: 20),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  offset: const Offset(0, 40),
+                  onSelected: (value) {
+                    if (value == 'edit' && onEdit != null) onEdit!();
+                    if (value == 'delete' && onDelete != null) onDelete!();
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(LucideIcons.edit3, size: 16, color: AppTheme.primaryAccent),
+                          const SizedBox(width: 12),
+                          Text('Edit Plot', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.primaryAccent)),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      _buildPlotDetails(context),
-                    ],
-                  ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          const Icon(LucideIcons.trash2, size: 16, color: Colors.redAccent),
+                          const SizedBox(width: 12),
+                          Text('Delete Plot', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.redAccent)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-          
-          // Weather Section
-          if (weatherData != null) _buildWeatherGrid(context, current, weatherCode),
-          
-          // Footer Status
-          _buildStatusFooter(context, weatherData),
-        ],
-      ),
-    );
-  }
-
-  Decoration _getWeatherDecoration(BuildContext context, int weatherCode) {
-    List<Color> colors;
-    if (weatherCode == 0) {
-      colors = [const Color(0xFF56AB2F), const Color(0xFFA8E063)]; // Sunny/Green
-    } else if (weatherCode >= 1 && weatherCode <= 3) {
-      colors = [const Color(0xFF2193B0), const Color(0xFF6DD5ED)]; // Cloudy/Blue
-    } else if (weatherCode >= 51 && weatherCode <= 65) {
-      colors = [const Color(0xFF4B6CB7), const Color(0xFF182848)]; // Rainy/Dark Blue
-    } else {
-      colors = [AppTheme.primaryAccent, const Color(0xFF66BB6A)]; // Default
-    }
-
-    return BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: colors,
-      ),
-      borderRadius: BorderRadius.circular(32),
-      boxShadow: [
-        BoxShadow(
-          color: colors[0].withOpacity(0.3),
-          blurRadius: 15,
-          offset: const Offset(0, 8),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCropIcon() {
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Center(
-        child: Icon(LucideIcons.sprout, color: Colors.white, size: 28),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
-    return Row(
-      children: [
-        _iconButton(LucideIcons.edit, onEdit, 'Edit'),
-        const SizedBox(width: 8),
-        _iconButton(LucideIcons.trash2, onDelete, 'Delete', isDelete: true),
-      ],
-    );
-  }
-
-  Widget _iconButton(IconData icon, VoidCallback? onPressed, String tooltip, {bool isDelete = false}) {
-    return Container(
-      width: 32,
-      height: 32,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 16),
-        onPressed: onPressed,
-        padding: EdgeInsets.zero,
-        color: isDelete ? Colors.red.shade100 : Colors.white,
-        tooltip: tooltip,
-      ),
-    );
-  }
-
-  Widget _buildPlotDetails(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _detailRow(LucideIcons.mapPin, plot.location),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            _detailRow(LucideIcons.calendar, plot.plantingDate),
-            const SizedBox(width: 12),
-            _detailRow(LucideIcons.ruler, '${plot.fieldSize} Ha'),
-          ],
-        ),
-        const SizedBox(height: 4),
-        _detailRow(LucideIcons.leaf, plot.cropName),
-      ],
-    );
-  }
-
-  Widget _detailRow(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 12, color: Colors.white.withOpacity(0.8)),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: const TextStyle(color: Colors.white, fontSize: 12),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildWeatherGrid(BuildContext context, dynamic current, int weatherCode) {
-    final temp = current['temperature_2m'];
-    final humidity = current['relative_humidity_2m'];
-    final precipitation = current['precipitation'] ?? current['rain'] ?? 0;
-    final wind = current['wind_speed_10m'];
-    final weatherEmoji = WeatherLocationService.getWeatherEmoji(weatherCode);
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Text(weatherEmoji, style: const TextStyle(fontSize: 32)),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$temp°C',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    WeatherLocationService.getWeatherDescription(weatherCode),
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          
+          // Zone 2: Dedicated Weather Container
+          if (current != null) ...[
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryAccent.withOpacity(0.04),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '${WeatherLocationService.getWeatherEmoji(current['weather_code'] ?? 0)} ${current['temperature_2m']}°C',
+                    style: GoogleFonts.inter(
+                      color: AppTheme.primaryAccent,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const Spacer(),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 12,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(LucideIcons.droplets, size: 12, color: Colors.blueGrey),
+                          const SizedBox(width: 4),
+                          Text('${current['precipitation']}mm', style: GoogleFonts.inter(color: Colors.blueGrey, fontSize: 11, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(LucideIcons.wind, size: 12, color: Colors.blueGrey),
+                          const SizedBox(width: 4),
+                          Text('${current['wind_speed_10m']}km/h', style: GoogleFonts.inter(color: Colors.blueGrey, fontSize: 11, fontWeight: FontWeight.w600)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+          
+          // Divider
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Divider(
+              height: 1,
+              thickness: 1,
+              color: AppTheme.primaryAccent.withOpacity(0.05),
+            ),
+          ),
+          
+          // Zone 3: Core Metrics (Non-scrollable)
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
             children: [
-              _weatherMetric('💧', '$humidity%'),
-              const SizedBox(height: 4),
-              _weatherMetric('🌧️', '${precipitation}mm'),
-              const SizedBox(height: 4),
-              _weatherMetric('💨', '${wind}km/h'),
+              _metricChip(context, LucideIcons.mapPin, 'LOCATION', plot.location),
+              _metricChip(context, LucideIcons.calendar, 'PLANTED', plot.plantingDate),
+              _metricChip(context, LucideIcons.ruler, 'FIELD SIZE', '${plot.fieldSize} Ha'),
+            ],
+          ),
+          
+          // Footer: Status and Weather Timestamp
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildStatusBadge(context),
+              if (fetchedAt != null)
+                Row(
+                  children: [
+                    Icon(LucideIcons.cloudRain, size: 10, color: Colors.grey.shade400),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Weather updated: ${DateFormat('h:mm a').format(DateTime.parse(fetchedAt))}',
+                      style: GoogleFonts.inter(
+                        color: Colors.grey.shade400,
+                        fontSize: 9,
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ],
@@ -313,49 +312,82 @@ class PlotInfoCard extends StatelessWidget {
     );
   }
 
-  Widget _weatherMetric(String icon, String value) {
+  Widget _metricChip(BuildContext context, IconData icon, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryAccent.withOpacity(0.04), // Very subtle background
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 14, color: AppTheme.primaryAccent.withOpacity(0.5)),
+          const SizedBox(width: 6),
+          Text(
+            '$label: ',
+            style: GoogleFonts.inter(
+              color: Colors.grey.shade500,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.3,
+            ),
+          ),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: AppTheme.primaryAccent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _smallInfo(IconData icon, String text) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(icon, style: const TextStyle(fontSize: 12)),
+        Icon(icon, size: 12, color: Colors.grey.shade400),
         const SizedBox(width: 4),
         Text(
-          value,
-          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
+          text,
+          style: TextStyle(color: Colors.grey.shade500, fontSize: 11),
         ),
       ],
     );
   }
 
-  Widget _buildStatusFooter(BuildContext context, Map<String, dynamic>? weatherData) {
+  Widget _buildStatusBadge(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF81C784).withOpacity(0.2)),
+      ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                const CircleAvatar(radius: 4, backgroundColor: Colors.white),
-                const SizedBox(width: 8),
-                Text(
-                  plot.status,
-                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-              ],
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: Color(0xFF2E7D32),
+              shape: BoxShape.circle,
             ),
           ),
+          const SizedBox(width: 6),
           Text(
-            'Updated ${weatherData?['fetched_at'] != null ? DateFormat('h:mm a').format(DateTime.parse(weatherData!['fetched_at'])) : 'just now'}',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 10,
-              fontStyle: FontStyle.italic,
+            plot.status,
+            style: const TextStyle(
+              color: Color(0xFF2E7D32),
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.3,
             ),
           ),
         ],
