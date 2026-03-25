@@ -5,6 +5,7 @@ import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../services/auth_service.dart';
 import '../models/plot.dart';
+import 'package:flutter/services.dart';
 
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
   final nameController = TextEditingController(text: existingPlot?.name);
@@ -98,7 +99,10 @@ final bool isEditing = existingPlot != null;
                           child: TextFormField(
                             controller: latController,
                             enabled: !isSaving,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.text,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.\-]')),
+                            ],
                             decoration: const InputDecoration(
                               labelText: 'Latitude',
                               hintText: 'e.g. -13.9',
@@ -111,7 +115,10 @@ final bool isEditing = existingPlot != null;
                           child: TextFormField(
                             controller: lngController,
                             enabled: !isSaving,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: TextInputType.text,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.\-]')),
+                            ],
                             decoration: const InputDecoration(
                               labelText: 'Longitude',
                               hintText: 'e.g. 33.7',
@@ -125,7 +132,7 @@ final bool isEditing = existingPlot != null;
                     TextFormField(
                       controller: sizeController,
                       enabled: !isSaving,
-                      keyboardType: TextInputType.number,
+                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       decoration: const InputDecoration(labelText: 'Field Size (Digits only)'),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter the size' : null,
                     ),

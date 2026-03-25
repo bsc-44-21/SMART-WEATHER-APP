@@ -57,53 +57,68 @@ class _PlotsPageState extends State<PlotsPage> {
             ),
             // Plots list
             Expanded(
-              child: hasPlots
-                  ? ListView.builder(
-                      padding: const EdgeInsets.all(16.0),
-                      itemCount: plots.length,
-                      itemBuilder: (context, index) {
-                        final plot = plots[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: PlotInfoCard(
-                            plot: plot,
-                            onEdit: () => showCreatePlotBottomSheet(
-                              context,
-                              existingPlot: plot,
-                            ),
-                            onDelete: () => showDeleteConfirmationDialog(
-                              context,
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await context.read<WeatherSmartService>().fetchWeatherForPlots();
+                  if (context.mounted) {
+                  await context.read<WeatherSmartService>().fetchWeatherForLocation();
+                  }
+                },
+                child: hasPlots
+                    ? ListView.builder(
+                        padding: const EdgeInsets.all(16.0),
+                        physics: const AlwaysScrollableScrollPhysics(), // Important for RefreshIndicator
+                        itemCount: plots.length,
+                        itemBuilder: (context, index) {
+                          final plot = plots[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: PlotInfoCard(
                               plot: plot,
+                              onEdit: () => showCreatePlotBottomSheet(
+                                context,
+                                existingPlot: plot,
+                              ),
+                              onDelete: () => showDeleteConfirmationDialog(
+                                context,
+                                plot: plot,
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    : SingleChildScrollView( // Allow pull-to-refresh even when empty
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  LucideIcons.map,
+                                  size: 64,
+                                  color: Colors.grey.shade400,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No plots yet',
+                                  style: Theme.of(context).textTheme.titleLarge
+                                      ?.copyWith(color: Colors.grey.shade600),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Create your first plot to get started',
+                                  style: Theme.of(context).textTheme.bodyMedium
+                                      ?.copyWith(color: Colors.grey.shade500),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                    )
-                  : Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            LucideIcons.map,
-                            size: 64,
-                            color: Colors.grey.shade400,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No plots yet',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(color: Colors.grey.shade600),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Create your first plot to get started',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: Colors.grey.shade500),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+              ),
             ),
           ],
         ),

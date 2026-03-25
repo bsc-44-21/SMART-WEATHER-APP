@@ -120,6 +120,7 @@ class WeatherSmartService extends ChangeNotifier {
         final lng = double.parse(plot.longitude);
         final weather = await WeatherLocationService.fetchWeather(lat, lng);
         if (weather != null) {
+          weather['fetched_at'] = DateTime.now().toIso8601String();
           _plotWeather[plot.id] = weather;
           notifyListeners();
         }

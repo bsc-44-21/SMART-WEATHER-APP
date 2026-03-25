@@ -5,6 +5,7 @@ import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../core/theme.dart';
 import '../models/plot.dart';
+import 'package:intl/intl.dart';
 
 class FarmingCard extends StatelessWidget {
   final Widget child;
@@ -350,7 +351,7 @@ class PlotInfoCard extends StatelessWidget {
             ),
           ),
           Text(
-            'Updated just now',
+            'Updated ${weatherData?['fetched_at'] != null ? DateFormat('h:mm a').format(DateTime.parse(weatherData!['fetched_at'])) : 'just now'}',
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 10,
