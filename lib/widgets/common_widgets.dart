@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:provider/provider.dart';
+import '../services/weather_smart_service.dart';
+import '../services/weather_location_service.dart';
 import '../core/theme.dart';
 import '../models/plot.dart';
 
@@ -171,11 +174,56 @@ class PlotInfoCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                const SizedBox(height: 16),
+                _buildWeatherInfo(context),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildWeatherInfo(BuildContext context) {
+    final weatherData = context.watch<WeatherSmartService>().getPlotWeather(plot.id);
+    if (weatherData == null) return const SizedBox.shrink();
+
+    final current = weatherData['current'];
+    final temp = current['temperature_2m'];
+    final humidity = current['relative_humidity_2m'];
+    final precipitation = current['precipitation'];
+    final wind = current['wind_speed_10m'];
+    final rain = current['rain'];
+    final weatherCode = current['weather_code'];
+    final weatherEmoji = WeatherLocationService.getWeatherEmoji(weatherCode);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Current Weather', style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 16,
+          runSpacing: 8,
+          children: [
+            _weatherMetric(context, weatherEmoji, '$temp°C'),
+            _weatherMetric(context, '💧', '$humidity%'),
+            _weatherMetric(context, '🌧️', '${precipitation ?? rain ?? 0}mm'),
+            _weatherMetric(context, '💨', '${wind}km/h'),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _weatherMetric(BuildContext context, String icon, String value) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(icon, style: const TextStyle(fontSize: 14)),
+        const SizedBox(width: 4),
+        Text(value, style: Theme.of(context).textTheme.labelSmall),
+      ],
     );
   }
 }

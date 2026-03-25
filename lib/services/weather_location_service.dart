@@ -43,7 +43,7 @@ class WeatherLocationService {
   ) async {
     try {
       final String url =
-          'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto';
+          'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,weather_code,precipitation,wind_speed_10m,rain&timezone=auto';
 
       print('[Weather] Fetching weather from: $url');
 
