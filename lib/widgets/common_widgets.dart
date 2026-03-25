@@ -10,23 +10,39 @@ class FarmingCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry? padding;
   final VoidCallback? onTap;
+  final Decoration? decoration;
 
   const FarmingCard({
     super.key,
     required this.child,
     this.padding,
     this.onTap,
+    this.decoration,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(44),
-        child: Padding(
-          padding: padding ?? const EdgeInsets.all(32.0),
-          child: child,
+    return Container(
+      decoration: decoration ?? BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(32),
+          child: Padding(
+            padding: padding ?? const EdgeInsets.all(32.0),
+            child: child,
+          ),
         ),
       ),
     );
@@ -74,156 +90,275 @@ class PlotInfoCard extends StatelessWidget {
     this.onDelete,
   });
 
-   @override
+  @override
   Widget build(BuildContext context) {
+    final weatherData = context.watch<WeatherSmartService>().getPlotWeather(plot.id);
+    final current = weatherData?['current'];
+    final weatherCode = current?['weather_code'] ?? 0;
+    
+    // Dynamic Gradient based on weather
+    final Decoration cardDecoration = _getWeatherDecoration(context, weatherCode);
+
     return FarmingCard(
-      padding: const EdgeInsets.all(24),
-      child: Row(
+      padding: EdgeInsets.zero,
+      decoration: cardDecoration,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const AppLogo(size: 48, backgroundColor: Color(0xFFF0F0E8)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
+          // Header Section
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(child: Text(plot.name, style: Theme.of(context).textTheme.titleLarge)),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(LucideIcons.edit, size: 18),
-                          onPressed: onEdit,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          color: Theme.of(context).primaryColor,
-                          tooltip: 'Edit Plot',
-                        ),
-
-                        const SizedBox(width: 8),
-                        IconButton(
-                          icon: const Icon(LucideIcons.trash2, size: 18),
-                          onPressed: onDelete,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          color: Colors.red.shade400,
-                          tooltip: 'Delete Plot',
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(LucideIcons.mapPin, size: 14, color: AppTheme.textMuted),
-                    const SizedBox(width: 4),
-                    Text(plot.location, style: Theme.of(context).textTheme.labelSmall),
-                    const SizedBox(width: 12),
-                    Icon(LucideIcons.calendar, size: 14, color: AppTheme.textMuted),
-                    const SizedBox(width: 4),
-                    Text(plot.plantingDate, style: Theme.of(context).textTheme.labelSmall),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(LucideIcons.ruler, size: 14, color: AppTheme.textMuted),
-                    const SizedBox(width: 4),
-                    Text('${plot.fieldSize} Ha', style: Theme.of(context).textTheme.labelSmall),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(LucideIcons.sprout, size: 14, color: AppTheme.textMuted),
-                    const SizedBox(width: 4),
-                    Text(plot.cropName, style: Theme.of(context).textTheme.labelSmall),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFC8E6C9)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                _buildCropIcon(),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF4CAF50),
-                          shape: BoxShape.circle,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              plot.name,
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          _buildActionButtons(context),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        plot.status,
-                        style: const TextStyle(
-                          color: Color(0xFF2E7D32),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      const SizedBox(height: 4),
+                      _buildPlotDetails(context),
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                _buildWeatherInfo(context),
               ],
             ),
+          ),
+          
+          // Weather Section
+          if (weatherData != null) _buildWeatherGrid(context, current, weatherCode),
+          
+          // Footer Status
+          _buildStatusFooter(context),
+        ],
+      ),
+    );
+  }
+
+  Decoration _getWeatherDecoration(BuildContext context, int weatherCode) {
+    List<Color> colors;
+    if (weatherCode == 0) {
+      colors = [const Color(0xFF56AB2F), const Color(0xFFA8E063)]; // Sunny/Green
+    } else if (weatherCode >= 1 && weatherCode <= 3) {
+      colors = [const Color(0xFF2193B0), const Color(0xFF6DD5ED)]; // Cloudy/Blue
+    } else if (weatherCode >= 51 && weatherCode <= 65) {
+      colors = [const Color(0xFF4B6CB7), const Color(0xFF182848)]; // Rainy/Dark Blue
+    } else {
+      colors = [AppTheme.primaryAccent, const Color(0xFF66BB6A)]; // Default
+    }
+
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: colors,
+      ),
+      borderRadius: BorderRadius.circular(32),
+      boxShadow: [
+        BoxShadow(
+          color: colors[0].withOpacity(0.3),
+          blurRadius: 15,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCropIcon() {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Center(
+        child: Icon(LucideIcons.sprout, color: Colors.white, size: 28),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(BuildContext context) {
+    return Row(
+      children: [
+        _iconButton(LucideIcons.edit, onEdit, 'Edit'),
+        const SizedBox(width: 8),
+        _iconButton(LucideIcons.trash2, onDelete, 'Delete', isDelete: true),
+      ],
+    );
+  }
+
+  Widget _iconButton(IconData icon, VoidCallback? onPressed, String tooltip, {bool isDelete = false}) {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(icon, size: 16),
+        onPressed: onPressed,
+        padding: EdgeInsets.zero,
+        color: isDelete ? Colors.red.shade100 : Colors.white,
+        tooltip: tooltip,
+      ),
+    );
+  }
+
+  Widget _buildPlotDetails(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _detailRow(LucideIcons.mapPin, plot.location),
+        const SizedBox(height: 4),
+        Row(
+          children: [
+            _detailRow(LucideIcons.calendar, plot.plantingDate),
+            const SizedBox(width: 12),
+            _detailRow(LucideIcons.ruler, '${plot.fieldSize} Ha'),
+          ],
+        ),
+        const SizedBox(height: 4),
+        _detailRow(LucideIcons.leaf, plot.cropName),
+      ],
+    );
+  }
+
+  Widget _detailRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 12, color: Colors.white.withOpacity(0.8)),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeatherGrid(BuildContext context, dynamic current, int weatherCode) {
+    final temp = current['temperature_2m'];
+    final humidity = current['relative_humidity_2m'];
+    final precipitation = current['precipitation'] ?? current['rain'] ?? 0;
+    final wind = current['wind_speed_10m'];
+    final weatherEmoji = WeatherLocationService.getWeatherEmoji(weatherCode);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text(weatherEmoji, style: const TextStyle(fontSize: 32)),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$temp°C',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    WeatherLocationService.getWeatherDescription(weatherCode),
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.8),
+                      fontSize: 10,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _weatherMetric('💧', '$humidity%'),
+              const SizedBox(height: 4),
+              _weatherMetric('🌧️', '${precipitation}mm'),
+              const SizedBox(height: 4),
+              _weatherMetric('💨', '${wind}km/h'),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildWeatherInfo(BuildContext context) {
-    final weatherData = context.watch<WeatherSmartService>().getPlotWeather(plot.id);
-    if (weatherData == null) return const SizedBox.shrink();
-
-    final current = weatherData['current'];
-    final temp = current['temperature_2m'];
-    final humidity = current['relative_humidity_2m'];
-    final precipitation = current['precipitation'];
-    final wind = current['wind_speed_10m'];
-    final rain = current['rain'];
-    final weatherCode = current['weather_code'];
-    final weatherEmoji = WeatherLocationService.getWeatherEmoji(weatherCode);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _weatherMetric(String icon, String value) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Current Weather', style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 16,
-          runSpacing: 8,
-          children: [
-            _weatherMetric(context, weatherEmoji, '$temp°C'),
-            _weatherMetric(context, '💧', '$humidity%'),
-            _weatherMetric(context, '🌧️', '${precipitation ?? rain ?? 0}mm'),
-            _weatherMetric(context, '💨', '${wind}km/h'),
-          ],
+        Text(icon, style: const TextStyle(fontSize: 12)),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500),
         ),
       ],
     );
   }
 
-  Widget _weatherMetric(BuildContext context, String icon, String value) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(icon, style: const TextStyle(fontSize: 14)),
-        const SizedBox(width: 4),
-        Text(value, style: Theme.of(context).textTheme.labelSmall),
-      ],
+  Widget _buildStatusFooter(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                const CircleAvatar(radius: 4, backgroundColor: Colors.white),
+                const SizedBox(width: 8),
+                Text(
+                  plot.status,
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            'Updated just now',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.6),
+              fontSize: 10,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
