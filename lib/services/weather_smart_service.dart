@@ -12,25 +12,37 @@ class WeatherSmartService extends ChangeNotifier {
   final List<Map<String, dynamic>> _activities = List.from(MockData.activities);
   bool _isDarkMode = false;
   StreamSubscription? _plotsSubscription;
+  Timer? _weatherTimer;
   
   // Weather data
   Map<String, dynamic>? _currentWeather;
+  final Map<String, Map<String, dynamic>> _plotWeather = {};
   bool _isLoadingWeather = false;
   String? _weatherError;
 
  WeatherSmartService() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       _plotsSubscription?.cancel();
+      _weatherTimer?.cancel();
       if (user != null) {
         _plotsSubscription = FirestoreService().getUserPlotsStream(user.uid).listen((plots) {
           _plots = plots;
+          fetchWeatherForPlots(); // Fetch weather for each plot
           notifyListeners();
         });
+        
+        // Start periodic refresh every minute
+        _weatherTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+          fetchWeatherForPlots();
+          fetchWeatherForLocation();
+        });
+
         // Fetch weather when user logs in
         fetchWeatherForLocation();
       } else {
         _plots = [];
         _currentWeather = null;
+        _plotWeather.clear();
         notifyListeners();
       }
     });
@@ -41,6 +53,7 @@ class WeatherSmartService extends ChangeNotifier {
   String get advice => MockData.farmingAdvice;
   bool get isDarkMode => _isDarkMode;
   Map<String, dynamic>? get currentWeather => _currentWeather;
+  Map<String, dynamic>? getPlotWeather(String plotId) => _plotWeather[plotId];
   bool get isLoadingWeather => _isLoadingWeather;
   String? get weatherError => _weatherError;
 
@@ -94,12 +107,37 @@ class WeatherSmartService extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchWeatherForPlots() async {
+    for (var plot in _plots) {
+      await fetchWeatherForPlot(plot);
+    }
+  }
+
+  Future<void> fetchWeatherForPlot(PlotModel plot) async {
+    if (plot.latitude.isNotEmpty && plot.longitude.isNotEmpty) {
+      try {
+        final lat = double.parse(plot.latitude);
+        final lng = double.parse(plot.longitude);
+        final weather = await WeatherLocationService.fetchWeather(lat, lng);
+        if (weather != null) {
+          weather['fetched_at'] = DateTime.now().toIso8601String();
+          _plotWeather[plot.id] = weather;
+          notifyListeners();
+        }
+      } catch (e) {
+        print('[WeatherSmartService] Error fetching weather for plot ${plot.id}: $e');
+      }
+    }
+  }
+
   Future<void> addPlot(PlotModel plot) async {
     await FirestoreService().savePlot(plot);
+    await fetchWeatherForPlot(plot);
   }
 
   Future<void> updatePlot(PlotModel plot) async {
     await FirestoreService().updatePlot(plot);
+    await fetchWeatherForPlot(plot);
   }
 
   Future<void> deletePlot(String plotId) async {
@@ -112,6 +150,13 @@ class WeatherSmartService extends ChangeNotifier {
       'time': DateFormat('h:mm a').format(DateTime.now()),
     });
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _plotsSubscription?.cancel();
+    _weatherTimer?.cancel();
+    super.dispose();
   }
 }
 
