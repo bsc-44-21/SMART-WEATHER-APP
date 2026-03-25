@@ -8,7 +8,8 @@ import '../models/plot.dart';
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
   final nameController = TextEditingController(text: existingPlot?.name);
   final locationController = TextEditingController(text: existingPlot?.location);
-  final sizeController = TextEditingController(text: existingPlot?.size);
+  final sizeController = TextEditingController(text: existingPlot?.fieldSize);
+  final dateController = TextEditingController(text: existingPlot?.plantingDate);
   final formKey = GlobalKey<FormState>();
 final bool isEditing = existingPlot != null;
 
@@ -18,7 +19,14 @@ final bool isEditing = existingPlot != null;
     backgroundColor: Colors.transparent,
     builder: (context) {
       bool isSaving = false;
-      
+      String? selectedCrop = existingPlot?.cropName;
+      String? selectedCropId = existingPlot?.cropId;
+      final List<Map<String, String>> crops = [
+        {'id': '1', 'name': 'Maize'},
+        {'id': '2', 'name': 'Tomato'},
+        {'id': '3', 'name': 'G/Nuts'},
+      ];
+
       return StatefulBuilder(
         builder: (context, setModalState) {
           return Container(
@@ -57,8 +65,51 @@ final bool isEditing = existingPlot != null;
                     TextFormField(
                       controller: sizeController,
                       enabled: !isSaving,
-                      decoration: const InputDecoration(labelText: 'Size (e.g., 1.5 Ha)'),
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Field Size (Digits only)'),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter the size' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: dateController,
+                      enabled: !isSaving,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Planting Date',
+                        suffixIcon: Icon(Icons.calendar_today),
+                      ),
+                      onTap: isSaving ? null : () async {
+                        final pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+                        if (pickedDate != null) {
+                          setModalState(() {
+                            dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                          });
+                        }
+                      },
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please select a planting date' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: selectedCrop,
+                      decoration: const InputDecoration(labelText: 'Crop Type'),
+                      items: crops.map((crop) {
+                        return DropdownMenuItem<String>(
+                          value: crop['name'],
+                          child: Text(crop['name']!),
+                        );
+                      }).toList(),
+                      onChanged: isSaving ? null : (value) {
+                        setModalState(() {
+                          selectedCrop = value;
+                          selectedCropId = crops.firstWhere((c) => c['name'] == value)['id'];
+                        });
+                      },
+                      validator: (value) => value == null ? 'Please select a crop type' : null,
                     ),
                     const SizedBox(height: 32),
                     SizedBox(
@@ -80,14 +131,19 @@ final bool isEditing = existingPlot != null;
                                 return;
                               }
 
+                              final now = DateTime.now().toIso8601String();
                               final plotName = nameController.text.trim();
                               final plot = PlotModel(
                                 id: isEditing ? existingPlot.id : DateTime.now().millisecondsSinceEpoch.toString(),
                                 name: plotName,
                                 location: locationController.text.trim(),
-                                size: sizeController.text.trim(),
-                                date: isEditing ? existingPlot.date : DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                                fieldSize: sizeController.text.trim(),
+                                plantingDate: dateController.text.trim(),
                                 userId: user.uid,
+                                cropId: selectedCropId ?? '',
+                                cropName: selectedCrop ?? '',
+                                createdAt: isEditing ? existingPlot.createdAt : now,
+                                modifiedAt: now,
                                 status: isEditing ? existingPlot.status : 'Active Growth',
                               );
                               

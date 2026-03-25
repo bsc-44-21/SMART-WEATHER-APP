@@ -121,7 +121,7 @@ class PlotInfoCard extends StatelessWidget {
                     const SizedBox(width: 12),
                     Icon(LucideIcons.calendar, size: 14, color: AppTheme.textMuted),
                     const SizedBox(width: 4),
-                    Text(plot.date, style: Theme.of(context).textTheme.labelSmall),
+                    Text(plot.plantingDate, style: Theme.of(context).textTheme.labelSmall),
                   ],
                 ),
                 const SizedBox(height: 4),
@@ -129,7 +129,15 @@ class PlotInfoCard extends StatelessWidget {
                   children: [
                     Icon(LucideIcons.ruler, size: 14, color: AppTheme.textMuted),
                     const SizedBox(width: 4),
-                    Text(plot.size, style: Theme.of(context).textTheme.labelSmall),
+                    Text('${plot.fieldSize} Ha', style: Theme.of(context).textTheme.labelSmall),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(LucideIcons.sprout, size: 14, color: AppTheme.textMuted),
+                    const SizedBox(width: 4),
+                    Text(plot.cropName, style: Theme.of(context).textTheme.labelSmall),
                   ],
                 ),
                 const SizedBox(height: 16),
