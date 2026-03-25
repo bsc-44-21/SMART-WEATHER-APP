@@ -99,10 +99,10 @@ class PlotInfoCard extends StatelessWidget {
     final current = weatherData?['current'] as Map<String, dynamic>?;
 
     return FarmingCard(
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.all(16), // Compressed from 28
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(44),
+        borderRadius: BorderRadius.circular(32), // Compressed from 44
         border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08), width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -122,20 +122,20 @@ class PlotInfoCard extends StatelessWidget {
         children: [
           // Zone 1: Identity & Actions
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
-                width: 60,
-                height: 60,
+                width: 48, // Compressed from 60
+                height: 48,
                 decoration: BoxDecoration(
                   color: AppTheme.primaryAccent.withOpacity(0.08),
                   shape: BoxShape.circle,
                 ),
                 child: const Center(
-                  child: Icon(LucideIcons.sprout, color: AppTheme.primaryAccent, size: 28),
+                  child: Icon(LucideIcons.sprout, color: AppTheme.primaryAccent, size: 24),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12), // Compressed from 16
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,7 +143,7 @@ class PlotInfoCard extends StatelessWidget {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), // Compressed
                           decoration: BoxDecoration(
                             color: AppTheme.primaryAccent.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(4),
@@ -152,18 +152,18 @@ class PlotInfoCard extends StatelessWidget {
                             plot.cropName.toUpperCase(),
                             style: GoogleFonts.inter(
                               color: AppTheme.primaryAccent,
-                              fontSize: 9,
+                              fontSize: 8, // Compressed from 9
                               fontWeight: FontWeight.w900,
-                              letterSpacing: 1.2,
+                              letterSpacing: 1.0,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4), // Compressed from 6
                     Text(
                       plot.name,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith( // Compressed from headlineSmall
                         color: AppTheme.primaryAccent,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5,
@@ -180,9 +180,10 @@ class PlotInfoCard extends StatelessWidget {
                   splashColor: AppTheme.primaryAccent.withOpacity(0.1),
                 ),
                 child: PopupMenuButton<String>(
-                  icon: Icon(LucideIcons.moreVertical, color: Colors.grey.shade400, size: 20),
+                  icon: Icon(LucideIcons.moreVertical, color: Colors.grey.shade400, size: 20), // Tighter padding
+                  padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  offset: const Offset(0, 40),
+                  offset: const Offset(0, 30),
                   onSelected: (value) {
                     if (value == 'edit' && onEdit != null) onEdit!();
                     if (value == 'delete' && onDelete != null) onDelete!();
@@ -214,45 +215,45 @@ class PlotInfoCard extends StatelessWidget {
             ],
           ),
           
-          // Zone 2: Dedicated Weather Container
+          // Zone 2: Dedicated Weather Container (Compact Strip)
           if (current != null) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 12), // Compressed from 20
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), // Compressed vertical
               decoration: BoxDecoration(
                 color: AppTheme.primaryAccent.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
               ),
               child: Row(
                 children: [
                   Text(
-                    '${WeatherLocationService.getWeatherEmoji(current['weather_code'] ?? 0)} ${current['temperature_2m']}°C',
+                    '${WeatherLocationService.getWeatherEmoji(current['weather_code'] ?? 0)} ${current['temperature_2m']}°',
                     style: GoogleFonts.inter(
                       color: AppTheme.primaryAccent,
-                      fontSize: 14,
+                      fontSize: 13, // Compressed from 14
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const Spacer(),
                   Wrap(
                     crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 12,
+                    spacing: 8, // Compressed
                     children: [
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(LucideIcons.droplets, size: 12, color: Colors.blueGrey),
-                          const SizedBox(width: 4),
-                          Text('${current['precipitation']}mm', style: GoogleFonts.inter(color: Colors.blueGrey, fontSize: 11, fontWeight: FontWeight.w600)),
+                          const Icon(LucideIcons.droplets, size: 10, color: Colors.blueGrey),
+                          const SizedBox(width: 2),
+                          Text('${current['precipitation']}mm', style: GoogleFonts.inter(color: Colors.blueGrey, fontSize: 10, fontWeight: FontWeight.w600)),
                         ],
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(LucideIcons.wind, size: 12, color: Colors.blueGrey),
-                          const SizedBox(width: 4),
-                          Text('${current['wind_speed_10m']}km/h', style: GoogleFonts.inter(color: Colors.blueGrey, fontSize: 11, fontWeight: FontWeight.w600)),
+                          const Icon(LucideIcons.wind, size: 10, color: Colors.blueGrey),
+                          const SizedBox(width: 2),
+                          Text('${current['wind_speed_10m']}km/h', style: GoogleFonts.inter(color: Colors.blueGrey, fontSize: 10, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ],
@@ -264,7 +265,7 @@ class PlotInfoCard extends StatelessWidget {
           
           // Divider
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
+            padding: const EdgeInsets.symmetric(vertical: 12), // Compressed from 24
             child: Divider(
               height: 1,
               thickness: 1,
@@ -274,8 +275,8 @@ class PlotInfoCard extends StatelessWidget {
           
           // Zone 3: Core Metrics (Non-scrollable)
           Wrap(
-            spacing: 16,
-            runSpacing: 16,
+            spacing: 8, // Compressed from 16
+            runSpacing: 8, // Compressed from 16
             children: [
               _metricChip(context, LucideIcons.mapPin, 'LOCATION', plot.location),
               _metricChip(context, LucideIcons.calendar, 'PLANTED', plot.plantingDate),
@@ -284,21 +285,23 @@ class PlotInfoCard extends StatelessWidget {
           ),
           
           // Footer: Status and Weather Timestamp
-          const SizedBox(height: 24),
+          const SizedBox(height: 12), // Compressed from 24
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _buildStatusBadge(context),
               if (fetchedAt != null)
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(LucideIcons.cloudRain, size: 10, color: Colors.grey.shade400),
+                    Icon(LucideIcons.clock, size: 9, color: Colors.grey.shade400),
                     const SizedBox(width: 4),
                     Text(
-                      'Weather updated: ${DateFormat('h:mm a').format(DateTime.parse(fetchedAt))}',
+                      'Synced: ${DateFormat('h:mm a').format(DateTime.parse(fetchedAt))}', // Shortened string
                       style: GoogleFonts.inter(
                         color: Colors.grey.shade400,
-                        fontSize: 9,
+                        fontSize: 8, // Compressed
                         fontStyle: FontStyle.italic,
                         letterSpacing: 0.2,
                       ),
@@ -314,30 +317,30 @@ class PlotInfoCard extends StatelessWidget {
 
   Widget _metricChip(BuildContext context, IconData icon, String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6), // Compressed
       decoration: BoxDecoration(
-        color: AppTheme.primaryAccent.withOpacity(0.04), // Very subtle background
-        borderRadius: BorderRadius.circular(12),
+        color: AppTheme.primaryAccent.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(8), // Compressed
         border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, size: 14, color: AppTheme.primaryAccent.withOpacity(0.5)),
-          const SizedBox(width: 6),
+          Icon(icon, size: 12, color: AppTheme.primaryAccent.withOpacity(0.5)), // Compressed
+          const SizedBox(width: 4), // Compressed
           Text(
             '$label: ',
             style: GoogleFonts.inter(
               color: Colors.grey.shade500,
-              fontSize: 10,
+              fontSize: 9, // Compressed
               fontWeight: FontWeight.w600,
-              letterSpacing: 0.3,
+              letterSpacing: 0.2,
             ),
           ),
           Text(
             value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: Theme.of(context).textTheme.bodySmall?.copyWith( // Compressed
               fontWeight: FontWeight.bold,
               color: AppTheme.primaryAccent,
             ),
