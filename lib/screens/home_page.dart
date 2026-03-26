@@ -9,6 +9,7 @@ import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../widgets/create_plot_sheet.dart';
+import '../widgets/quick_log_sheet.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -110,6 +111,14 @@ class HomePage extends StatelessWidget {
             title: 'Add New Plot',
             subtitle: 'Register a new field',
             onTap: () => showCreatePlotBottomSheet(context),
+          ),
+          const SizedBox(height: 12),
+          _buildQuickAction(
+            context,
+            icon: LucideIcons.clipboardList,
+            title: 'Log Activity',
+            subtitle: 'Record farm tasks & events',
+            onTap: () => showQuickLogBottomSheet(context),
           ),
 
           const SizedBox(height: 32),

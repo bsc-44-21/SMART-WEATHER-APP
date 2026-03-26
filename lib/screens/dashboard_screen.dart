@@ -3,7 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
 import 'home_page.dart';
 import 'plots_page.dart';
-import 'advice_page.dart';
+import 'detect_page.dart';
 import 'log_page.dart';
 import 'profile_settings_page.dart';
 
@@ -20,7 +20,7 @@ class _MainLayoutState extends State<MainLayout> {
   static const List<Widget> _pages = [
     HomePage(),
     PlotsPage(),
-    AdvicePage(),
+    DetectPage(),
     LogPage(),
     ProfileSettingsPage(),
   ];
@@ -47,7 +47,7 @@ class _MainLayoutState extends State<MainLayout> {
           items: [
             _buildNavItem(LucideIcons.layoutGrid, 'HOME', 0),
             _buildNavItem(LucideIcons.map, 'PLOTS', 1),
-            _buildNavItem(LucideIcons.sparkles, 'ADVICE', 2),
+            _buildNavItem(LucideIcons.sparkles, 'DETECT', 2),
             _buildNavItem(LucideIcons.clipboardList, 'LOG', 3),
             _buildNavItem(LucideIcons.user, 'PROFILE', 4),
           ],
