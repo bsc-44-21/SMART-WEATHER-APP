@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../services/weather_smart_service.dart';
+import '../services/weather_location_service.dart';
 import '../services/auth_service.dart';
 import '../models/plot.dart';
+import 'package:flutter/services.dart';
 
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
   final nameController = TextEditingController(text: existingPlot?.name);
   final locationController = TextEditingController(text: existingPlot?.location);
-  final sizeController = TextEditingController(text: existingPlot?.size);
+  final sizeController = TextEditingController(text: existingPlot?.fieldSize);
+  final dateController = TextEditingController(text: existingPlot?.plantingDate);
+  final latController = TextEditingController(text: existingPlot?.latitude);
+  final lngController = TextEditingController(text: existingPlot?.longitude);
   final formKey = GlobalKey<FormState>();
 final bool isEditing = existingPlot != null;
 
@@ -18,7 +23,16 @@ final bool isEditing = existingPlot != null;
     backgroundColor: Colors.transparent,
     builder: (context) {
       bool isSaving = false;
-      
+      String? selectedCrop = existingPlot?.cropName;
+      String? selectedCropId = existingPlot?.cropId;
+      bool isFetchingLocation = false;
+
+      final List<Map<String, String>> crops = [
+        {'id': '1', 'name': 'Maize'},
+        {'id': '2', 'name': 'Tomato'},
+        {'id': '3', 'name': 'G/Nuts'},
+      ];
+
       return StatefulBuilder(
         builder: (context, setModalState) {
           return Container(
@@ -49,16 +63,120 @@ final bool isEditing = existingPlot != null;
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: locationController,
-                      enabled: !isSaving,
-                      decoration: const InputDecoration(labelText: 'Location (e.g. Sector 4)'),
-                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a location' : null,
+                      enabled: !isSaving && !isFetchingLocation,
+                      decoration: InputDecoration(
+                        labelText: 'Location Name (e.g. Sector 4)',
+                        suffixIcon: isFetchingLocation 
+                          ? const SizedBox(width: 20, height: 20, child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator(strokeWidth: 2)))
+                          : IconButton(
+                              icon: const Icon(Icons.my_location),
+                              onPressed: () async {
+                                setModalState(() => isFetchingLocation = true);
+                                final pos = await WeatherLocationService.getLocationWithPermission();
+                                if (pos != null) {
+                                  setModalState(() {
+                                    latController.text = pos.latitude.toString();
+                                    lngController.text = pos.longitude.toString();
+                                    isFetchingLocation = false;
+                                  });
+                                } else {
+                                  setModalState(() => isFetchingLocation = false);
+                                  if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Failed to get location. Ensure location services are enabled.')),
+                                  );
+                                  }
+                                }
+                              },
+                            ),
+                      ),
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a location name' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: latController,
+                            enabled: !isSaving,
+                            keyboardType: TextInputType.text,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.\-]')),
+                            ],
+                            decoration: const InputDecoration(
+                              labelText: 'Latitude',
+                              hintText: 'e.g. -13.9',
+                            ),
+                            validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextFormField(
+                            controller: lngController,
+                            enabled: !isSaving,
+                            keyboardType: TextInputType.text,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.\-]')),
+                            ],
+                            decoration: const InputDecoration(
+                              labelText: 'Longitude',
+                              hintText: 'e.g. 33.7',
+                            ),
+                            validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: sizeController,
                       enabled: !isSaving,
-                      decoration: const InputDecoration(labelText: 'Size (e.g., 1.5 Ha)'),
+                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(labelText: 'Field Size (Digits only)'),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter the size' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: dateController,
+                      enabled: !isSaving,
+                      readOnly: true,
+                      decoration: const InputDecoration(
+                        labelText: 'Planting Date',
+                        suffixIcon: Icon(Icons.calendar_today),
+                      ),
+                      onTap: isSaving ? null : () async {
+                        final pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+                        if (pickedDate != null) {
+                          setModalState(() {
+                            dateController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
+                          });
+                        }
+                      },
+                      validator: (value) => value == null || value.trim().isEmpty ? 'Please select a planting date' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: selectedCrop,
+                      decoration: const InputDecoration(labelText: 'Crop Type'),
+                      items: crops.map((crop) {
+                        return DropdownMenuItem<String>(
+                          value: crop['name'],
+                          child: Text(crop['name']!),
+                        );
+                      }).toList(),
+                      onChanged: isSaving ? null : (value) {
+                        setModalState(() {
+                          selectedCrop = value;
+                          selectedCropId = crops.firstWhere((c) => c['name'] == value)['id'];
+                        });
+                      },
+                      validator: (value) => value == null ? 'Please select a crop type' : null,
                     ),
                     const SizedBox(height: 32),
                     SizedBox(
@@ -80,14 +198,39 @@ final bool isEditing = existingPlot != null;
                                 return;
                               }
 
+                                // Capture location if fields are empty
+                                if (latController.text.isEmpty || lngController.text.isEmpty) {
+                                  setModalState(() => isSaving = true);
+                                   final pos = await WeatherLocationService.getLocationWithPermission();
+                                   if (pos != null) {
+                                     latController.text = pos.latitude.toString();
+                                     lngController.text = pos.longitude.toString();
+                                   } else {
+                                     setModalState(() => isSaving = false);
+                                     if (context.mounted) {
+                                       ScaffoldMessenger.of(context).showSnackBar(
+                                         const SnackBar(content: Text('Could not capture location automatically. Please enter coordinates manually or tap the icon.')),
+                                       );
+                                     }
+                                     return;
+                                   }
+                                }
+
+                              final now = DateTime.now().toIso8601String();
                               final plotName = nameController.text.trim();
                               final plot = PlotModel(
                                 id: isEditing ? existingPlot.id : DateTime.now().millisecondsSinceEpoch.toString(),
                                 name: plotName,
                                 location: locationController.text.trim(),
-                                size: sizeController.text.trim(),
-                                date: isEditing ? existingPlot.date : DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                                latitude: latController.text.trim(),
+                                longitude: lngController.text.trim(),
+                                fieldSize: sizeController.text.trim(),
+                                plantingDate: dateController.text.trim(),
                                 userId: user.uid,
+                                cropId: selectedCropId ?? '',
+                                cropName: selectedCrop ?? '',
+                                createdAt: isEditing ? existingPlot.createdAt : now,
+                                modifiedAt: now,
                                 status: isEditing ? existingPlot.status : 'Active Growth',
                               );
                               
