@@ -8,8 +8,8 @@ import '../widgets/common_widgets.dart';
 import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
+import '../services/navigation_service.dart';
 import '../widgets/create_plot_sheet.dart';
-import '../widgets/quick_log_sheet.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -118,7 +118,7 @@ class HomePage extends StatelessWidget {
             icon: LucideIcons.clipboardList,
             title: 'Log Activity',
             subtitle: 'Record farm tasks & events',
-            onTap: () => showQuickLogBottomSheet(context),
+            onTap: () => context.read<NavigationService>().setIndex(3),
           ),
 
           const SizedBox(height: 32),
