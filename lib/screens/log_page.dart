@@ -32,7 +32,11 @@ class _LogPageState extends State<LogPage> {
 
     if (activity.isEmpty || plot.isEmpty || date.isEmpty) return;
 
-    context.read<WeatherSmartService>().addLog(activity);
+    context.read<WeatherSmartService>().addLog(
+      activity,
+      plot: plot,
+      date: date,
+    );
 
     _activityController.clear();
     _plotController.clear();
