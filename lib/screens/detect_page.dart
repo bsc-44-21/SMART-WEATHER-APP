@@ -39,7 +39,7 @@ class DetectPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
-TextButton(
+                TextButton(
                   onPressed: () {},
                   child: Text(
                     'View All',
@@ -133,3 +133,130 @@ TextButton(
       ),
     );
   }
+
+  Widget _buildHistoryList(BuildContext context) {
+    final List<Map<String, dynamic>> history = [
+      {
+        'title': 'Fall Armyworm',
+        'date': 'Today, 10:30 AM',
+        'status': 'Detected - High Risk',
+        'isCritical': true,
+        'icon': LucideIcons.bug,
+      },
+      {
+        'title': 'Healthy Maize Leaf',
+        'date': 'Yesterday, 2:15 PM',
+        'status': 'Clear',
+        'isCritical': false,
+        'icon': LucideIcons.checkCircle,
+      },
+      {
+        'title': 'Aphids Detected',
+        'date': 'Mon, 9:00 AM',
+        'status': 'Low Risk',
+        'isCritical': false,
+        'icon': LucideIcons.alertTriangle,
+      },
+    ];
+
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: history.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
+      itemBuilder: (context, index) {
+        final item = history[index];
+        return _buildHistoryItem(
+          context: context,
+          title: item['title'],
+          date: item['date'],
+          status: item['status'],
+          isCritical: item['isCritical'],
+          icon: item['icon'],
+        );
+      },
+    );
+  }
+
+  Widget _buildHistoryItem({
+    required BuildContext context,
+    required String title,
+    required String date,
+    required String status,
+    required bool isCritical,
+    required IconData icon,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: isCritical
+                  ? Colors.red.withOpacity(0.1)
+                  : Colors.green.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: isCritical ? Colors.red : Colors.green,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  date,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: isCritical
+                  ? Colors.red.withOpacity(0.1)
+                  : Colors.green.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              status,
+              style: TextStyle(
+                color: isCritical ? Colors.red : Colors.green,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
