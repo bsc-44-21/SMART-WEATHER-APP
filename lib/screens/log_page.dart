@@ -26,18 +26,8 @@ class _LogPageState extends State<LogPage> {
   }
 
   void _addActivity(BuildContext context) {
-    final activity = _activityController.text.trim();
-    final plot = _plotController.text.trim();
-    final date = _dateController.text.trim();
-
-    if (activity.isEmpty || plot.isEmpty || date.isEmpty) return;
-
-    context.read<WeatherSmartService>().addLog(
-      activity,
-      plot: plot,
-      date: date,
-    );
-
+    if (_activityController.text.trim().isEmpty) return;
+    context.read<WeatherSmartService>().addLog(_activityController.text.trim());
     _activityController.clear();
     _plotController.clear();
     _dateController.clear();
