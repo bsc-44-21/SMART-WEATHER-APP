@@ -13,9 +13,14 @@ class AdvicePage extends StatefulWidget {
 
 class _AdvicePageState extends State<AdvicePage> {
   int _selectedFilter = 0;
-  final List<String> _filters = ['All', 'Weather Alerts', 'Pest Detection', 'Soil Health'];
+  final List<String> _filters = [
+    'All',
+    'Weather Alerts',
+    'Pest Detection',
+    'Soil Health',
+  ];
 
-   final List<String> _adviceContent = [
+  final List<String> _adviceContent = [
     '', // Placeholder for 'All' which dynamically fetches from service
     "⚠️ Heavy rainfall expected over the next 48 hours. Ensure proper drainage in the lower sections of the plot to prevent root rot.\n\n🌡️ Temperatures are expected to drop below 10°C on Thursday night. Cover sensitive seedlings.",
     "🐛 Low risk of Fall Armyworm detected this week based on regional sensor data. Continue standard weekly scouting.\n\n🛡️ Preventative action: Consider applying neem oil spray to the perimeter of the field.",
@@ -38,7 +43,8 @@ class _AdvicePageState extends State<AdvicePage> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-
+          if (plots.isNotEmpty) PlotInfoCard(plot: plots[0]),
+          const SizedBox(height: 16),
           Expanded(
             child: FarmingCard(
               padding: const EdgeInsets.all(24),
@@ -48,9 +54,15 @@ class _AdvicePageState extends State<AdvicePage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      const AppLogo(size: 40, backgroundColor: Color(0xFFFFF9C4)),
+                      const AppLogo(
+                        size: 40,
+                        backgroundColor: Color(0xFFFFF9C4),
+                      ),
                       const SizedBox(width: 16),
-                      Text('Farming Advice', style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                        'Farming Advice',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       const Spacer(),
                       const Icon(LucideIcons.refreshCw, size: 20),
                     ],
@@ -74,22 +86,32 @@ class _AdvicePageState extends State<AdvicePage> {
                             showCheckmark: false,
                             selectedColor: Theme.of(context).primaryColor,
                             labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : Theme.of(context).textTheme.bodyMedium?.color,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              color: isSelected
+                                  ? Colors.white
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.color,
+                              fontWeight: isSelected
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                               fontSize: 12,
                             ),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
                           ),
                         );
                       }),
                     ),
                   ),
-                    const SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Text(
                         _getFilteredAdvice(advice),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(height: 1.6),
                       ),
                     ),
                   ),
