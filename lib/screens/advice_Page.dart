@@ -44,11 +44,6 @@ class _AdvicePageState extends State<AdvicePage> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-<<<<<<< HEAD:lib/screens/advice_Page.dart
-          if (plots.isNotEmpty) PlotInfoCard(plot: plots[0]),
-          const SizedBox(height: 16),
-=======
->>>>>>> 9c44c99e7f99dc99428d8e5db32fe71f3016d38b:lib/screens/advice_page.dart
           Expanded(
             child: FarmingCard(
               padding: const EdgeInsets.all(24),
