@@ -102,7 +102,7 @@ class _DetectPageState extends State<DetectPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Identify diseases and pests instantly by scanning your crops.',
+              'Identify pests instantly by scanning your crops.',
               style: TextStyle(fontSize: 14, color: Colors.black54),
             ),
             const SizedBox(height: 24),

@@ -144,10 +144,11 @@ class WeatherSmartService extends ChangeNotifier {
     await FirestoreService().deletePlot(plotId);
   }
 
-  void addLog(String activity) {
+  void addLog(String activity, {String? plot, String? date}) {
     _activities.insert(0, {
       'title': activity,
-      'time': DateFormat('h:mm a').format(DateTime.now()),
+      'plot': plot ?? 'General',
+      'time': date ?? DateFormat('MMM d, yyyy').format(DateTime.now()),
     });
     notifyListeners();
   }
