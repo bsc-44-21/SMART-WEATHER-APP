@@ -116,7 +116,8 @@ class AppTheme {
           elevation: 2,
         ),
       ),
-       bottomNavigationBarTheme: BottomNavigationBarThemeData(
+
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surface,
         selectedItemColor: primaryAccent,
         unselectedItemColor: primaryAccent.withOpacity(0.4),
@@ -215,3 +216,31 @@ class AppTheme {
         ),
       ),
 
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkPrimaryAccent,
+          foregroundColor: darkBackground,
+          minimumSize: const Size(double.infinity, 64),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(32),
+          ),
+          textStyle: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          elevation: 4,
+        ),
+      ),
+
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: darkSurface,
+        selectedItemColor: darkPrimaryAccent,
+        unselectedItemColor: darkTextMuted,
+        type: BottomNavigationBarType.fixed,
+        elevation: 10,
+        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+      ),
+    );
+  }
+}
