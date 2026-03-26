@@ -39,3 +39,43 @@ class DetectPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                 ),
+TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'View All',
+                    style: TextStyle(color: AppTheme.primaryAccent),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildHistoryList(context),
+            const SizedBox(height: 40), // Bottom padding
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScanCard(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF2E7D32), // Dark Green
+            Color(0xFF4CAF50), // Light Green
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2E7D32).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
