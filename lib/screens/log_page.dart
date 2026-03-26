@@ -55,11 +55,9 @@ class _LogPageState extends State<LogPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // HEADER
+                  // HEADER (NO SETTINGS ICON)
                   Row(
                     children: [
-                      const Icon(LucideIcons.settings, size: 20),
-                      const SizedBox(width: 16),
                       const AppLogo(
                         size: 40,
                         backgroundColor: Color(0xFFE3F2FD),
