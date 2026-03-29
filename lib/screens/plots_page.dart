@@ -7,6 +7,7 @@ import '../services/weather_smart_service.dart';
 
 import '../widgets/create_plot_sheet.dart';
 import '../widgets/delete_confirmation_dialog.dart';
+import 'plot_details_page.dart';
 
 class PlotsPage extends StatefulWidget {
   const PlotsPage({super.key});
@@ -57,16 +58,16 @@ class _PlotsPageState extends State<PlotsPage> {
                           final plot = plots[index];
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 16.0),
-                            child: PlotInfoCard(
+                            child: CompactPlotCard(
                               plot: plot,
-                              onEdit: () => showCreatePlotBottomSheet(
-                                context,
-                                existingPlot: plot,
-                              ),
-                              onDelete: () => showDeleteConfirmationDialog(
-                                context,
-                                plot: plot,
-                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PlotDetailsPage(plotId: plot.id),
+                                  ),
+                                );
+                              },
                             ),
                           );
                         },

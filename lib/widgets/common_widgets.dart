@@ -334,6 +334,77 @@ class PlotInfoCard extends StatelessWidget {
   }
 }
 
+class CompactPlotCard extends StatelessWidget {
+  final PlotModel plot;
+  final VoidCallback? onTap;
+
+  const CompactPlotCard({
+    super.key,
+    required this.plot,
+    this.onTap,
+  });
+
+  String _getCropEmoji(String cropName) {
+    final lower = cropName.toLowerCase();
+    if (lower.contains('maize')) return '🌽';
+    if (lower.contains('tomato')) return '🍅';
+    if (lower.contains('nut') || lower.contains('g/nut')) return '🥜';
+    if (lower.contains('coffee')) return '☕';
+    if (lower.contains('cotton')) return '🌿';
+    if (lower.contains('tobacco')) return '🚬';
+    if (lower.contains('soy')) return '🌿';
+    return '🌱';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FarmingCard(
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryAccent.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              _getCropEmoji(plot.cropName),
+              style: const TextStyle(fontSize: 24),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              plot.name,
+              style: GoogleFonts.inter(
+                color: Colors.black87,
+                fontWeight: FontWeight.w600,
+                fontSize: 18,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          Icon(LucideIcons.chevronRight, color: Colors.grey.shade400, size: 24),
+        ],
+      ),
+    );
+  }
+}
+
 class CustomTextField extends StatelessWidget {
   final String label;
   final String hint;
