@@ -22,14 +22,17 @@ class FirestoreService {
   }
   // Get a real-time stream of plots for a specific user
   Stream<List<PlotModel>> getUserPlotsStream(String userId) {
+    // Handling both legacy 'userId' and new 'user_id'
     return _db
         .collection('plots')
-        .where('userId', isEqualTo: userId)
         .snapshots()
-        .map((snapshot) => snapshot.docs
+        .map((snapshot) {
+          return snapshot.docs
             .map((doc) => PlotModel.fromMap(doc.data(), doc.id))
-            .toList());
-             }
+            .where((plot) => plot.userId == userId)
+            .toList();
+        });
+  }
 
   // Delete a plot
   Future<void> deletePlot(String plotId) async {

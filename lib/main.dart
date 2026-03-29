@@ -6,7 +6,7 @@ import 'screens/auth_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'services/weather_smart_service.dart';
 import 'services/auth_service.dart';
-import 'services/weather_smart_service.dart';
+import 'services/navigation_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +16,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => WeatherSmartService()),
         ChangeNotifierProvider(create: (context) => AuthService()),
+        ChangeNotifierProvider(create: (context) => NavigationService()),
       ],
       child: const WeatherSmartApp(),
     ),

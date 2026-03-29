@@ -12,11 +12,12 @@ class AppTheme {
   static const Color inputBorder = Color(0xFFE0E0E0);
   
   // Dark Color Palette
-  static const Color darkBackground = Color(0xFF1A1C19);
-  static const Color darkSurface = Color(0xFF2D302C);
-  static const Color darkTextPrimary = Color(0xFFE3E3E3);
-  static final Color darkTextMuted = const Color(0xFFE3E3E3).withOpacity(0.60);
-  static const Color darkInputBorder = Color(0xFF4A4C48);
+  static const Color darkBackground = Color(0xFF0E110F); // Deeper Charcoal
+  static const Color darkSurface = Color(0xFF1E211E); // Distinct Surface
+  static const Color darkTextPrimary = Colors.white; // Pure White
+  static final Color darkTextMuted = Colors.white.withOpacity(0.80); // Clearer Muted Text
+  static const Color darkInputBorder = Color(0xFF3A3C38);
+  static const Color darkPrimaryAccent = Color(0xFF4CAF50); // Vibrant Emerald
 
   static ThemeData get theme {
     return ThemeData(
@@ -134,62 +135,68 @@ class AppTheme {
       brightness: Brightness.dark,
       colorScheme: ColorScheme.fromSeed(
         brightness: Brightness.dark,
-        seedColor: primaryAccent,
-        primary: const Color(0xFFA5D6A7),
+        seedColor: darkPrimaryAccent,
+        primary: darkPrimaryAccent,
         surface: darkSurface,
-        surfaceVariant: darkBackground,
         onSurface: darkTextPrimary,
+        secondary: const Color(0xFF66BB6A),
       ),
       scaffoldBackgroundColor: darkBackground,
       
       textTheme: TextTheme(
         displayLarge: GoogleFonts.cormorantGaramond(
           fontSize: 36,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.bold,
           color: darkTextPrimary,
         ),
         displayMedium: GoogleFonts.cormorantGaramond(
           fontSize: 32,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.bold,
           color: darkTextPrimary,
         ),
         titleLarge: GoogleFonts.cormorantGaramond(
           fontSize: 24,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.bold,
           color: darkTextPrimary,
         ),
         bodyLarge: GoogleFonts.inter(
           fontSize: 16,
           color: darkTextPrimary,
+          fontWeight: FontWeight.w500,
         ),
         bodyMedium: GoogleFonts.inter(
           fontSize: 14,
           color: darkTextPrimary,
-          height: 1.5,
+          height: 1.6,
         ),
         labelLarge: GoogleFonts.inter(
           fontSize: 12,
-          fontWeight: FontWeight.w700,
+          fontWeight: FontWeight.w800,
           color: darkTextMuted,
-          letterSpacing: 1.2,
+          letterSpacing: 1.5,
         ),
         labelSmall: GoogleFonts.inter(
           fontSize: 11,
+          fontWeight: FontWeight.w600,
           color: darkTextMuted,
         ),
       ),
 
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
+        filled: true, 
         fillColor: darkSurface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: darkInputBorder),
+          borderSide: const BorderSide(color: darkInputBorder, width: 1.5),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: darkInputBorder),
+          borderSide: const BorderSide(color: darkInputBorder, width: 1.5), 
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: darkPrimaryAccent, width: 2.0),
         ),
         labelStyle: GoogleFonts.inter(
           fontSize: 12,
@@ -201,16 +208,17 @@ class AppTheme {
 
       cardTheme: CardThemeData(
         color: darkSurface,
-        elevation: 0,
+        elevation: 8,
+        shadowColor: Colors.black.withOpacity(0.5),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(44),
-          side: BorderSide(color: Colors.white.withOpacity(0.05)),
+          borderRadius: BorderRadius.circular(32),
+          side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
         ),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFA5D6A7),
+          backgroundColor: darkPrimaryAccent,
           foregroundColor: darkBackground,
           minimumSize: const Size(double.infinity, 64),
           shape: RoundedRectangleBorder(
@@ -218,20 +226,20 @@ class AppTheme {
           ),
           textStyle: GoogleFonts.inter(
             fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
           ),
-          elevation: 2,
+          elevation: 4,
         ),
       ),
 
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: darkSurface,
-        selectedItemColor: const Color(0xFFA5D6A7),
+        selectedItemColor: darkPrimaryAccent,
         unselectedItemColor: darkTextMuted,
         type: BottomNavigationBarType.fixed,
-        elevation: 0,
-        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5),
-        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+        elevation: 10,
+        selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+        unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.5),
       ),
     );
   }
