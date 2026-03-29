@@ -183,7 +183,7 @@ class AppTheme {
       ),
 
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
+        filled: true, 
         fillColor: darkSurface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         border: OutlineInputBorder(
@@ -192,7 +192,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: darkInputBorder, width: 1.5),
+          borderSide: const BorderSide(color: darkInputBorder, width: 1.5), 
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
