@@ -205,27 +205,43 @@ class PlotInfoCard extends StatelessWidget {
                 color: Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Row(
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Icon(LucideIcons.cloud, size: 14, color: Colors.grey.shade700),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${current['temperature_2m']}°',
-                    style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.cloud, size: 14, color: Colors.grey.shade700),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${current['temperature_2m']}°',
+                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Icon(LucideIcons.droplets, size: 14, color: Colors.grey.shade700),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${current['precipitation']}mm',
-                    style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.droplets, size: 14, color: Colors.grey.shade700),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${current['precipitation']}mm',
+                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Icon(LucideIcons.wind, size: 14, color: Colors.grey.shade700),
-                  const SizedBox(width: 4),
-                  Text(
-                    '${current['wind_speed_10m']}km/h',
-                    style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.wind, size: 14, color: Colors.grey.shade700),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${current['wind_speed_10m']}km/h',
+                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -236,7 +252,9 @@ class PlotInfoCard extends StatelessWidget {
           if (current == null) const SizedBox(height: 12),
 
           // Row 3: Plot Details
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -249,14 +267,16 @@ class PlotInfoCard extends StatelessWidget {
                   children: [
                     Icon(LucideIcons.mapPin, size: 14, color: Colors.grey.shade700),
                     const SizedBox(width: 4),
-                    Text(
-                      plot.location,
-                      style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w500),
+                    Flexible(
+                      child: Text(
+                        plot.location,
+                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w500),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(

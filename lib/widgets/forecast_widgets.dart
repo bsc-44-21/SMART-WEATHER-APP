@@ -183,30 +183,34 @@ class DailyForecastWidget extends StatelessWidget {
                   ),
                   Expanded(
                     flex: 5,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Icon(LucideIcons.droplets, size: 12, color: AppTheme.primaryAccent),
-                        const SizedBox(width: 2),
-                        SizedBox(
-                          width: 35,
-                          child: Text('${precip[index]}', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade600)),
-                        ),
-                        Icon(LucideIcons.wind, size: 12, color: Colors.grey.shade400),
-                        const SizedBox(width: 2),
-                        SizedBox(
-                          width: 25,
-                          child: Text('${wind[index].round()}', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade600)),
-                        ),
-                        Text(
-                          '${minTemps[index].round()}°',
-                          style: GoogleFonts.inter(fontSize: 14, color: Colors.grey.shade400),
-                        ),
-                        Text(
-                          ' / ${maxTemps[index].round()}°',
-                          style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
-                        ),
-                      ],
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerRight,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(LucideIcons.droplets, size: 12, color: AppTheme.primaryAccent),
+                          const SizedBox(width: 2),
+                          SizedBox(
+                            width: 35,
+                            child: Text('${precip[index]}', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade600)),
+                          ),
+                          Icon(LucideIcons.wind, size: 12, color: Colors.grey.shade400),
+                          const SizedBox(width: 2),
+                          SizedBox(
+                            width: 25,
+                            child: Text('${wind[index].round()}', style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade600)),
+                          ),
+                          Text(
+                            '${minTemps[index].round()}°',
+                            style: GoogleFonts.inter(fontSize: 14, color: Colors.grey.shade400),
+                          ),
+                          Text(
+                            ' / ${maxTemps[index].round()}°',
+                            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

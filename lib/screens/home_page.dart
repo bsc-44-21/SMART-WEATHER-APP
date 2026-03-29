@@ -237,9 +237,10 @@ class HomePage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Text(
                 'Local Weather',
                 style: GoogleFonts.inter(
@@ -276,7 +277,8 @@ class HomePage extends StatelessWidget {
                   ),
                 ],
               ),
-            ],
+              ],
+            ),
           ),
           Text(
             emoji,
