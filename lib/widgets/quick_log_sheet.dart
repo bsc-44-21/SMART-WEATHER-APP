@@ -25,14 +25,15 @@ void showQuickLogBottomSheet(BuildContext context) {
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     Row(
                       children: [
                         Container(
@@ -147,7 +148,8 @@ void showQuickLogBottomSheet(BuildContext context) {
                 ),
               ),
             ),
-          );
+          ),
+        );
         },
       );
     },
