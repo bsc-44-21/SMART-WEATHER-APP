@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../core/theme.dart';
 import 'home_page.dart';
 import 'plots_page.dart';
-import 'advice_page.dart';
 import 'log_page.dart';
 import 'profile_settings_page.dart';
 
@@ -17,16 +16,18 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
 
+  // AdvicePage removed completely
   static const List<Widget> _pages = [
     HomePage(),
     PlotsPage(),
-    AdvicePage(),
     LogPage(),
     ProfileSettingsPage(),
   ];
-@override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: _pages[_selectedIndex],
       ),
@@ -43,20 +44,19 @@ class _MainLayoutState extends State<MainLayout> {
           ],
         ),
         child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed, // Needed when >3 items
-          items: [
-            _buildNavItem(LucideIcons.layoutGrid, 'HOME', 0),
-            _buildNavItem(LucideIcons.map, 'PLOTS', 1),
-            _buildNavItem(LucideIcons.sparkles, 'ADVICE', 2),
-            _buildNavItem(LucideIcons.clipboardList, 'LOG', 3),
-            _buildNavItem(LucideIcons.user, 'PROFILE', 4),
-          ],
+          type: BottomNavigationBarType.fixed,
           currentIndex: _selectedIndex,
           onTap: (index) => setState(() => _selectedIndex = index),
           selectedFontSize: 10,
           unselectedFontSize: 10,
           selectedItemColor: AppTheme.primaryAccent,
           unselectedItemColor: AppTheme.textMuted,
+          items: [
+            _buildNavItem(LucideIcons.layoutGrid, 'HOME', 0),
+            _buildNavItem(LucideIcons.map, 'PLOTS', 1),
+            _buildNavItem(LucideIcons.clipboardList, 'LOG', 2),
+            _buildNavItem(LucideIcons.user, 'PROFILE', 3),
+          ],
         ),
       ),
     );
@@ -64,9 +64,10 @@ class _MainLayoutState extends State<MainLayout> {
 
   BottomNavigationBarItem _buildNavItem(IconData icon, String label, int index) {
     final bool isSelected = _selectedIndex == index;
+
     return BottomNavigationBarItem(
       icon: Container(
-         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.background : Colors.transparent,
           borderRadius: BorderRadius.circular(20),

@@ -6,6 +6,7 @@ import 'screens/auth_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'services/weather_smart_service.dart';
 import 'services/auth_service.dart';
+import 'services/weather_smart_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -21,17 +21,24 @@ class _LogPageState extends State<LogPage> {
     super.dispose();
   }
 
-  void _addActivity(BuildContext context) {
+  Future<void> _addActivity(BuildContext context) async {
     if (_activityController.text.trim().isEmpty) return;
-    context.read<WeatherSmartService>().addLog(_activityController.text.trim());
+    final activityText = _activityController.text.trim();
+    await context.read<WeatherSmartService>().addLog(activityText);
     _activityController.clear();
     // Dismiss keyboard
     FocusManager.instance.primaryFocus?.unfocus();
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Activity logged and AI advice generated.')),
+    );
   }
    @override
   Widget build(BuildContext context) {
     final plots = context.watch<WeatherSmartService>().plots;
     final logs = context.watch<WeatherSmartService>().logs;
+    final advice = context.watch<WeatherSmartService>().advice;
+    final isGeneratingAdvice = context.watch<WeatherSmartService>().isGeneratingAdvice;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -87,6 +94,55 @@ class _LogPageState extends State<LogPage> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 20),
+                  // AI-Generated Advice Section
+                  if (logs.isNotEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF9C4),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.amber.shade300),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(LucideIcons.lightbulb, color: Colors.amber, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                'AI Advice for: ${logs.first['title'] ?? 'Latest Activity'}',
+                                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          if (isGeneratingAdvice)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 12),
+                              child: SizedBox(
+                                height: 40,
+                                child: Center(
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                ),
+                              ),
+                            )
+                          else
+                            Text(
+                              advice,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                height: 1.5,
+                              ),
+                              maxLines: 5,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(height: 16),
                   Expanded(
                     child: logs.isEmpty
