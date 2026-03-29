@@ -4,6 +4,7 @@ import '../services/weather_smart_service.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/create_plot_sheet.dart';
 import '../widgets/delete_confirmation_dialog.dart';
+import '../widgets/forecast_widgets.dart';
 
 class PlotDetailsPage extends StatelessWidget {
   final String plotId;
@@ -15,7 +16,8 @@ class PlotDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final plots = context.watch<WeatherSmartService>().plots;
+    final weatherService = context.watch<WeatherSmartService>();
+    final plots = weatherService.plots;
     
     final plotIndex = plots.indexWhere((p) => p.id == plotId);
     if (plotIndex == -1) {
@@ -35,6 +37,7 @@ class PlotDetailsPage extends StatelessWidget {
     }
     
     final plot = plots[plotIndex];
+    final weatherData = weatherService.getPlotWeather(plotId);
 
     return Scaffold(
       appBar: AppBar(
@@ -45,21 +48,32 @@ class PlotDetailsPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(vertical: 16.0), // Changed from EdgeInsets.all
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              PlotInfoCard(
-                plot: plot,
-                onEdit: () => showCreatePlotBottomSheet(
-                  context,
-                  existingPlot: plot,
-                ),
-                onDelete: () => showDeleteConfirmationDialog(
-                  context,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: PlotInfoCard(
                   plot: plot,
+                  onEdit: () => showCreatePlotBottomSheet(
+                    context,
+                    existingPlot: plot,
+                  ),
+                  onDelete: () => showDeleteConfirmationDialog(
+                    context,
+                    plot: plot,
+                  ),
                 ),
               ),
+              const SizedBox(height: 24),
+              if (weatherData != null && weatherData['hourly'] != null)
+                HourlyForecastWidget(hourlyData: weatherData['hourly']),
+              if (weatherData != null && weatherData['hourly'] != null)
+                const SizedBox(height: 24),
+              if (weatherData != null && weatherData['daily'] != null)
+                DailyForecastWidget(dailyData: weatherData['daily']),
+              const SizedBox(height: 24),
             ],
           ),
         ),
