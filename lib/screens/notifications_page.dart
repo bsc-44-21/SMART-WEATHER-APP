@@ -236,7 +236,7 @@ class NotificationsPage extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
@@ -249,7 +249,7 @@ class NotificationsPage extends StatelessWidget {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(LucideIcons.arrowLeft, color: AppTheme.primaryAccent),
+                    icon: Icon(LucideIcons.arrowLeft, color: Theme.of(context).colorScheme.onSurface),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -260,7 +260,7 @@ class NotificationsPage extends StatelessWidget {
                     child: Text(
                       'Clear All',
                       style: GoogleFonts.inter(
-                        color: Colors.grey.shade500,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
@@ -273,7 +273,7 @@ class NotificationsPage extends StatelessWidget {
                 'Notifications',
                 style: Theme.of(context).textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.w900,
-                  color: AppTheme.primaryAccent,
+                  color: Theme.of(context).colorScheme.onSurface,
                   letterSpacing: -1.5,
                 ),
               ),
@@ -283,13 +283,13 @@ class NotificationsPage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryAccent.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '$alertCount Active Alerts',
                       style: GoogleFonts.inter(
-                        color: AppTheme.primaryAccent,
+                        color: Theme.of(context).colorScheme.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
@@ -306,12 +306,12 @@ class NotificationsPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(LucideIcons.bellOff, size: 64, color: Colors.grey.shade300),
+                            Icon(LucideIcons.bellOff, size: 64, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                             const SizedBox(height: 16),
                             Text(
                               'Everything is clear!',
                               style: GoogleFonts.inter(
-                                color: Colors.grey.shade500,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -357,20 +357,18 @@ class _NotificationCard extends StatelessWidget {
     final isOptimal = title.contains('Optimal');
     final accentColor = isOptimal ? Colors.green : iconColor;
 
-    return Container(
+    return Card(
       margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withOpacity(0.1)
+              : Colors.black.withOpacity(0.05),
+        ),
+      ),
+      elevation: Theme.of(context).brightness == Brightness.dark ? 2 : 0,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -405,7 +403,7 @@ class _NotificationCard extends StatelessWidget {
                               style: GoogleFonts.inter(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 16,
-                                color: AppTheme.primaryAccent,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -413,7 +411,7 @@ class _NotificationCard extends StatelessWidget {
                               time,
                               style: GoogleFonts.inter(
                                 fontSize: 11,
-                                color: Colors.grey.shade500,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -443,7 +441,7 @@ class _NotificationCard extends StatelessWidget {
                     message,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: Colors.black87,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                       height: 1.5,
                     ),
                   ),
