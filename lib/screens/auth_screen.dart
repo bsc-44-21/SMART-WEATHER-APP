@@ -96,6 +96,7 @@ class _AuthScreenState extends State<AuthScreen> {
                                       );
 
                                   if (success && context.mounted) {
+                                    context.read<NavigationService>().setIndex(0);
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(

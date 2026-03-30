@@ -66,7 +66,7 @@ class _DetectPageState extends State<DetectPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Scan complete! Results added to history.'),
-              backgroundColor: Color(0xFF5A5A40),
+              backgroundColor: AppTheme.primaryAccent,
             ),
           );
         }
@@ -141,10 +141,10 @@ class _DetectPageState extends State<DetectPage> {
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
       // Changed gradient to Deep Olive theme
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [
-            Color(0xFF5A5A40), // Deep Olive
-            Color(0xFF7A7A57), // Lighter Olive
+            AppTheme.primaryAccent,
+            AppTheme.primaryAccent.withOpacity(0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -152,7 +152,7 @@ class _DetectPageState extends State<DetectPage> {
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF5A5A40).withOpacity(0.3),
+            color: AppTheme.primaryAccent.withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -201,9 +201,9 @@ class _DetectPageState extends State<DetectPage> {
             icon: const Icon(LucideIcons.camera),
             label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             style: ElevatedButton.styleFrom(
-              foregroundColor: const Color(0xFF5A5A40), // Deep Olive
-              backgroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white.withOpacity(0.7),
+              foregroundColor: Colors.white,
+              backgroundColor: AppTheme.primaryAccent,
+              disabledBackgroundColor: AppTheme.primaryAccent.withOpacity(0.7),
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
