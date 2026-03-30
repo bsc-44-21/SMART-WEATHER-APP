@@ -3,6 +3,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import '../widgets/common_widgets.dart';
 import '../services/auth_service.dart';
+import '../services/navigation_service.dart';
 import '../core/theme.dart';
 import 'dashboard_screen.dart';
 import 'sign_up_screen.dart';
