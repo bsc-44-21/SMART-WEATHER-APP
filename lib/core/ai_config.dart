@@ -13,4 +13,8 @@ class AiConfig {
     'openchat/openchat-3.6-8b:free',
     'openrouter/auto', // Automatic model selection by OpenRouter
   ];
+  // Request timeout duration
+  static const int requestTimeoutSeconds = 60;
   
+  // Debugging: Set to true to see detailed logs
+  static const bool debugMode = true;
