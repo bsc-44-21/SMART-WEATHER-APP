@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 
 class DetectPage extends StatefulWidget {
@@ -67,7 +66,7 @@ class _DetectPageState extends State<DetectPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Scan complete! Results added to history.'),
-              backgroundColor: AppTheme.primaryAccent,
+              backgroundColor: Color(0xFF5A5A40),
             ),
           );
         }
@@ -137,48 +136,62 @@ class _DetectPageState extends State<DetectPage> {
   }
 
   Widget _buildScanCard(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-        child: Column(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+      // Changed gradient to Deep Olive theme
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFF5A5A40), // Deep Olive
+            Color(0xFF7A7A57), // Lighter Olive
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF5A5A40).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: AppTheme.primaryAccent.withOpacity(0.05),
+              color: Colors.white.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
             child: _isProcessing 
               ? const SizedBox(
                   width: 56, 
                   height: 56, 
-                  child: CircularProgressIndicator(
-                    color: AppTheme.primaryAccent, 
-                    strokeWidth: 3,
-                  )
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3,)
                 )
               : const Icon(
                   LucideIcons.scanLine,
                   size: 56,
-                  color: AppTheme.primaryAccent,
+                  color: Colors.white,
                 ),
           ),
           const SizedBox(height: 24),
           Text(
             _isProcessing ? 'Analyzing...' : 'Scan Crop or Pest',
-            style: GoogleFonts.inter(
-              color: AppTheme.primaryAccent,
-              fontSize: 22,
-              fontWeight: FontWeight.w800,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             _isProcessing ? 'Please wait while we process the image.' : 'Keep your crops healthy and safe',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              color: Colors.grey.shade600,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.9),
               fontSize: 14,
             ),
           ),
@@ -186,10 +199,19 @@ class _DetectPageState extends State<DetectPage> {
           ElevatedButton.icon(
             onPressed: _isProcessing ? null : _scanPest,
             icon: const Icon(LucideIcons.camera),
-            label: const Text('Tap to Scan'),
+            label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: const Color(0xFF5A5A40), // Deep Olive
+              backgroundColor: Colors.white,
+              disabledBackgroundColor: Colors.white.withOpacity(0.7),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              elevation: 0,
+            ),
           ),
         ],
-        ),
       ),
     );
   }
@@ -229,19 +251,20 @@ class _DetectPageState extends State<DetectPage> {
     required bool isCritical,
     required IconData icon,
   }) {
-    return Card(
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.05),
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+      child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(12),
@@ -298,7 +321,6 @@ class _DetectPageState extends State<DetectPage> {
             ),
           ),
         ],
-        ),
       ),
     );
   }
