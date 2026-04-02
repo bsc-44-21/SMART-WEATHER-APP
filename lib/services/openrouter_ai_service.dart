@@ -89,3 +89,44 @@ class OpenRouterAiService {
         'temperature': 0.5,
         'max_tokens': 250,
       };
+
+      final response = await http.post(
+        Uri.parse(AiConfig.apiUrl),
+        headers: {
+          'Authorization': 'Bearer ${AiConfig.apiKey}',
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://smart-weather-app.example.com',
+          'X-Title': 'Smart Weather Farm App',
+        },
+        body: jsonEncode(requestBody),
+      ).timeout(Duration(seconds: AiConfig.requestTimeoutSeconds));
+
+      print('[AI] Response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        try {
+          final data = jsonDecode(response.body);
+          if (data['choices'] != null && data['choices'].isNotEmpty) {
+            final advice = data['choices'][0]['message']['content'].toString().trim();
+            print('[AI] Successfully generated advice with $model');
+            return advice;
+          }
+        } catch (e) {
+          print('[AI] Error parsing response: $e');
+        }
+        return null;
+      } else {
+        try {
+          final errorData = jsonDecode(response.body);
+          final errorMsg = errorData['error']?['message'] ?? response.body;
+          print('[AI] Model $model failed - Status ${response.statusCode}: $errorMsg');
+        } catch (e) {
+          print('[AI] Model $model failed - Status ${response.statusCode}');
+        }
+        return null;
+      }
+    } catch (e) {
+      print('[AI] Exception with model $model: $e');
+      return null;
+    }
+  }
