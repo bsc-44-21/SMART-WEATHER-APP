@@ -6,6 +6,7 @@ import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/auth_service.dart';
 import 'auth_screen.dart';
+import 'notifications_page.dart';
 
 class ProfileSettingsPage extends StatelessWidget {
   const ProfileSettingsPage({super.key});
@@ -21,7 +22,16 @@ class ProfileSettingsPage extends StatelessWidget {
           Text('Preferences', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           _buildSettingsSection([
-            _SettingsTile(icon: LucideIcons.bell, title: 'Notifications', onTap: () {}),
+            _SettingsTile(
+              icon: LucideIcons.bell, 
+              title: 'Notifications', 
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                );
+              }
+            ),
             _SettingsTile(icon: LucideIcons.globe, title: 'Language', subtitle: 'English',
             onTap: () {}),
             _SettingsTile(

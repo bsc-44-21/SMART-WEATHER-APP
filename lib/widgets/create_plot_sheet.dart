@@ -35,6 +35,11 @@ final bool isEditing = existingPlot != null;
 
       return StatefulBuilder(
         builder: (context, setModalState) {
+          String? capturedCoords;
+          if (latController.text.isNotEmpty && lngController.text.isNotEmpty) {
+            capturedCoords = 'Coordinates: ${latController.text}, ${lngController.text}';
+          }
+
           return Container(
             decoration: BoxDecoration(
               color: Theme.of(context).scaffoldBackgroundColor,
@@ -57,7 +62,7 @@ final bool isEditing = existingPlot != null;
                     TextFormField(
                       controller: nameController,
                       enabled: !isSaving,
-                      decoration: const InputDecoration(labelText: 'Plot Name (e.g. North Field)'),
+                      decoration: const InputDecoration(labelText: 'Plot Name'),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a plot name' : null,
                     ),
                     const SizedBox(height: 16),
@@ -65,7 +70,13 @@ final bool isEditing = existingPlot != null;
                       controller: locationController,
                       enabled: !isSaving && !isFetchingLocation,
                       decoration: InputDecoration(
-                        labelText: 'Location Name (e.g. Sector 4)',
+                        labelText: 'Location Name',
+                        helperText: capturedCoords,
+                        helperStyle: const TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                         suffixIcon: isFetchingLocation 
                           ? const SizedBox(width: 20, height: 20, child: Padding(padding: EdgeInsets.all(12), child: CircularProgressIndicator(strokeWidth: 2)))
                           : IconButton(
@@ -75,8 +86,8 @@ final bool isEditing = existingPlot != null;
                                 final pos = await WeatherLocationService.getLocationWithPermission();
                                 if (pos != null) {
                                   setModalState(() {
-                                    latController.text = pos.latitude.toString();
-                                    lngController.text = pos.longitude.toString();
+                                    latController.text = pos.latitude.toStringAsFixed(4);
+                                    lngController.text = pos.longitude.toStringAsFixed(4);
                                     isFetchingLocation = false;
                                   });
                                 } else {
@@ -93,47 +104,15 @@ final bool isEditing = existingPlot != null;
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter a location name' : null,
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: latController,
-                            enabled: !isSaving,
-                            keyboardType: TextInputType.text,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.\-]')),
-                            ],
-                            decoration: const InputDecoration(
-                              labelText: 'Latitude',
-                              hintText: 'e.g. -13.9',
-                            ),
-                            validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: TextFormField(
-                            controller: lngController,
-                            enabled: !isSaving,
-                            keyboardType: TextInputType.text,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp(r'[0-9\.\-]')),
-                            ],
-                            decoration: const InputDecoration(
-                              labelText: 'Longitude',
-                              hintText: 'e.g. 33.7',
-                            ),
-                            validator: (value) => value == null || value.trim().isEmpty ? 'Required' : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
                     TextFormField(
                       controller: sizeController,
                       enabled: !isSaving,
-                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      decoration: const InputDecoration(labelText: 'Field Size (Digits only)'),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        labelText: 'Field Size',
+                        hintText: 'e.g. 2.5',
+                        suffixText: 'ha',
+                      ),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter the size' : null,
                     ),
                     const SizedBox(height: 16),
