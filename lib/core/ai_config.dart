@@ -6,3 +6,11 @@ class AiConfig {
   // Primary model (will auto-fallback if fails)
   // These are VERIFIED working free models on OpenRouter
   static const String primaryModel = 'mistralai/mistral-7b-instruct:free';
+// Fallback models (tried in order if primary fails)
+  static const List<String> fallbackModels = [
+    'meta-llama/llama-3-8b-instruct:free',
+    'nousresearch/nous-hermes-2-mixtral-8x7b-dpo:free',
+    'openchat/openchat-3.6-8b:free',
+    'openrouter/auto', // Automatic model selection by OpenRouter
+  ];
+  
