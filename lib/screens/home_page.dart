@@ -10,6 +10,7 @@ import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../services/navigation_service.dart';
 import '../widgets/create_plot_sheet.dart';
+import 'notifications_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -44,23 +45,36 @@ class HomePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. Welcome & Header
-          Text(
-            _getGreeting(),
-            style: GoogleFonts.inter(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            username,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: AppTheme.primaryAccent,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -1,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _getGreeting(),
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      username,
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: AppTheme.primaryAccent,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _buildNotificationIcon(context),
+            ],
           ),
 
           const SizedBox(height: 32),
@@ -237,9 +251,10 @@ class HomePage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               Text(
                 'Local Weather',
                 style: GoogleFonts.inter(
@@ -276,7 +291,8 @@ class HomePage extends StatelessWidget {
                   ),
                 ],
               ),
-            ],
+              ],
+            ),
           ),
           Text(
             emoji,
@@ -374,6 +390,31 @@ class HomePage extends StatelessWidget {
             Icon(LucideIcons.chevronRight, color: Colors.grey.shade300, size: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildNotificationIcon(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const NotificationsPage()),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Icon(LucideIcons.bell, color: AppTheme.primaryAccent, size: 24),
       ),
     );
   }

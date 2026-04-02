@@ -43,7 +43,7 @@ class WeatherLocationService {
   ) async {
     try {
       final String url =
-          'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,weather_code,precipitation,wind_speed_10m,rain&timezone=auto';
+          'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,weather_code,precipitation,wind_speed_10m,rain&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,wind_speed_10m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=auto';
 
       print('[Weather] Fetching weather from: $url');
 
@@ -67,6 +67,8 @@ class WeatherLocationService {
           'longitude': jsonResponse['longitude'],
           'timezone': jsonResponse['timezone'],
           'current': jsonResponse['current'],
+          'hourly': jsonResponse['hourly'],
+          'daily': jsonResponse['daily'],
         };
       } else {
         print('[Weather] API Error: ${response.statusCode} - ${response.body}');

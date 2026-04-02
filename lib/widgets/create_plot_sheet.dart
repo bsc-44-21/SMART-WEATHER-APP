@@ -48,14 +48,15 @@ final bool isEditing = existingPlot != null;
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     Text(isEditing ? 'Edit Plot' : 'Create New Plot', style: 
                     Theme.of(context).textTheme.headlineMedium),
                     const SizedBox(height: 24),
@@ -251,7 +252,8 @@ final bool isEditing = existingPlot != null;
                 ),
               ),
             ),
-          );
+          ),
+        );
         },
       );
     },
