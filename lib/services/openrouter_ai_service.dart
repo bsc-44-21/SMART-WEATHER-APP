@@ -130,3 +130,55 @@ class OpenRouterAiService {
       return null;
     }
   }
+   /// Build the prompt for the AI model
+  String _buildPrompt({
+    required String activity,
+    required String plotName,
+    required String cropName,
+    required String date,
+    required Map<String, dynamic>? weatherData,
+    required List<String> previousAdvice,
+  }) {
+    StringBuffer prompt = StringBuffer();
+
+    prompt.writeln('You are an agricultural expert. Provide concise, actionable farming advice.');
+    prompt.writeln('');
+    prompt.writeln('Farmer Activity: $activity');
+    prompt.writeln('Plot: $plotName');
+    prompt.writeln('Crop: $cropName');
+    prompt.writeln('Date: $date');
+
+    if (weatherData != null) {
+      prompt.writeln('');
+      prompt.writeln('Current Weather:');
+      if (weatherData.containsKey('temperature')) {
+        prompt.writeln('- Temperature: ${weatherData['temperature']}°C');
+      }
+      if (weatherData.containsKey('humidity')) {
+        prompt.writeln('- Humidity: ${weatherData['humidity']}%');
+      }
+      if (weatherData.containsKey('precipitation')) {
+        prompt.writeln('- Precipitation: ${weatherData['precipitation']}mm');
+      }
+      if (weatherData.containsKey('windSpeed')) {
+        prompt.writeln('- Wind Speed: ${weatherData['windSpeed']} km/h');
+      }
+      if (weatherData.containsKey('condition')) {
+        prompt.writeln('- Condition: ${weatherData['condition']}');
+      }
+    }
+
+    if (previousAdvice.isNotEmpty) {
+      prompt.writeln('');
+      prompt.writeln('Previous advices for context:');
+      for (int i = 0; i < previousAdvice.length && i < 3; i++) {
+        prompt.writeln('- ${previousAdvice[i]}');
+      }
+    }
+
+    prompt.writeln('');
+    prompt.writeln('Provide advice in 1-2 sentences, focusing on the current activity and weather.');
+
+    return prompt.toString();
+  }
+}
