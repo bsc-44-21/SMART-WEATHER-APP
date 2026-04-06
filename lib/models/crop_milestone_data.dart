@@ -20,4 +20,11 @@ class CropMilestoneData {
           'body': 'Your Maize at "$plotName" should be reaching maturity. Check for dry husks.',
         },
       ];
+      } else if (normalizedCrop.contains('tomato')) {
+      return [
+        {
+          'dap': 14,
+          'title': 'Staking',
+          'body': 'Support your Tomato plants in "$plotName" with stakes to keep fruit off the ground.',
+        },
 }
