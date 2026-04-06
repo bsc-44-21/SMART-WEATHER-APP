@@ -1,18 +1,21 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../core/mock_data.dart';
-import '../models/plot.dart';
 import 'firestore_service.dart';
 import 'weather_location_service.dart';
 import 'openrouter_ai_service.dart';
 import 'package:intl/intl.dart';
+import '../models/plot.dart';
+import '../models/activity_log.dart';
+import '../core/mock_data.dart';
+import 'package:uuid/uuid.dart';
 
 class WeatherSmartService extends ChangeNotifier {
   List<PlotModel> _plots = [];
-  final List<Map<String, dynamic>> _activities = List.from(MockData.activities);
+  List<Map<String, dynamic>> _activities = [];
   bool _isDarkMode = false;
   StreamSubscription? _plotsSubscription;
+  StreamSubscription? _logsSubscription;
   Timer? _weatherTimer;
   
   // Weather data
@@ -30,12 +33,24 @@ class WeatherSmartService extends ChangeNotifier {
  WeatherSmartService() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       _plotsSubscription?.cancel();
+      _logsSubscription?.cancel();
       _weatherTimer?.cancel();
       if (user != null) {
+        // Plots Stream
         _plotsSubscription = FirestoreService().getUserPlotsStream(user.uid).listen((plots) {
           _plots = plots;
           fetchWeatherForPlots(); // Fetch weather for each plot
           notifyListeners();
+        }, onError: (e) {
+          print('[WeatherSmartService] Plots stream error: $e');
+        });
+        
+        // Logs Stream
+        _logsSubscription = FirestoreService().getUserActivitiesStream(user.uid).listen((logs) {
+          _activities = logs.map((l) => l.toMap()).toList();
+          notifyListeners();
+        }, onError: (e) {
+          print('[WeatherSmartService] Logs stream error: $e');
         });
         
         // Start periodic refresh every minute
@@ -48,6 +63,7 @@ class WeatherSmartService extends ChangeNotifier {
         fetchWeatherForLocation();
       } else {
         _plots = [];
+        _activities = [];
         _currentWeather = null;
         _plotWeather.clear();
         notifyListeners();
@@ -153,158 +169,30 @@ class WeatherSmartService extends ChangeNotifier {
     await FirestoreService().deletePlot(plotId);
   }
 
-  void addLog(String activity, {String? plot, String? date}) {
-    final entryDate = date ?? DateFormat('MMM d, yyyy').format(DateTime.now());
-    final logId = 'log_${DateTime.now().millisecondsSinceEpoch}';
+  Future<void> addLog(String activity, {String? plot, String? date, bool? isRecommended, String? aiFeedback}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-    _activities.insert(0, {
-      'id': logId,
-      'title': activity,
-      'plot': plot ?? 'General',
-      'time': entryDate,
-      'advice': '',
-      'isGeneratingAdvice': true, // Add generating flag
-    });
-    
-    // Generate AI advice for this activity
-    _generateAdviceForActivity(
-      activity: activity,
-      plotName: plot ?? 'General',
-      date: entryDate,
-      logId: logId,
+    final logId = const Uuid().v4();
+    final newLog = ActivityLogModel(
+      id: logId,
+      userId: user.uid,
+      plot: plot ?? 'General',
+      title: activity,
+      time: date ?? DateFormat('MMM d, yyyy').format(DateTime.now()),
+      isRecommended: isRecommended,
+      aiFeedback: aiFeedback,
+      createdAt: DateTime.now(),
     );
-    
-    notifyListeners();
-  }
 
-  /// Generate farming advice using OpenRouter AI based on the logged activity
-  Future<void> _generateAdviceForActivity({
-    required String activity,
-    required String plotName,
-    required String date,
-    required String logId,
-  }) async {
-    print('[WeatherSmartService] _generateAdviceForActivity: activity=$activity plot=$plotName date=$date logId=$logId');
-    _isGeneratingAdvice = true;
-    notifyListeners();
-
-    try {
-      // Find the plot to get crop name and weather data
-      String cropName = 'Unknown Crop';
-      Map<String, dynamic>? plotWeather;
-      
-      if (plotName != 'General') {
-        try {
-          final selectedPlot = _plots.firstWhere((p) => p.name == plotName);
-          cropName = selectedPlot.cropName.isNotEmpty ? selectedPlot.cropName : 'Unknown Crop';
-          plotWeather = _plotWeather[selectedPlot.id] ?? _currentWeather;
-        } catch (e) {
-          // Plot not found, use current location weather
-          cropName = 'Unknown Crop';
-          plotWeather = _currentWeather;
-        }
-      } else {
-        plotWeather = _currentWeather;
-      }
-
-      // Validate supported crops before proceeding
-      const supportedCrops = ['tomato', 'maize', 'groundnut'];
-      final cropLower = cropName.toLowerCase().trim();
-      print('[WeatherSmartService] Crop validation: cropName="$cropName" (lowercased="$cropLower") supported=$supportedCrops');
-      
-      if (!supportedCrops.contains(cropLower)) {
-        final errorMsg = 'AI advice only available for tomato, maize, or groundnut. Your crop: "$cropName"';
-        print('[WeatherSmartService] Crop validation FAILED: $errorMsg');
-        _currentAdvice = errorMsg;
-        _setLogAdvice(logId, errorMsg);
-        return;
-      }
-      
-      if (plotWeather == null) {
-        print('[WeatherSmartService] WARNING: plotWeather is null, using default');
-        plotWeather = {};
-      }
-      
-      print('[WeatherSmartService] Crop validation passed. Calling AI with crop=$cropName activity=$activity');
-      
-      // Generate advice using OpenRouter AI
-      final advice = await OpenRouterAiService().generateFarmingAdvice(
-        activity: activity,
-        plotName: plotName,
-        cropName: cropName,
-        date: date,
-        weatherData: plotWeather,
-        previousAdvice: _previousAdvice,
-      );
-
-      _currentAdvice = advice;
-      
-      // Store in previous advice list for context in next requests
-      _previousAdvice.insert(0, advice);
-      if (_previousAdvice.length > _maxPreviousAdviceCount) {
-        _previousAdvice.removeLast();
-      }
-      
-      // TODO: Store advice in Firestore for later retrieval
-      // await FirestoreService().saveActivityAdvice(userId, activity, advice, date);
-      
-      print('[WeatherSmartService] Generated advice: $advice');
-      _setLogAdvice(logId, advice);
-    } catch (e) {
-      final errorMsg = 'Error: ${e.toString()}';
-      _currentAdvice = errorMsg;
-      _setLogAdvice(logId, errorMsg);
-      print('[WeatherSmartService] ERROR generating advice: $e');
-    } finally {
-      _isGeneratingAdvice = false;
-      notifyListeners();
-    }
-  }
-
-  void _setLogAdvice(String logId, String advice) {
-    final idx = _activities.indexWhere((log) => log['id'] == logId);
-    if (idx != -1) {
-      _activities[idx]['advice'] = advice;
-      _activities[idx]['isGeneratingAdvice'] = false; // Mark as done
-      notifyListeners();
-    }
-  }
-
-  /// Ask the AI a custom user question and store the answer
-  Future<void> askAIQuestion(String question) async {
-    print('[WeatherSmartService] askAIQuestion called with: $question');
-    if (question.trim().isEmpty) {
-      _currentAdvice = 'Please enter a question.';
-      notifyListeners();
-      return;
-    }
-
-    _isGeneratingAdvice = true;
-    notifyListeners();
-
-    try {
-      print('[WeatherSmartService] Calling OpenRouterAiService.generateCustomResponse');
-      final answer = await OpenRouterAiService().generateCustomResponse(userPrompt: question);
-      print('[WeatherSmartService] Received answer: $answer');
-      _currentAdvice = answer;
-
-      // keep history
-      _previousAdvice.insert(0, answer);
-      if (_previousAdvice.length > _maxPreviousAdviceCount) {
-        _previousAdvice.removeLast();
-      }
-    } catch (e) {
-      _currentAdvice = 'Unable to generate AI response. Please try again later.';
-      print('[WeatherSmartService] askAIQuestion error: $e');
-    } finally {
-      _isGeneratingAdvice = false;
-      notifyListeners();
-    }
+    // Save to Firestore - the stream will update the local UI list
+    await FirestoreService().saveActivityLog(newLog);
   }
 
   @override
   void dispose() {
     _plotsSubscription?.cancel();
+    _logsSubscription?.cancel();
     _weatherTimer?.cancel();
     super.dispose();
   }

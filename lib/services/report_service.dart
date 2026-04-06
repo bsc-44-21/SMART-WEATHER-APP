@@ -6,8 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import '../models/pest_detection.dart';
 import 'package:intl/intl.dart';
 
-class ReportService{
-     static Future<void> generateAndShareReport(PestDetectionModel detection) async {
+class ReportService {
+  static Future<void> generateAndShareReport(PestDetectionModel detection) async {
     final pdf = pw.Document();
 
     final dateStr = DateFormat('yyyy-MM-dd HH:mm').format(detection.timestamp);
@@ -50,7 +50,7 @@ class ReportService{
                 ),
                 pw.Divider(thickness: 2, color: PdfColors.grey300, height: 40),
 
-                 // Diagnosis Summary
+                // Diagnosis Summary
                 pw.Text(
                   'Diagnosis: ${detection.pestName}',
                   style: pw.TextStyle(
@@ -110,6 +110,7 @@ class ReportService{
                   ),
                   pw.SizedBox(height: 24),
                 ],
+
                 // Treatment Recommendations
                 pw.Text(
                   'Treatment Plan',
@@ -141,6 +142,7 @@ class ReportService{
         },
       ),
     );
+
     // Save and Share
     await Printing.sharePdf(
       bytes: await pdf.save(),

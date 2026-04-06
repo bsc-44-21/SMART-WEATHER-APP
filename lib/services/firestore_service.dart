@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/plot.dart';
+import '../models/activity_log.dart';
+import '../models/pest_detection.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -32,6 +34,66 @@ class FirestoreService {
             .where((plot) => plot.userId == userId)
             .toList();
         });
+  }
+
+  // Save or Update an activity log
+  Future<void> saveActivityLog(ActivityLogModel log) async {
+    try {
+      await _db.collection('activity_logs').doc(log.id).set(log.toMap());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get a real-time stream of activities for a specific user
+  Stream<List<ActivityLogModel>> getUserActivitiesStream(String userId) {
+    return _db
+        .collection('activity_logs')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          final docs = snapshot.docs
+            .map((doc) => ActivityLogModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+            .toList();
+          
+          // Sort client-side to avoid requiring a composite index in Firestore
+          docs.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return docs;
+        });
+  }
+
+  // Save a pest detection
+  Future<void> savePestDetection(PestDetectionModel detection) async {
+    try {
+      await _db.collection('pest_detections').doc(detection.id).set(detection.toMap());
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Get a stream of pest detections
+  Stream<List<PestDetectionModel>> getUserPestDetectionsStream(String userId) {
+    return _db
+        .collection('pest_detections')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((snapshot) {
+          final docs = snapshot.docs
+              .map((doc) => PestDetectionModel.fromMap(doc.data(), doc.id))
+              .toList();
+          
+          docs.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          return docs; // Newest first
+        });
+  }
+
+  // Delete a pest detection
+  Future<void> deletePestDetection(String detectionId) async {
+    try {
+      await _db.collection('pest_detections').doc(detectionId).delete();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   // Delete a plot
