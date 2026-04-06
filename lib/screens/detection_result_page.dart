@@ -162,4 +162,173 @@ class DetectionResultPage extends StatelessWidget {
       ],
     );
   }
+  Widget _buildThreatMeter(Color riskColor) {
+    double progress = 0.3;
+    if (detection.riskLevel.toLowerCase() == 'medium') progress = 0.6;
+    if (detection.riskLevel.toLowerCase() == 'high') progress = 1.0;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Threat Level",
+          style: GoogleFonts.inter(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: LinearProgressIndicator(
+            value: progress,
+            minHeight: 10,
+            backgroundColor: Colors.grey.withOpacity(0.1),
+            valueColor: AlwaysStoppedAnimation<Color>(riskColor),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeatherAdviceCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.blue.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.cloudRain, color: Colors.blue, size: 20),
+              const SizedBox(width: 10),
+              Text(
+                'Smart Weather Advice',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.blue.shade800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            detection.weatherAdvice!,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: Colors.blue.shade900,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title.toUpperCase(),
+      style: GoogleFonts.inter(
+        letterSpacing: 1.2,
+        fontSize: 13,
+        fontWeight: FontWeight.w800,
+        color: AppTheme.primaryAccent,
+      ),
+    );
+  }
+
+  Widget _buildBulletList(List<String> items) {
+    return Column(
+      children: items.map((item) => Padding(
+        padding: const EdgeInsets.only(bottom: 8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(top: 6.0),
+              child: Icon(Icons.circle, size: 6, color: Colors.black26),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                item,
+                style: GoogleFonts.inter(fontSize: 15, height: 1.4),
+              ),
+            ),
+          ],
+        ),
+      )).toList(),
+    );
+  }
+
+  Widget _buildRecommendationsCard() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+             Row(
+              children: [
+                const Icon(LucideIcons.leaf, color: Colors.green),
+                const SizedBox(width: 12),
+                Text(
+                  'Treatment Advice',
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildTabSection('Natural (Malawi)', detection.naturalRecommendations, Colors.green),
+            const Divider(height: 40),
+            _buildTabSection('Chemical (Available in MW)', detection.chemicalRecommendations, Colors.blueGrey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabSection(String title, List<String> items, Color color) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            color: color,
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...items.map((item) => Padding(
+          padding: const EdgeInsets.only(bottom: 6.0),
+          child: Row(
+            children: [
+              Icon(Icons.check_circle_outline, size: 16, color: color.withOpacity(0.5)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  item,
+                  style: GoogleFonts.inter(fontSize: 14),
+                ),
+              ),
+            ],
+          ),
+        )).toList(),
+      ],
+    );
+  }
+}
 
