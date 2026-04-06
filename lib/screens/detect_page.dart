@@ -415,6 +415,27 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                 ),
               ),
             ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: _isProcessing ? null : _scanPest,
+            icon: const Icon(LucideIcons.camera),
+            label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: const Color(0xFF5A5A40), // Deep Olive
+              backgroundColor: Colors.white,
+              disabledBackgroundColor: Colors.white.withOpacity(0.7),
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30), 
+              ),
+              elevation: 0,
+            ),
+          ),
+        ],
+            label: const Text('Tap to Scan'),
+          ),
+        ],
             if (_isProcessing)
               Positioned.fill(
                 child: LayoutBuilder(
