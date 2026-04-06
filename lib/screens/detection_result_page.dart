@@ -19,3 +19,23 @@ class DetectionResultPage extends StatelessWidget {
     final Color riskColor = isHighRisk 
         ? Colors.red 
         : (isMediumRisk ? Colors.orange : Colors.green);
+          return Scaffold(
+      backgroundColor: AppTheme.background,
+      body: CustomScrollView(
+        slivers: [
+          _buildAppBar(context, riskColor),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(riskColor),
+                  const SizedBox(height: 20),
+                  _buildThreatMeter(riskColor),
+                  const SizedBox(height: 24),
+                  
+                  if (detection.weatherAdvice != null && detection.weatherAdvice!.isNotEmpty) ...[
+                    _buildWeatherAdviceCard(),
+                    const SizedBox(height: 24),
+                  ],
