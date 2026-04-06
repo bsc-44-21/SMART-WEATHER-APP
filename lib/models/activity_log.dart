@@ -20,3 +20,30 @@ class ActivityLogModel {
     this.aiFeedback,
     required this.createdAt,
   });
+
+ Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'userId': userId,
+      'plot': plot,
+      'title': title,
+      'time': time,
+      'isRecommended': isRecommended,
+      'aiFeedback': aiFeedback,
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
+  }
+
+  factory ActivityLogModel.fromMap(Map<String, dynamic> map, String docId) {
+    return ActivityLogModel(
+      id: docId,
+      userId: map['userId'] ?? '',
+      plot: map['plot'] ?? '',
+      title: map['title'] ?? '',
+      time: map['time'] ?? '',
+      isRecommended: map['isRecommended'],
+      aiFeedback: map['aiFeedback'],
+      createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+}
