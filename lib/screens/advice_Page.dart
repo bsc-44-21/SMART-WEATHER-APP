@@ -27,6 +27,9 @@ class _AdvicePageState extends State<AdvicePage> {
     "🌱 Your crop's growth stage requires high nitrogen. Consider a top-dressing application of urea within the next 2 weeks.\n\n💧 Soil moisture levels are currently optimal at 68%.",
   ];
 
+  final TextEditingController _questionController = TextEditingController();
+
+
   String _getFilteredAdvice(String fullAdvice) {
     if (_selectedFilter == 0) {
       return fullAdvice;
@@ -35,10 +38,20 @@ class _AdvicePageState extends State<AdvicePage> {
   }
 
   @override
+  void dispose() {
+    _questionController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // Note: 'plots' is available if needed for future filtering by plot
     // final plots = context.watch<WeatherSmartService>().plots;
-    final advice = context.watch<WeatherSmartService>().advice;
+    final aiService = context.watch<WeatherSmartService>();
+    final advice = aiService.advice;
+    final currentAdvice = aiService.currentAdvice;
+    final isGenerating = aiService.isGeneratingAdvice;
+    final displayAdvice = currentAdvice.isNotEmpty ? currentAdvice : advice;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -104,10 +117,37 @@ class _AdvicePageState extends State<AdvicePage> {
                     ),
                   ),
                   const SizedBox(height: 16),
+                  TextField(
+                    controller: _questionController,
+                    minLines: 1,
+                    maxLines: 4,
+                    decoration: InputDecoration(
+                      hintText: 'Ask a farm-related question (e.g., "When should I water maize?")',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: isGenerating ? null : () {
+                        final query = _questionController.text.trim();
+                        if (query.isNotEmpty) {
+                          context.read<WeatherSmartService>().askAIQuestion(query);
+                        }
+                      },
+                      icon: isGenerating ? const SizedBox.shrink() : const Icon(LucideIcons.messageCircle, size: 18),
+                      label: isGenerating ? const Text('Generating...') : const Text('Ask AI'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Text(
-                        _getFilteredAdvice(advice),
+                        _getFilteredAdvice(displayAdvice),
                         style: Theme.of(
                           context,
                         ).textTheme.bodyMedium?.copyWith(height: 1.6),

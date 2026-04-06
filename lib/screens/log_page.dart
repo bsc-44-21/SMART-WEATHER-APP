@@ -59,7 +59,7 @@ class _LogPageState extends State<LogPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // HEADER (NO SETTINGS ICON)
+                  // HEADER
                   Row(
                     children: [
                       const AppLogo(
@@ -84,10 +84,6 @@ class _LogPageState extends State<LogPage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
                     ),
                   ),
 
@@ -102,10 +98,6 @@ class _LogPageState extends State<LogPage> {
                       suffixIcon: const Icon(Icons.calendar_today),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
                       ),
                     ),
                     onTap: () async {
@@ -127,19 +119,14 @@ class _LogPageState extends State<LogPage> {
 
                   const SizedBox(height: 12),
 
-                  // ACTIVITY INPUT (EXPANDS)
+                  // ACTIVITY INPUT
                   TextField(
                     controller: _activityController,
-                    minLines: 1,
-                    maxLines: 5,
+                    maxLines: 3,
                     decoration: InputDecoration(
                       hintText: 'Record activity...',
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
                       ),
                     ),
                   ),
@@ -153,64 +140,108 @@ class _LogPageState extends State<LogPage> {
                       onPressed: () => _addActivity(context),
                       icon: const Icon(Icons.send),
                       label: const Text("Send"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryAccent,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  // LOG LIST
+                  // LOG LIST WITH AI ADVICE
                   Expanded(
                     child: logs.isEmpty
                         ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  LucideIcons.clipboardList,
-                                  size: 64,
-                                  color: Colors.grey.shade400,
-                                ),
-                                const SizedBox(height: 24),
-                                Text(
-                                  'Ready to record',
-                                  style: Theme.of(context).textTheme.titleLarge,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Log your farm activities to keep an accurate history.',
-                                  textAlign: TextAlign.center,
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(color: AppTheme.textMuted),
-                                ),
-                              ],
-                            ),
+                            child: Text('No activities yet'),
                           )
                         : ListView.builder(
                             itemCount: logs.length,
                             itemBuilder: (context, index) {
                               final log = logs[index];
 
-                              return ListTile(
-                                leading: const Icon(
-                                  LucideIcons.checkSquare,
-                                  color: AppTheme.primaryAccent,
-                                ),
-                                title: Text(log['title'] ?? ''),
-                                subtitle: Text(
-                                  "Plot: ${log['plot']} | Date: ${log['time']}",
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black54,
+                              return Card(
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Activity
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                            LucideIcons.checkSquare,
+                                            color: AppTheme.primaryAccent,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              log['title'] ?? '',
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 4),
+
+                                      // Meta
+                                      Text(
+                                        "Plot: ${log['plot']} | Date: ${log['time']}",
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 8),
+
+                                      // 🔥 AI RESPONSE SECTION
+                                      if (log['isGeneratingAdvice'] == true)
+                                        Row(
+                                          children: const [
+                                            SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child:
+                                                  CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text("Generating advice..."),
+                                          ],
+                                        )
+                                      else if ((log['advice'] ?? '')
+                                          .toString()
+                                          .isNotEmpty)
+                                        Container(
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.shade50,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Icon(Icons.smart_toy,
+                                                  size: 18,
+                                                  color: Colors.green),
+                                              const SizedBox(width: 6),
+                                              Expanded(
+                                                child: Text(
+                                                  log['advice'],
+                                                  style: const TextStyle(
+                                                      fontSize: 13),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
-                                contentPadding: EdgeInsets.zero,
                               );
                             },
                           ),

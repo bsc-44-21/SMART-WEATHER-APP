@@ -1,19 +1,105 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../core/ai_config.dart';
 
 class OpenRouterAiService {
   static final OpenRouterAiService _instance = OpenRouterAiService._internal();
 
-  factory OpenRouterAiService() {
-    return _instance;
-  }
+  factory OpenRouterAiService() => _instance;
 
-  
   OpenRouterAiService._internal();
 
-  /// Generate farming advice based on activity, plot info, and weather data
-  /// Automatically retries with fallback models if primary fails
+  /// Generate AI response for a user prompt
+  Future<String> generateCustomResponse({required String userPrompt}) async {
+    if (!AiConfig.hasApiKey) {
+      return 'API key is missing or invalid. Please set OPENROUTER_API_KEY and ensure it has no quotes.';
+    }
+
+    final modelsToTry = [AiConfig.primaryModel, ...AiConfig.fallbackModels];
+
+    for (int i = 0; i < modelsToTry.length; i++) {
+      final model = modelsToTry[i];
+      print('[AI] Attempt ${i + 1}/${modelsToTry.length} with model: $model');
+
+      final result = await _callOpenRouterChat(model: model, userPrompt: userPrompt);
+
+      if (result != null && _isValidAiResponse(result)) {
+        return result;
+      }
+
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
+    return 'Unable to generate AI response at the moment.';
+  }
+
+  Future<String?> _callOpenRouterChat({required String model, required String userPrompt}) async {
+    try {
+      final requestBody = {
+        'model': model,
+        'messages': [
+          {'role': 'system', 'content': AiConfig.systemPrompt},
+          {'role': 'user', 'content': userPrompt},
+        ],
+        'temperature': 0.5,
+        'max_tokens': 250,
+      };
+
+      final response = await http.post(
+        Uri.parse(AiConfig.apiUrl),
+        headers: {
+          'Authorization': 'Bearer ${AiConfig.normalizedApiKey}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(requestBody),
+      ).timeout(Duration(seconds: AiConfig.requestTimeoutSeconds));
+
+      // Safe preview
+      final bodyPreview = AiConfig.safeSubstring(response.body, 500);
+      print('[AI] Response body: $bodyPreview');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['choices'] != null && data['choices'].isNotEmpty) {
+          return data['choices'][0]['message']?['content']?.toString().trim();
+        }
+        return 'Empty response from model';
+      }
+
+      if (response.statusCode == 401) {
+        return 'Unauthorized (401): missing or invalid API key. Ensure OPENROUTER_API_KEY is set and valid.';
+      }
+
+      return 'HTTP ${response.statusCode}: ${response.body}';
+    } catch (e) {
+      print('[AI] Exception: $e');
+      return 'Exception occurred: $e';
+    }
+  }
+  bool _isValidAiResponse(String response) {
+    final lower = response.trim().toLowerCase();
+    if (lower.isEmpty) return false;
+
+    final errorIndicators = [
+      'http ',
+      'exception',
+      'invalid api key',
+      'received html',
+      'no choices',
+      'empty response',
+      'parse error',
+      'failed',
+    ];
+
+    for (final token in errorIndicators) {
+      if (lower.contains(token)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  /// Generate farming advice with retries
   Future<String> generateFarmingAdvice({
     required String activity,
     required String plotName,
@@ -22,13 +108,10 @@ class OpenRouterAiService {
     required Map<String, dynamic>? weatherData,
     List<String> previousAdvice = const [],
   }) async {
-    // Try primary model first, then fallbacks
     final modelsToTry = [AiConfig.primaryModel, ...AiConfig.fallbackModels];
-    
-    for (int i = 0; i < modelsToTry.length; i++) {
-      final model = modelsToTry[i];
-      print('[AI] Attempt ${i + 1}/${modelsToTry.length} with model: $model');
-      
+    String lastError = 'No response from any model';
+
+    for (var model in modelsToTry) {
       final result = await _callOpenRouterAPI(
         activity: activity,
         plotName: plotName,
@@ -39,22 +122,22 @@ class OpenRouterAiService {
         model: model,
       );
 
-      // If successful (doesn't contain error indicator), return it
-      if (result != null && !result.contains('Error') && !result.contains('error')) {
+      if (result != null && _isValidAiResponse(result)) {
+        print('[AI] SUCCESS with $model');
         return result;
       }
-      
+
+      if (result != null) {
+        lastError = result;
+      }
+
       print('[AI] Model $model failed, trying next fallback...');
-      
-      // Wait a bit before retry
       await Future.delayed(const Duration(milliseconds: 500));
     }
 
-    // All models failed
-    return 'Unable to generate advice at this moment. Please try again later.';
+    return 'AI failed: $lastError';
   }
 
-  /// Call OpenRouter API with a specific model
   Future<String?> _callOpenRouterAPI({
     required String activity,
     required String plotName,
@@ -64,26 +147,25 @@ class OpenRouterAiService {
     required List<String> previousAdvice,
     required String model,
   }) async {
+    final prompt = _buildPrompt(
+      activity: activity,
+      plotName: plotName,
+      cropName: cropName,
+      date: date,
+      weatherData: weatherData,
+      previousAdvice: previousAdvice,
+    );
+
+    print('[AI] Sending request with model $model');
+    print('[AI] API Key: ${AiConfig.safeSubstring(AiConfig.normalizedApiKey, 20)}...');
+    print('[AI] Prompt length: ${prompt.length} chars');
+
     try {
-      final prompt = _buildPrompt(
-        activity: activity,
-        plotName: plotName,
-        cropName: cropName,
-        date: date,
-        weatherData: weatherData,
-        previousAdvice: previousAdvice,
-      );
-
-      print('[AI] Sending request to OpenRouter...');
-      print('[AI] Model: $model');
-
       final requestBody = {
         'model': model,
         'messages': [
-          {
-            'role': 'user',
-            'content': prompt,
-          }
+          {'role': 'system', 'content': AiConfig.systemPrompt},
+          {'role': 'user', 'content': prompt},
         ],
         'temperature': 0.5,
         'max_tokens': 250,
@@ -92,44 +174,32 @@ class OpenRouterAiService {
       final response = await http.post(
         Uri.parse(AiConfig.apiUrl),
         headers: {
-          'Authorization': 'Bearer ${AiConfig.apiKey}',
+          'Authorization': 'Bearer ${AiConfig.normalizedApiKey}',
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://smart-weather-app.example.com',
-          'X-Title': 'Smart Weather Farm App',
         },
         body: jsonEncode(requestBody),
       ).timeout(Duration(seconds: AiConfig.requestTimeoutSeconds));
 
-      print('[AI] Response status: ${response.statusCode}');
+      final bodyPreview = AiConfig.safeSubstring(response.body, 500);
+      print('[AI] Response body preview: $bodyPreview');
 
       if (response.statusCode == 200) {
-        try {
-          final data = jsonDecode(response.body);
-          if (data['choices'] != null && data['choices'].isNotEmpty) {
-            final advice = data['choices'][0]['message']['content'].toString().trim();
-            print('[AI] Successfully generated advice with $model');
-            return advice;
-          }
-        } catch (e) {
-          print('[AI] Error parsing response: $e');
+        final data = jsonDecode(response.body);
+        if (data['choices'] != null && data['choices'].isNotEmpty) {
+          return data['choices'][0]['message']?['content']?.toString().trim() ?? 'Empty response';
         }
-        return null;
-      } else {
-        try {
-          final errorData = jsonDecode(response.body);
-          final errorMsg = errorData['error']?['message'] ?? response.body;
-          print('[AI] Model $model failed - Status ${response.statusCode}: $errorMsg');
-        } catch (e) {
-          print('[AI] Model $model failed - Status ${response.statusCode}');
-        }
-        return null;
       }
+
+      if (response.statusCode == 401) {
+        return 'Unauthorized (401): missing or invalid API key. Ensure OPENROUTER_API_KEY is set and valid.';
+      }
+
+      return 'HTTP ${response.statusCode}: ${response.body}';
     } catch (e) {
-      print('[AI] Exception with model $model: $e');
-      return null;
+      return 'Exception: $e';
     }
   }
-   /// Build the prompt for the AI model
+
   String _buildPrompt({
     required String activity,
     required String plotName,
@@ -138,46 +208,25 @@ class OpenRouterAiService {
     required Map<String, dynamic>? weatherData,
     required List<String> previousAdvice,
   }) {
-    StringBuffer prompt = StringBuffer();
-
-    prompt.writeln('You are an agricultural expert. Provide concise, actionable farming advice.');
-    prompt.writeln('');
-    prompt.writeln('Farmer Activity: $activity');
-    prompt.writeln('Plot: $plotName');
-    prompt.writeln('Crop: $cropName');
-    prompt.writeln('Date: $date');
+    final buffer = StringBuffer();
+    buffer.writeln('You are an agricultural expert. Provide concise, actionable farming advice.');
+    buffer.writeln('Farmer Activity: $activity');
+    buffer.writeln('Plot: $plotName');
+    buffer.writeln('Crop: $cropName');
+    buffer.writeln('Date: $date');
 
     if (weatherData != null) {
-      prompt.writeln('');
-      prompt.writeln('Current Weather:');
-      if (weatherData.containsKey('temperature')) {
-        prompt.writeln('- Temperature: ${weatherData['temperature']}°C');
-      }
-      if (weatherData.containsKey('humidity')) {
-        prompt.writeln('- Humidity: ${weatherData['humidity']}%');
-      }
-      if (weatherData.containsKey('precipitation')) {
-        prompt.writeln('- Precipitation: ${weatherData['precipitation']}mm');
-      }
-      if (weatherData.containsKey('windSpeed')) {
-        prompt.writeln('- Wind Speed: ${weatherData['windSpeed']} km/h');
-      }
-      if (weatherData.containsKey('condition')) {
-        prompt.writeln('- Condition: ${weatherData['condition']}');
-      }
+      buffer.writeln('Weather Data: $weatherData');
     }
 
     if (previousAdvice.isNotEmpty) {
-      prompt.writeln('');
-      prompt.writeln('Previous advices for context:');
-      for (int i = 0; i < previousAdvice.length && i < 3; i++) {
-        prompt.writeln('- ${previousAdvice[i]}');
+      buffer.writeln('Previous Advice:');
+      for (var advice in previousAdvice.take(3)) {
+        buffer.writeln('- $advice');
       }
     }
 
-    prompt.writeln('');
-    prompt.writeln('Provide advice in 1-2 sentences, focusing on the current activity and weather.');
-
-    return prompt.toString();
+    buffer.writeln('Provide advice in 1-2 sentences.');
+    return buffer.toString();
   }
 }

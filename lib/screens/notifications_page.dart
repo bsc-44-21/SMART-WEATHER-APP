@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../widgets/common_widgets.dart';
 import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
@@ -191,7 +190,6 @@ class NotificationsPage extends StatelessWidget {
     final plots = weatherService.plots;
 
     List<Widget> notificationWidgets = [];
-    int alertCount = 0;
 
     if (isLoading) {
       notificationWidgets.add(
@@ -204,6 +202,7 @@ class NotificationsPage extends StatelessWidget {
       );
     } else {
       if (plots.isEmpty) {
+        // Fallback to current location if user has no plots
         notificationWidgets.addAll(
           _buildNotificationsForWeather(
             weatherService.currentWeather,
@@ -212,116 +211,82 @@ class NotificationsPage extends StatelessWidget {
           )
         );
       } else {
+        // Generate notifications specifically targeting each plot
         for (var plot in plots) {
           final plotWeather = weatherService.getPlotWeather(plot.id);
           final pName = plot.name.isNotEmpty ? plot.name : "Unnamed Plot";
           final cName = plot.cropName.isNotEmpty ? plot.cropName : "Crop";
           
-          final cards = _buildNotificationsForWeather(
-            plotWeather,
-            plotName: pName,
-            cropName: cName,
+          notificationWidgets.addAll(
+            _buildNotificationsForWeather(
+              plotWeather,
+              plotName: pName,
+              cropName: cName,
+            )
           );
-          notificationWidgets.addAll(cards);
-          
-          // Count non-optimal notifications as alerts
-          alertCount += cards.where((w) {
-            if (w is _NotificationCard) {
-              return !w.title.contains('Optimal');
-            }
-            return false;
-          }).length;
         }
       }
     }
 
+    // Add back button at the end
+    notificationWidgets.add(const SizedBox(height: 8));
+    notificationWidgets.add(
+      SizedBox(
+        width: double.infinity,
+        child: OutlinedButton(
+          onPressed: () => Navigator.pop(context),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            side: BorderSide(color: AppTheme.primaryAccent.withOpacity(0.5)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          child: const Text(
+            'Back to Settings',
+            style: TextStyle(
+              color: AppTheme.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: AppTheme.background,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(LucideIcons.arrowLeft, color: Theme.of(context).colorScheme.onSurface),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      // Logic to clear could be added here
-                    },
-                    child: Text(
-                      'Clear All',
-                      style: GoogleFonts.inter(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
+                  const AppLogo(size: 40, backgroundColor: Colors.white),
+                  const SizedBox(width: 16),
+                  Text(
+                    'Notifications',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 28,
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Weather alerts customized for your plots:',
+                style: TextStyle(color: Colors.black54, fontSize: 14),
               ),
               const SizedBox(height: 16),
-              Text(
-                'Notifications',
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Theme.of(context).colorScheme.onSurface,
-                  letterSpacing: -1.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      '$alertCount Active Alerts',
-                      style: GoogleFonts.inter(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 32),
 
               // Notifications List
               Expanded(
-                child: notificationWidgets.isEmpty && !isLoading
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(LucideIcons.bellOff, size: 64, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Everything is clear!',
-                              style: GoogleFonts.inter(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView(
-                        physics: const BouncingScrollPhysics(),
-                        children: notificationWidgets,
-                      ),
+                child: ListView(
+                  children: notificationWidgets,
+                ),
               ),
             ],
           ),
@@ -354,125 +319,129 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isOptimal = title.contains('Optimal');
-    final accentColor = isOptimal ? Colors.green : iconColor;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: color,
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.black.withOpacity(0.05),
-        ),
-      ),
-      elevation: Theme.of(context).brightness == Brightness.dark ? 2 : 0,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            width: 6,
-            color: accentColor,
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: accentColor.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(icon, color: accentColor, size: 20),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 16,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              time,
-                              style: GoogleFonts.inter(
-                                fontSize: 11,
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (plotName != null || cropName != null) ...[
-                    const SizedBox(height: 16),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: [
-                          if (plotName != null)
-                            _buildInfoChip(LucideIcons.mapPin, plotName!, accentColor),
-                          if (cropName != null) ...[
-                            const SizedBox(width: 8),
-                            _buildInfoChip(LucideIcons.leaf, cropName!, accentColor),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 16),
-                  Text(
-                    message,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
-                      height: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildInfoChip(IconData icon, String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.1)),
-      ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              color: color,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: iconColor, size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: iconColor == Colors.black54 ? AppTheme.textPrimary : iconColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (plotName != null || cropName != null) ...[
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      if (plotName != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: iconColor.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(LucideIcons.mapPin, size: 12, color: iconColor),
+                              const SizedBox(width: 4),
+                              Text(
+                                plotName!,
+                                style: TextStyle(
+                                  fontSize: 11, 
+                                  fontWeight: FontWeight.bold, 
+                                  color: iconColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (cropName != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: iconColor.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(LucideIcons.leaf, size: 12, color: iconColor),
+                              const SizedBox(width: 4),
+                              Text(
+                                cropName!,
+                                style: TextStyle(
+                                  fontSize: 11, 
+                                  fontWeight: FontWeight.bold, 
+                                  color: iconColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 8),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    time,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.black45,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
