@@ -49,4 +49,65 @@ class ReportService{
                   ],
                 ),
                 pw.Divider(thickness: 2, color: PdfColors.grey300, height: 40),
+
+                 // Diagnosis Summary
+                pw.Text(
+                  'Diagnosis: ${detection.pestName}',
+                  style: pw.TextStyle(
+                    fontSize: 20,
+                    fontWeight: pw.FontWeight.bold,
+                    color: detection.riskLevel.toLowerCase() == 'high' 
+                        ? PdfColors.red800 
+                        : PdfColors.green800,
+                  ),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text('Plot Name: ${detection.plotName}'),
+                pw.Text('Crop Type: ${detection.cropType}'),
+                pw.Text('Risk Level: ${detection.riskLevel}'),
+                pw.SizedBox(height: 24),
+
+                // Symptoms
+                pw.Text(
+                  'Signs & Symptoms',
+                  style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Bullet(text: detection.symptoms.join('\n')),
+                pw.SizedBox(height: 24),
+
+                // Impact
+                pw.Text(
+                  'Impact on Crop',
+                  style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
+                ),
+                pw.SizedBox(height: 8),
+                pw.Text(detection.impact),
+                pw.SizedBox(height: 24),
+
+                // Smart Weather Advice
+                if (detection.weatherAdvice != null && detection.weatherAdvice!.isNotEmpty) ...[
+                  pw.Container(
+                    padding: const pw.EdgeInsets.all(12),
+                    decoration: pw.BoxDecoration(
+                      color: PdfColors.blue50,
+                      borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
+                    ),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          'Smart Weather Advisory',
+                          style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            color: PdfColors.blue800,
+                          ),
+                        ),
+                        pw.SizedBox(height: 4),
+                        pw.Text(detection.weatherAdvice!),
+                      ],
+                    ),
+                  ),
+                  pw.SizedBox(height: 24),
+                ],
 }
