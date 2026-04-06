@@ -9,3 +9,14 @@ class ActivityLogModel {
   final bool? isRecommended;
   final String? aiFeedback;
   final DateTime createdAt;
+
+    ActivityLogModel({
+    required this.id,
+    required this.userId,
+    required this.plot,
+    required this.title,
+    required this.time,
+    this.isRecommended,
+    this.aiFeedback,
+    required this.createdAt,
+  });
