@@ -141,3 +141,10 @@ class ReportService{
         },
       ),
     );
+    // Save and Share
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename: 'WeatherSmart_Report_${detection.pestName.replaceAll(' ', '_')}.pdf',
+    );
+  }
+}
