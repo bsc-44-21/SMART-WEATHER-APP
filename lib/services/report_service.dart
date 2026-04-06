@@ -5,3 +5,5 @@ import 'package:printing/printing.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/pest_detection.dart';
 import 'package:intl/intl.dart';
+
+class ReportService{}
