@@ -5,6 +5,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import '../widgets/common_widgets.dart';
 import '../core/theme.dart';
 import '../services/notification_service.dart';
+import '../services/weather_smart_service.dart';
 import '../models/notification_model.dart';
 
 class NotificationsPage extends StatelessWidget {
@@ -23,16 +24,25 @@ class NotificationsPage extends StatelessWidget {
               // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Row(
                     children: [
-                      const AppLogo(size: 40, backgroundColor: Colors.white),
-                      const SizedBox(width: 16),
+                      IconButton(
+                        icon: const Icon(LucideIcons.arrowLeft),
+                        onPressed: () => Navigator.pop(context),
+                        color: AppTheme.primaryAccent,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: 12),
                       Text(
                         'Notifications',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                          color: AppTheme.primaryAccent,
                           fontWeight: FontWeight.bold,
-                          fontSize: 28,
+                          letterSpacing: -0.5,
+                          fontSize: 32,
                         ),
                       ),
                     ],
@@ -40,12 +50,21 @@ class NotificationsPage extends StatelessWidget {
                   Consumer<NotificationService>(
                     builder: (context, notificationService, child) {
                       if (notificationService.unreadCount > 0) {
-                        return IconButton(
-                          icon: const Icon(LucideIcons.checkCheck),
-                          tooltip: 'Mark all as read',
-                          onPressed: () {
-                            notificationService.markAllAsRead();
-                          },
+                        return TextButton.icon(
+                          icon: const Icon(LucideIcons.checkCheck, size: 16),
+                          label: const Text(
+                            'Mark all read',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          onPressed: () => notificationService.markAllAsRead(),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppTheme.primaryAccent.withOpacity(0.6),
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                          ),
                         );
                       }
                       return const SizedBox.shrink();
@@ -66,18 +85,32 @@ class NotificationsPage extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              LucideIcons.bellRing,
-                              size: 64,
-                              color: AppTheme.textMuted.withOpacity(0.5),
+                            Container(
+                              padding: const EdgeInsets.all(32),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryAccent.withOpacity(0.04),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                LucideIcons.bellRing,
+                                size: 56,
+                                color: AppTheme.primaryAccent.withOpacity(0.2),
+                              ),
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 24),
                             Text(
                               "You're all caught up!",
-                              style: TextStyle(
-                                fontSize: 18,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: AppTheme.primaryAccent.withOpacity(0.8),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Your farming schedule is perfectly on track.",
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: AppTheme.textMuted,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -129,29 +162,7 @@ class NotificationsPage extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 24),
-
-              // Back Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(color: AppTheme.primaryAccent.withOpacity(0.5)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Back to Settings',
-                    style: TextStyle(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -167,146 +178,275 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color cardColor;
-    Color iconColor;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    Color stripColor;
     IconData icon;
 
     switch (notification.type) {
       case NotificationType.weather:
-        cardColor = const Color(0xFFFFEBEE); // Light red
-        iconColor = Colors.red;
+        stripColor = Colors.blue.shade400;
         icon = LucideIcons.cloudRain;
         break;
       case NotificationType.pest:
-        cardColor = const Color(0xFFE8F5E9); // Light green
-        iconColor = Colors.green;
+        stripColor = Colors.orange.shade400;
         icon = LucideIcons.bug;
         break;
       case NotificationType.tip:
-        cardColor = Colors.white;
-        iconColor = Colors.black54;
+        stripColor = AppTheme.primaryAccent;
         icon = LucideIcons.leaf;
+        break;
+      case NotificationType.success:
+        stripColor = Colors.green.shade400;
+        icon = LucideIcons.checkCircle;
         break;
       case NotificationType.system:
       default:
-        cardColor = const Color(0xFFE8EAF6); // Light indigo
-        iconColor = Colors.indigo;
+        stripColor = Colors.grey.shade400;
         icon = LucideIcons.info;
         break;
     }
 
-    if (notification.isRead) {
-      cardColor = Colors.grey.shade100;
-      iconColor = iconColor.withOpacity(0.5);
-    }
-
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(20),
+        color: isDark ? AppTheme.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: AppTheme.primaryAccent.withOpacity(isDark ? 0.2 : 0.08),
+          width: 1,
+        ),
         boxShadow: notification.isRead
             ? []
             : [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: (isDark ? Colors.black : AppTheme.primaryAccent).withOpacity(0.04),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
               ],
-        border: notification.isRead
-            ? Border.all(color: Colors.grey.shade300, width: 1)
-            : null,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.1),
-              shape: BoxShape.circle,
+      clipBehavior: Clip.antiAlias,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Status Strip
+            Container(
+              width: 6,
+              color: notification.isRead ? stripColor.withOpacity(0.3) : stripColor,
             ),
-            child: Icon(icon, color: iconColor, size: 24),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(
-                      child: Text(
-                        notification.title,
-                        style: TextStyle(
-                          fontWeight: notification.isRead ? FontWeight.w600 : FontWeight.bold,
-                          fontSize: 16,
-                          color: notification.isRead ? AppTheme.textMuted : (iconColor == Colors.black54 ? AppTheme.textPrimary : iconColor),
+                    Row(
+                      children: [
+                        Icon(
+                          icon, 
+                          size: 16, 
+                          color: notification.isRead ? AppTheme.textMuted : stripColor,
                         ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            notification.title,
+                            style: TextStyle(
+                              fontWeight: notification.isRead ? FontWeight.w600 : FontWeight.w800,
+                              fontSize: 14,
+                              color: notification.isRead ? AppTheme.textMuted : AppTheme.textPrimary,
+                            ),
+                          ),
+                        ),
+                        if (!notification.isRead)
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.redAccent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      notification.message,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: notification.isRead ? AppTheme.textMuted : AppTheme.textPrimary.withOpacity(0.8),
+                        height: 1.5,
                       ),
                     ),
-                    if (!notification.isRead)
+                    
+                    // Smart Advisory Section
+                    if (notification.isAnalyzing) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryAccent),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'AI is analyzing weather safety...',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                              color: AppTheme.textMuted,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ] else if (notification.aiAdvice != null) ...[
+                      const SizedBox(height: 12),
                       Container(
-                        width: 8,
-                        height: 8,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryAccent,
-                          shape: BoxShape.circle,
+                          color: stripColor.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: stripColor.withOpacity(0.1)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(LucideIcons.lightbulb, size: 14, color: stripColor),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                notification.aiAdvice!,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  fontStyle: FontStyle.italic,
+                                  color: stripColor.withOpacity(0.8),
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
+                    ],
+                    
+                    // Action Buttons for Milestones
+                    if (notification.isActionable && !notification.isRead) ...[
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              final weatherService = context.read<WeatherSmartService>();
+                              await weatherService.addLog(
+                                notification.activityTitle ?? notification.title,
+                                plot: notification.relatedPlotId,
+                                aiFeedback: 'Completed on time.',
+                              );
+                              
+                              if (context.mounted) {
+                                context.read<NotificationService>().removeNotification(notification.id);
+                                
+                                final plotIdx = weatherService.plots.indexWhere((p) => p.id == notification.relatedPlotId);
+                                if (plotIdx != -1) {
+                                  context.read<NotificationService>().schedulePlotMilestones(weatherService.plots[plotIdx], weatherService.logs);
+                                }
+                                
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Activity tracked and logged!'))
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primaryAccent,
+                              foregroundColor: Colors.white,
+                              minimumSize: const Size(120, 40),
+                              padding: const EdgeInsets.symmetric(horizontal: 20),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: const Text(
+                              'I Did This', 
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: () async {
+                              final weatherService = context.read<WeatherSmartService>();
+                              await weatherService.addLog(
+                                notification.activityTitle ?? notification.title,
+                                plot: notification.relatedPlotId,
+                                aiFeedback: 'Skipped by user.',
+                              );
+                              
+                              if (context.mounted) {
+                                context.read<NotificationService>().removeNotification(notification.id);
+                                
+                                final plotIdx = weatherService.plots.indexWhere((p) => p.id == notification.relatedPlotId);
+                                if (plotIdx != -1) {
+                                  context.read<NotificationService>().schedulePlotMilestones(weatherService.plots[plotIdx], weatherService.logs);
+                                }
+                              }
+                            },
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red.shade400,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            ),
+                            child: const Text(
+                              'Skip', 
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    // Standard Action Label (if any)
+                    if (notification.actionLabel != null && !notification.isActionable) ...[
+                      const SizedBox(height: 12),
+                      InkWell(
+                        onTap: () {
+                          // Generic action handler
+                        },
+                        child: Text(
+                          notification.actionLabel!,
+                          style: TextStyle(
+                            color: AppTheme.primaryAccent,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                    
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          timeago.format(notification.timestamp),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppTheme.textMuted.withOpacity(0.6),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  notification.message,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: notification.isRead ? Colors.grey.shade600 : Colors.black87,
-                    height: 1.4,
-                  ),
-                ),
-                if (notification.actionLabel != null) ...[
-                  const SizedBox(height: 12),
-                  InkWell(
-                    onTap: () {
-                      // Navigate or perform action
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryAccent.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        notification.actionLabel!,
-                        style: TextStyle(
-                          color: AppTheme.primaryAccent,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: Text(
-                    timeago.format(notification.timestamp),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: notification.isRead ? Colors.grey.shade500 : Colors.black45,
-                      fontWeight: notification.isRead ? FontWeight.normal : FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
+

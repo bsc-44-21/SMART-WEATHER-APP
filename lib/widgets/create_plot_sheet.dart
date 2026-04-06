@@ -5,6 +5,7 @@ import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../services/auth_service.dart';
 import '../models/plot.dart';
+import '../services/notification_service.dart';
 import 'package:flutter/services.dart';
 
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
@@ -218,6 +219,13 @@ final bool isEditing = existingPlot != null;
                                   await context.read<WeatherSmartService>().updatePlot(plot);
                                 } else {
                                   await context.read<WeatherSmartService>().addPlot(plot);
+                                }
+
+                                if (context.mounted) {
+                                  final weatherService = context.read<WeatherSmartService>();
+                                  final logs = weatherService.logs;
+                                  final plotWeather = weatherService.getPlotWeather(plot.id);
+                                  context.read<NotificationService>().schedulePlotMilestones(plot, logs, plotWeather: plotWeather);
                                 }
 
                                 if (context.mounted) {

@@ -1,17 +1,20 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../core/mock_data.dart';
-import '../models/plot.dart';
 import 'firestore_service.dart';
 import 'weather_location_service.dart';
 import 'package:intl/intl.dart';
+import '../models/plot.dart';
+import '../models/activity_log.dart';
+import '../core/mock_data.dart';
+import 'package:uuid/uuid.dart';
 
 class WeatherSmartService extends ChangeNotifier {
   List<PlotModel> _plots = [];
-  final List<Map<String, dynamic>> _activities = List.from(MockData.activities);
+  List<Map<String, dynamic>> _activities = [];
   bool _isDarkMode = false;
   StreamSubscription? _plotsSubscription;
+  StreamSubscription? _logsSubscription;
   Timer? _weatherTimer;
   
   // Weather data
@@ -23,12 +26,24 @@ class WeatherSmartService extends ChangeNotifier {
  WeatherSmartService() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       _plotsSubscription?.cancel();
+      _logsSubscription?.cancel();
       _weatherTimer?.cancel();
       if (user != null) {
+        // Plots Stream
         _plotsSubscription = FirestoreService().getUserPlotsStream(user.uid).listen((plots) {
           _plots = plots;
           fetchWeatherForPlots(); // Fetch weather for each plot
           notifyListeners();
+        }, onError: (e) {
+          print('[WeatherSmartService] Plots stream error: $e');
+        });
+        
+        // Logs Stream
+        _logsSubscription = FirestoreService().getUserActivitiesStream(user.uid).listen((logs) {
+          _activities = logs.map((l) => l.toMap()).toList();
+          notifyListeners();
+        }, onError: (e) {
+          print('[WeatherSmartService] Logs stream error: $e');
         });
         
         // Start periodic refresh every minute
@@ -41,6 +56,7 @@ class WeatherSmartService extends ChangeNotifier {
         fetchWeatherForLocation();
       } else {
         _plots = [];
+        _activities = [];
         _currentWeather = null;
         _plotWeather.clear();
         notifyListeners();
@@ -144,18 +160,30 @@ class WeatherSmartService extends ChangeNotifier {
     await FirestoreService().deletePlot(plotId);
   }
 
-  void addLog(String activity, {String? plot, String? date}) {
-    _activities.insert(0, {
-      'title': activity,
-      'plot': plot ?? 'General',
-      'time': date ?? DateFormat('MMM d, yyyy').format(DateTime.now()),
-    });
-    notifyListeners();
+  Future<void> addLog(String activity, {String? plot, String? date, bool? isRecommended, String? aiFeedback}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final logId = const Uuid().v4();
+    final newLog = ActivityLogModel(
+      id: logId,
+      userId: user.uid,
+      plot: plot ?? 'General',
+      title: activity,
+      time: date ?? DateFormat('MMM d, yyyy').format(DateTime.now()),
+      isRecommended: isRecommended,
+      aiFeedback: aiFeedback,
+      createdAt: DateTime.now(),
+    );
+
+    // Save to Firestore - the stream will update the local UI list
+    await FirestoreService().saveActivityLog(newLog);
   }
 
   @override
   void dispose() {
     _plotsSubscription?.cancel();
+    _logsSubscription?.cancel();
     _weatherTimer?.cancel();
     super.dispose();
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:timezone/data/latest.dart' as tz;
 import 'core/theme.dart';
 import 'screens/auth_screen.dart';
 import 'screens/dashboard_screen.dart';
@@ -8,9 +9,11 @@ import 'services/weather_smart_service.dart';
 import 'services/auth_service.dart';
 import 'services/navigation_service.dart';
 import 'services/notification_service.dart';
+import 'services/firestore_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  tz.initializeTimeZones();
   await Firebase.initializeApp();
   runApp(
     MultiProvider(
@@ -19,6 +22,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => NavigationService()),
         ChangeNotifierProvider(create: (context) => NotificationService()),
+        Provider(create: (context) => FirestoreService()),
       ],
       child: const WeatherSmartApp(),
     ),
