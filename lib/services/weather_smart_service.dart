@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firestore_service.dart';
 import 'weather_location_service.dart';
+import 'openrouter_ai_service.dart';
 import 'package:intl/intl.dart';
 import '../models/plot.dart';
 import '../models/activity_log.dart';
@@ -22,6 +23,12 @@ class WeatherSmartService extends ChangeNotifier {
   final Map<String, Map<String, dynamic>> _plotWeather = {};
   bool _isLoadingWeather = false;
   String? _weatherError;
+  
+  // AI Advice data
+  String _currentAdvice = '';
+  bool _isGeneratingAdvice = false;
+  final List<String> _previousAdvice = [];
+  final int _maxPreviousAdviceCount = 5;
 
  WeatherSmartService() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
@@ -64,9 +71,11 @@ class WeatherSmartService extends ChangeNotifier {
     });
   }
 
-   List<PlotModel> get plots => _plots;
+  List<PlotModel> get plots => _plots;
   List<Map<String, dynamic>> get logs => _activities;
-  String get advice => MockData.farmingAdvice;
+  String get advice => _currentAdvice.isNotEmpty ? _currentAdvice : MockData.farmingAdvice;
+  String get currentAdvice => _currentAdvice;
+  bool get isGeneratingAdvice => _isGeneratingAdvice;
   bool get isDarkMode => _isDarkMode;
   Map<String, dynamic>? get currentWeather => _currentWeather;
   Map<String, dynamic>? getPlotWeather(String plotId) => _plotWeather[plotId];
@@ -188,4 +197,3 @@ class WeatherSmartService extends ChangeNotifier {
     super.dispose();
   }
 }
-

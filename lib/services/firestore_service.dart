@@ -104,4 +104,20 @@ class FirestoreService {
       rethrow;
     }
   }
+
+  // Save generated advice in Firestore
+  Future<void> saveAdvice(String userId, Map<String, dynamic> advice) async {
+    try {
+      await _db.collection('advice').add({
+        'userId': userId,
+        'activity': advice['activity'] ?? '',
+        'weather': advice['weather'] ?? {},
+        'advice': advice['advice'] ?? '',
+        'explanation': advice['explanation'] ?? '',
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

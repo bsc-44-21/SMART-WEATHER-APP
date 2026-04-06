@@ -28,7 +28,9 @@ class HomePage extends StatelessWidget {
     final weatherService = context.watch<WeatherSmartService>();
     final plots = weatherService.plots;
     final logs = weatherService.logs;
-    final advice = weatherService.advice;
+    final rawAdvice = weatherService.advice;
+    final currentAdvice = weatherService.currentAdvice;
+    final advice = currentAdvice.isNotEmpty ? currentAdvice : rawAdvice;
     final currentWeather = weatherService.currentWeather;
 
     final user = FirebaseAuth.instance.currentUser;
@@ -245,37 +247,72 @@ class HomePage extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 12.0),
               child: FarmingCard(
                 padding: const EdgeInsets.all(16),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryAccent.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(LucideIcons.clipboardList, size: 16, color: AppTheme.primaryAccent),
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryAccent.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(LucideIcons.clipboardList, size: 16, color: AppTheme.primaryAccent),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            log['title'] ?? 'Activity',
+                            style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          log['time'] ?? '',
+                          style: GoogleFonts.inter(
+                            color: Colors.grey.shade500,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        log['title'] ?? 'Activity',
+                    if ((log['advice'] ?? '').toString().isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'AI Advice:',
                         style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: AppTheme.primaryAccent,
                         ),
                       ),
-                    ),
-                    Text(
-                      log['time'] ?? '',
-                      style: GoogleFonts.inter(
-                        color: Colors.grey.shade500,
-                        fontSize: 11,
+                      const SizedBox(height: 4),
+                      Text(
+                        log['advice'].toString(),
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: AppTheme.textPrimary,
+                        ),
                       ),
-                    ),
+                    ] else if (log['isGeneratingAdvice'] == true) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Generating AI advice...',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: Colors.grey,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
             )),
+
           ],
           
           const SizedBox(height: 32),

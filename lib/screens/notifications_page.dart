@@ -327,10 +327,9 @@ class _NotificationCard extends StatelessWidget {
                                   height: 1.4,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
                     ],
                     
                     // Action Buttons for Milestones
