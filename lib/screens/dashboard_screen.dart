@@ -9,8 +9,18 @@ import 'detect_page.dart';
 import 'log_page.dart';
 import 'profile_settings_page.dart';
 
-class MainLayout extends StatelessWidget {
+import '../services/weather_smart_service.dart';
+import '../services/notification_service.dart';
+
+class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
+
+  @override
+  State<MainLayout> createState() => _MainLayoutState();
+}
+
+class _MainLayoutState extends State<MainLayout> {
+  bool _milestonesScheduled = false;
 
   static const List<Widget> _pages = [
     HomePage(),
@@ -19,6 +29,22 @@ class MainLayout extends StatelessWidget {
     LogPage(),
     ProfileSettingsPage(),
   ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_milestonesScheduled) {
+      final weatherService = context.watch<WeatherSmartService>();
+      if (weatherService.plots.isNotEmpty && weatherService.logs.isNotEmpty) {
+        final notifService = context.read<NotificationService>();
+        for (var plot in weatherService.plots) {
+          final plotWeather = weatherService.getPlotWeather(plot.id);
+          notifService.schedulePlotMilestones(plot, weatherService.logs, plotWeather: plotWeather);
+        }
+        _milestonesScheduled = true;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +56,7 @@ class MainLayout extends StatelessWidget {
         child: _pages[selectedIndex],
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(top: 8, bottom: 20),
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [

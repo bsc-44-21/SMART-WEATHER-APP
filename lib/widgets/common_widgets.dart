@@ -205,43 +205,27 @@ class PlotInfoCard extends StatelessWidget {
                 color: Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Wrap(
-                spacing: 16,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
+              child: Row(
                 children: [
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(LucideIcons.cloud, size: 14, color: Colors.grey.shade700),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${current['temperature_2m']}°',
-                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                  Icon(LucideIcons.cloud, size: 14, color: Colors.grey.shade700),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${current['temperature_2m']}°',
+                    style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(LucideIcons.droplets, size: 14, color: Colors.grey.shade700),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${current['precipitation']}mm',
-                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                  const SizedBox(width: 16),
+                  Icon(LucideIcons.droplets, size: 14, color: Colors.grey.shade700),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${current['precipitation']}mm',
+                    style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
                   ),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(LucideIcons.wind, size: 14, color: Colors.grey.shade700),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${current['wind_speed_10m']}km/h',
-                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                  const SizedBox(width: 16),
+                  Icon(LucideIcons.wind, size: 14, color: Colors.grey.shade700),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${current['wind_speed_10m']}km/h',
+                    style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -252,9 +236,7 @@ class PlotInfoCard extends StatelessWidget {
           if (current == null) const SizedBox(height: 12),
 
           // Row 3: Plot Details
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          Row(
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -267,16 +249,14 @@ class PlotInfoCard extends StatelessWidget {
                   children: [
                     Icon(LucideIcons.mapPin, size: 14, color: Colors.grey.shade700),
                     const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        plot.location,
-                        style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w500),
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      plot.location,
+                      style: GoogleFonts.inter(color: Colors.grey.shade800, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
@@ -348,77 +328,6 @@ class PlotInfoCard extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class CompactPlotCard extends StatelessWidget {
-  final PlotModel plot;
-  final VoidCallback? onTap;
-
-  const CompactPlotCard({
-    super.key,
-    required this.plot,
-    this.onTap,
-  });
-
-  String _getCropEmoji(String cropName) {
-    final lower = cropName.toLowerCase();
-    if (lower.contains('maize')) return '🌽';
-    if (lower.contains('tomato')) return '🍅';
-    if (lower.contains('nut') || lower.contains('g/nut')) return '🥜';
-    if (lower.contains('coffee')) return '☕';
-    if (lower.contains('cotton')) return '🌿';
-    if (lower.contains('tobacco')) return '🚬';
-    if (lower.contains('soy')) return '🌿';
-    return '🌱';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FarmingCard(
-      onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryAccent.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              _getCropEmoji(plot.cropName),
-              style: const TextStyle(fontSize: 24),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              plot.name,
-              style: GoogleFonts.inter(
-                color: Colors.black87,
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Icon(LucideIcons.chevronRight, color: Colors.grey.shade400, size: 24),
         ],
       ),
     );
