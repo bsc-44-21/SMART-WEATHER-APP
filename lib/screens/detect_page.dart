@@ -206,7 +206,7 @@ class _DetectPageState extends State<DetectPage> {
               disabledBackgroundColor: Colors.white.withOpacity(0.7),
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(30), 
               ),
               elevation: 0,
             ),
