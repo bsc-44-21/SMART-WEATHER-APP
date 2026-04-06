@@ -27,4 +27,9 @@ class CropMilestoneData {
           'title': 'Staking',
           'body': 'Support your Tomato plants in "$plotName" with stakes to keep fruit off the ground.',
         },
+        {
+          'dap': 35,
+          'title': 'Pruning/Suckering',
+          'body': 'Remove side shoots on your Tomato plants in "$plotName" to improve fruit quality.',
+        },
 }
