@@ -36,9 +36,16 @@ class WeatherSmartService extends ChangeNotifier {
       _weatherTimer?.cancel();
       if (user != null) {
         // Plots Stream
+        // Plots Stream
         _plotsSubscription = FirestoreService().getUserPlotsStream(user.uid).listen((plots) {
+          final bool countChanged = plots.length != _plots.length;
           _plots = plots;
-          fetchWeatherForPlots(); // Fetch weather for each plot
+          
+          // Only auto-fetch weather on first load or if a plot was added/removed
+          // This avoids re-fetching everything when just a detail (like status) changes
+          if (_plotWeather.isEmpty || countChanged) {
+            fetchWeatherForPlots();
+          }
           notifyListeners();
         }, onError: (e) {
           debugPrint('[WeatherSmartService] Plots stream error: $e');
@@ -52,13 +59,13 @@ class WeatherSmartService extends ChangeNotifier {
           debugPrint('[WeatherSmartService] Logs stream error: $e');
         });
         
-        // Start periodic refresh every minute
-        _weatherTimer = Timer.periodic(const Duration(minutes: 1), (_) {
-          fetchWeatherForPlots();
+        // Start periodic refresh every 15 minutes (weather doesn't change every minute)
+        _weatherTimer = Timer.periodic(const Duration(minutes: 15), (_) {
+          fetchWeatherForPlots(force: true);
           fetchWeatherForLocation();
         });
 
-        // Fetch weather when user logs in
+        // Initial fetch
         fetchWeatherForLocation();
       } else {
         _plots = [];
@@ -93,20 +100,16 @@ class WeatherSmartService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      debugPrint('[Weather] Starting weather fetch...');
-      
-      // Get location with permission
+      debugPrint('[Weather] Starting location fetch (3s delay for safety)...');
+      await Future.delayed(const Duration(seconds: 3));
       final position = await WeatherLocationService.getLocationWithPermission();
       
       if (position == null) {
-        _weatherError = 'Location permission denied. Enable location access in settings.';
-        debugPrint('[Weather] Location permission denied');
+        _weatherError = 'Location required.';
         _isLoadingWeather = false;
         notifyListeners();
         return;
       }
-
-      debugPrint('[Weather] Location obtained: ${position.latitude}, ${position.longitude}');
 
       final weather = await WeatherLocationService.fetchWeather(
         position.latitude,
@@ -114,19 +117,21 @@ class WeatherSmartService extends ChangeNotifier {
       );
 
       _currentWeather = weather;
-      _weatherError = null;
-      debugPrint('[Weather] Weather fetched successfully');
     } catch (e) {
-      _weatherError = e.toString().replaceAll('Exception: ', '');
-      debugPrint('[Weather] Exception: $e');
+      debugPrint('[Weather] Location fetch error: $e');
     } finally {
       _isLoadingWeather = false;
       notifyListeners();
     }
   }
 
-  Future<void> fetchWeatherForPlots() async {
+  Future<void> fetchWeatherForPlots({bool force = false}) async {
+    // Pace to avoid 429/502 errors: 3 seconds per plot
     for (var plot in _plots) {
+      if (plot.latitude.isEmpty || plot.longitude.isEmpty) continue;
+      
+      debugPrint('[Weather] Waiting 3 seconds before next plot...');
+      await Future.delayed(const Duration(seconds: 3));
       await fetchWeatherForPlot(plot);
     }
   }
@@ -137,11 +142,15 @@ class WeatherSmartService extends ChangeNotifier {
         final lat = double.parse(plot.latitude);
         final lng = double.parse(plot.longitude);
         final weather = await WeatherLocationService.fetchWeather(lat, lng);
-        weather['fetched_at'] = DateTime.now().toIso8601String();
-        _plotWeather[plot.id] = weather;
-        notifyListeners();
+        
+        if (weather != null) {
+          final updatedWeather = Map<String, dynamic>.from(weather);
+          updatedWeather['fetched_at'] = DateTime.now().toIso8601String();
+          _plotWeather[plot.id] = updatedWeather;
+          notifyListeners();
+        }
       } catch (e) {
-        debugPrint('[WeatherSmartService] Error fetching weather for plot ${plot.id}: $e');
+        debugPrint('[Weather] Error for plot ${plot.name}: $e');
       }
     }
   }

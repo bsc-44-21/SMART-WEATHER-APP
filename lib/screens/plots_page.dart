@@ -45,9 +45,9 @@ class _PlotsPageState extends State<PlotsPage> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  await context.read<WeatherSmartService>().fetchWeatherForPlots();
+                  await context.read<WeatherSmartService>().fetchWeatherForPlots(force: true);
                   if (context.mounted) {
-                  await context.read<WeatherSmartService>().fetchWeatherForLocation();
+                    await context.read<WeatherSmartService>().fetchWeatherForLocation();
                   }
                 },
                 child: hasPlots
