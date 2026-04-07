@@ -209,25 +209,41 @@ class OpenRouterAiService {
     required Map<String, dynamic>? weatherData,
     required List<String> previousAdvice,
   }) {
+    final now = DateTime.now();
+    final inputDate = DateTime.tryParse(date) ?? now;
+    final dayDiff = inputDate.difference(DateTime(now.year, now.month, now.day)).inDays;
+    
     final buffer = StringBuffer();
-    buffer.writeln('You are an agricultural expert. Provide concise, actionable farming advice.');
-    buffer.writeln('Farmer Activity: $activity');
-    buffer.writeln('Plot: $plotName');
-    buffer.writeln('Crop: $cropName');
-    buffer.writeln('Date: $date');
-
-    if (weatherData != null) {
-      buffer.writeln('Weather Data: $weatherData');
+    buffer.writeln('CONTEXT:');
+    buffer.writeln('Today is: ${now.toString().substring(0, 10)}');
+    buffer.writeln('Farmer Activity Date: $date');
+    
+    if (dayDiff < 0) {
+      buffer.writeln('IMPORTANT: This is a PAST LOG (${dayDiff.abs()} days ago). Acknowledge that the date has passed but explain if the weather then was suitable.');
+    } else if (dayDiff == 0) {
+      buffer.writeln('IMPORTANT: This is for TODAY. Check the hourly forecast if available.');
+    } else {
+      buffer.writeln('IMPORTANT: This is for the FUTURE. Act as a predictive planner.');
     }
 
-    if (previousAdvice.isNotEmpty) {
-      buffer.writeln('Previous Advice:');
-      for (var advice in previousAdvice.take(3)) {
-        buffer.writeln('- $advice');
+    buffer.writeln('\nFARMING CASE:');
+    buffer.writeln('- Activity: $activity');
+    buffer.writeln('- Plot Name: $plotName');
+    buffer.writeln('- Crop: $cropName');
+    
+    if (weatherData != null) {
+      buffer.writeln('\nWEATHER FORECAST DATA:');
+      // Limit data sent to AI to keep it focused (7 days max)
+      if (weatherData['daily'] != null) {
+        buffer.writeln('7-Day Highs: ${weatherData['daily']['temperature_2m_max']}');
+        buffer.writeln('7-Day Rainfall Sums: ${weatherData['daily']['precipitation_sum']}');
+      }
+      if (weatherData['current'] != null) {
+        buffer.writeln('Current: ${weatherData['current']}');
       }
     }
 
-    buffer.writeln('Provide advice in 1-2 sentences.');
+    buffer.writeln('\nTASK: Provide professional agricultural advice in 1-2 concise sentences based on the Knowledge Base in your system prompt.');
     return buffer.toString();
   }
 }

@@ -36,11 +36,15 @@ class _MainLayoutState extends State<MainLayout> {
     if (!_milestonesScheduled) {
       final weatherService = context.watch<WeatherSmartService>();
       if (weatherService.plots.isNotEmpty && weatherService.logs.isNotEmpty) {
-        final notifService = context.read<NotificationService>();
-        for (var plot in weatherService.plots) {
-          final plotWeather = weatherService.getPlotWeather(plot.id);
-          notifService.schedulePlotMilestones(plot, weatherService.logs, plotWeather: plotWeather);
-        }
+        // Fix for "setState() called during build"
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          final notifService = context.read<NotificationService>();
+          for (var plot in weatherService.plots) {
+            final plotWeather = weatherService.getPlotWeather(plot.id);
+            notifService.schedulePlotMilestones(plot, weatherService.logs, plotWeather: plotWeather);
+          }
+        });
         _milestonesScheduled = true;
       }
     }

@@ -76,7 +76,7 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            await context.read<WeatherSmartService>().fetchWeatherForPlots();
+            await context.read<WeatherSmartService>().fetchWeatherForPlots(force: true);
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -86,16 +86,20 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
               children: [
                 _buildPlotHeaders(),
                 const SizedBox(height: 24),
-                if (weatherData != null) ...[
-                  _buildCurrentWeatherDetails(weatherData['current']),
-                  const SizedBox(height: 32),
-                  _buildHourlyForecast(weatherData['hourly']),
-                  const SizedBox(height: 32),
-                  _buildDailyForecast(weatherData['daily']),
-                  const SizedBox(height: 32),
-                  _buildPlotActivities(),
-                  const SizedBox(height: 32),
-                ] else ...[
+                 if (weatherData != null) ...[
+                   _buildCurrentWeatherDetails(weatherData['current']),
+                   if (weatherData['hourly'] != null) ...[
+                     const SizedBox(height: 32),
+                     _buildHourlyForecast(weatherData['hourly']),
+                   ],
+                   if (weatherData['daily'] != null) ...[
+                     const SizedBox(height: 32),
+                     _buildDailyForecast(weatherData['daily']),
+                   ],
+                   const SizedBox(height: 32),
+                   _buildPlotActivities(),
+                   const SizedBox(height: 32),
+                 ] else ...[
                   SizedBox(
                     height: 200,
                     child: Center(
@@ -277,12 +281,9 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
               children: [
                 Icon(LucideIcons.mapPin, size: 16, color: Colors.grey.shade600),
                 const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    _plot.location,
-                    style: GoogleFonts.inter(color: Colors.grey.shade800, fontWeight: FontWeight.w500),
-                    textAlign: TextAlign.center,
-                  ),
+                Text(
+                  _plot.location,
+                  style: GoogleFonts.inter(color: Colors.grey.shade800, fontWeight: FontWeight.w500),
                 ),
               ],
             )
@@ -388,7 +389,8 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
     int startIndex = 0;
     final now = DateTime.now();
     for (int i = 0; i < times.length; i++) {
-        final dt = DateTime.parse("${times[i]}Z").toLocal();
+        final String t = times[i];
+        final dt = DateTime.parse(t.endsWith('Z') ? t : "${t}Z").toLocal();
         // If this hour block is after 1 hour ago, use it as starting point
         if (dt.isAfter(now.subtract(const Duration(hours: 1)))) {
            startIndex = i;
@@ -420,8 +422,10 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: endIndex - startIndex,
             itemBuilder: (context, index) {
-              final actualIndex = startIndex + index;
-              final dt = DateTime.parse("${times[actualIndex]}Z").toLocal();
+              final int actualIndex = startIndex + index;
+              final String timeStr = times[actualIndex];
+              // MET Norway already includes 'Z', so we don't append it again
+              final dt = DateTime.parse(timeStr.endsWith('Z') ? timeStr : "${timeStr}Z").toLocal();
               final isNow = index == 0; // First item is 'Now'
 
               return Container(
