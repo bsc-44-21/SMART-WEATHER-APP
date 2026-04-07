@@ -23,36 +23,41 @@ class NotificationsPage extends StatelessWidget {
               // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(LucideIcons.arrowLeft),
-                        onPressed: () => Navigator.pop(context),
-                        color: AppTheme.primaryAccent,
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Notifications',
-                        style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                  Expanded(
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(LucideIcons.arrowLeft),
+                          onPressed: () => Navigator.pop(context),
                           color: AppTheme.primaryAccent,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: -0.5,
-                          fontSize: 32,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Flexible(
+                          child: Text(
+                            'Notifications',
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                              color: AppTheme.primaryAccent,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                              fontSize: 28, // Slightly smaller to help with overflow
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 8),
                   Consumer<NotificationService>(
                     builder: (context, notificationService, child) {
                       if (notificationService.unreadCount > 0) {
                         return TextButton.icon(
                           icon: const Icon(LucideIcons.checkCheck, size: 16),
                           label: const Text(
-                            'Mark all read',
+                            'Mark all',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
@@ -62,7 +67,7 @@ class NotificationsPage extends StatelessWidget {
                           onPressed: () => notificationService.markAllAsRead(),
                           style: TextButton.styleFrom(
                             foregroundColor: AppTheme.primaryAccent.withValues(alpha: 0.6),
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
                           ),
                         );
                       }

@@ -76,6 +76,7 @@ class HomePage extends StatelessWidget {
                 builder: (context, notificationService, child) {
                   final unreadCount = notificationService.unreadCount;
                   return Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       Container(
                         decoration: BoxDecoration(
@@ -104,8 +105,8 @@ class HomePage extends StatelessWidget {
                       ),
                       if (unreadCount > 0)
                         Positioned(
-                          right: 0,
-                          top: 0,
+                          right: -2,
+                          top: -2,
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(
