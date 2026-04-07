@@ -93,6 +93,8 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
                   const SizedBox(height: 32),
                   _buildDailyForecast(weatherData['daily']),
                   const SizedBox(height: 32),
+                  _buildPlotActivities(),
+                  const SizedBox(height: 32),
                 ] else ...[
                   SizedBox(
                     height: 200,
@@ -103,7 +105,7 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
                           const CircularProgressIndicator(),
                           const SizedBox(height: 16),
                           Text(
-                            "Loading plot weather...",
+                            "Loading plot data...",
                             style: GoogleFonts.inter(color: Colors.grey.shade600),
                           ),
                         ],
@@ -115,6 +117,117 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPlotActivities() {
+    final allLogs = context.watch<WeatherSmartService>().logs;
+    // Filter logs for this specific plot
+    // Fallback to name-matching for legacy logs without plotId
+    final plotLogs = allLogs.where((log) {
+      if (log['plotId'] != null) {
+        return log['plotId'] == _plot.id;
+      }
+      return log['plot'] == _plot.name;
+    }).toList();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Recent Activities",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (plotLogs.isNotEmpty)
+                Text(
+                  "${plotLogs.length} total",
+                  style: GoogleFonts.inter(color: Colors.grey.shade500, fontSize: 12),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (plotLogs.isEmpty)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+              ),
+              child: Column(
+                children: [
+                  Icon(LucideIcons.clipboardList, size: 40, color: Colors.grey.shade200),
+                  const SizedBox(height: 12),
+                  Text(
+                    "No activities recorded yet",
+                    style: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 13),
+                  ),
+                ],
+              ),
+            )
+          else
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: plotLogs.length.clamp(0, 5), // Show last 5
+              itemBuilder: (context, index) {
+                final log = plotLogs[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: FarmingCard(
+                    padding: const EdgeInsets.all(16),
+                    onTap: () {
+                       // Log Details could be opened here if needed
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppTheme.primaryAccent.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(LucideIcons.check, size: 16, color: AppTheme.primaryAccent),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                log['title'] ?? '',
+                                style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14),
+                              ),
+                              Text(
+                                log['time'] ?? '',
+                                style: GoogleFonts.inter(color: Colors.grey.shade500, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (log['isRecommended'] != null)
+                           Icon(
+                            log['isRecommended'] == true ? LucideIcons.checkCircle : LucideIcons.alertTriangle,
+                            size: 16,
+                            color: log['isRecommended'] == true ? Colors.green : Colors.orange,
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+        ],
       ),
     );
   }

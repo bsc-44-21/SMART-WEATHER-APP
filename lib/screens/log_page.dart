@@ -261,6 +261,7 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
     context.read<WeatherSmartService>().addLog(
       activity,
       plot: _selectedPlot!.name,
+      plotId: _selectedPlot!.id,
       date: date,
       isRecommended: _analysisResult != null ? _analysisResult!['is_recommended'] : null,
       aiFeedback: _analysisResult != null ? _analysisResult!['feedback_message'] : null,
@@ -616,8 +617,42 @@ class _ActivityLogTile extends StatelessWidget {
                 color: isRec ? Colors.green : Colors.orange,
               ),
             ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(LucideIcons.trash2, size: 18, color: Colors.grey),
+            onPressed: () {
+              _showDeleteConfirmation(context);
+            },
+          ),
         ],
       ),
+    ),
+  );
+}
+
+void _showDeleteConfirmation(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Delete Activity?"),
+      content: const Text("Are you sure you want to permanently delete this farm record?"),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+          onPressed: () {
+            context.read<WeatherSmartService>().deleteLog(log['id']);
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Activity deleted")),
+            );
+          },
+          child: const Text("Delete", style: TextStyle(color: Colors.white)),
+        ),
+      ],
     ),
   );
 }

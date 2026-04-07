@@ -160,7 +160,7 @@ class WeatherSmartService extends ChangeNotifier {
     await FirestoreService().deletePlot(plotId);
   }
 
-  Future<void> addLog(String activity, {String? plot, String? date, bool? isRecommended, String? aiFeedback}) async {
+  Future<void> addLog(String activity, {String? plot, String? plotId, String? date, bool? isRecommended, String? aiFeedback}) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -169,6 +169,7 @@ class WeatherSmartService extends ChangeNotifier {
       id: logId,
       userId: user.uid,
       plot: plot ?? 'General',
+      plotId: plotId,
       title: activity,
       time: date ?? DateFormat('MMM d, yyyy').format(DateTime.now()),
       isRecommended: isRecommended,
@@ -178,6 +179,10 @@ class WeatherSmartService extends ChangeNotifier {
 
     // Save to Firestore - the stream will update the local UI list
     await FirestoreService().saveActivityLog(newLog);
+  }
+
+  Future<void> deleteLog(String logId) async {
+    await FirestoreService().deleteActivityLog(logId);
   }
 
   @override

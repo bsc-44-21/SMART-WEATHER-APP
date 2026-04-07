@@ -45,6 +45,15 @@ class FirestoreService {
     }
   }
 
+  // Delete an activity log
+  Future<void> deleteActivityLog(String logId) async {
+    try {
+      await _db.collection('activity_logs').doc(logId).delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Get a real-time stream of activities for a specific user
   Stream<List<ActivityLogModel>> getUserActivitiesStream(String userId) {
     return _db
