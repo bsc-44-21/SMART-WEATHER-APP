@@ -73,6 +73,7 @@ dependencies:
   share_plus: ^12.0.2
 >>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
 
+  uuid: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

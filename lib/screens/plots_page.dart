@@ -7,6 +7,8 @@ import '../services/weather_smart_service.dart';
 
 import '../widgets/create_plot_sheet.dart';
 import '../widgets/delete_confirmation_dialog.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'plot_detail_page.dart';
 
 class PlotsPage extends StatefulWidget {
   const PlotsPage({super.key});
@@ -43,9 +45,9 @@ class _PlotsPageState extends State<PlotsPage> {
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async {
-                  await context.read<WeatherSmartService>().fetchWeatherForPlots();
+                  await context.read<WeatherSmartService>().fetchWeatherForPlots(force: true);
                   if (context.mounted) {
-                  await context.read<WeatherSmartService>().fetchWeatherForLocation();
+                    await context.read<WeatherSmartService>().fetchWeatherForLocation();
                   }
                 },
                 child: hasPlots
@@ -56,16 +58,67 @@ class _PlotsPageState extends State<PlotsPage> {
                         itemBuilder: (context, index) {
                           final plot = plots[index];
                           return Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: PlotInfoCard(
-                              plot: plot,
-                              onEdit: () => showCreatePlotBottomSheet(
-                                context,
-                                existingPlot: plot,
-                              ),
-                              onDelete: () => showDeleteConfirmationDialog(
-                                context,
-                                plot: plot,
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: FarmingCard(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PlotDetailPage(initialPlot: plot),
+                                  ),
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primaryAccent.withValues(alpha: 0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Text(plot.cropEmoji, style: const TextStyle(fontSize: 24)),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          plot.name,
+                                          style: GoogleFonts.inter(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Text(
+                                          '${plot.cropName} • ${plot.fieldSize} Ha',
+                                          style: GoogleFonts.inter(
+                                            color: Colors.grey.shade500,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8F5E9),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      plot.status,
+                                      style: GoogleFonts.inter(
+                                        color: const Color(0xFF2E7D32),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Icon(LucideIcons.chevronRight, color: Colors.grey.shade400, size: 20),
+                                ],
                               ),
                             ),
                           );
@@ -107,10 +160,14 @@ class _PlotsPageState extends State<PlotsPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showCreatePlotBottomSheet(context),
         backgroundColor: AppTheme.primaryAccent,
-        child: const Icon(LucideIcons.plus, color: Colors.white),
+        icon: const Icon(LucideIcons.plus, color: Colors.white, size: 20),
+        label: const Text(
+          "Add Plot",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

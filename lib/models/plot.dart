@@ -13,6 +13,18 @@ class PlotModel {
   final String modifiedAt;
   final String status;
 
+  String get cropEmoji {
+    final lower = cropName.toLowerCase();
+    if (lower.contains('maize')) return '🌽';
+    if (lower.contains('tomato')) return '🍅';
+    if (lower.contains('nut') || lower.contains('g/nut')) return '🥜';
+    if (lower.contains('coffee')) return '☕';
+    if (lower.contains('cotton')) return '🌿';
+    if (lower.contains('tobacco')) return '🚬';
+    if (lower.contains('soy')) return '🌿';
+    return '🌱';
+  }
+
   PlotModel({
     required this.id,
     required this.name,

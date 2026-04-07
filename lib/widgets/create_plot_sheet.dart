@@ -6,7 +6,6 @@ import '../services/weather_location_service.dart';
 import '../services/auth_service.dart';
 import '../models/plot.dart';
 import '../services/notification_service.dart';
-import 'package:flutter/services.dart';
 
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
   final nameController = TextEditingController(text: existingPlot?.name);
@@ -142,7 +141,7 @@ final bool isEditing = existingPlot != null;
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: selectedCrop,
+                      initialValue: selectedCrop,
                       decoration: const InputDecoration(labelText: 'Crop Type'),
                       items: crops.map((crop) {
                         return DropdownMenuItem<String>(

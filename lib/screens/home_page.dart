@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../widgets/common_widgets.dart';
 import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
@@ -12,6 +11,8 @@ import '../services/navigation_service.dart';
 import '../services/notification_service.dart';
 import '../widgets/create_plot_sheet.dart';
 import 'notifications_page.dart';
+import 'log_page.dart';
+import '../models/notification_model.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -27,10 +28,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final weatherService = context.watch<WeatherSmartService>();
     final plots = weatherService.plots;
-    final logs = weatherService.logs;
-    final rawAdvice = weatherService.advice;
-    final currentAdvice = weatherService.currentAdvice;
-    final advice = currentAdvice.isNotEmpty ? currentAdvice : rawAdvice;
     final currentWeather = weatherService.currentWeather;
 
     final user = FirebaseAuth.instance.currentUser;
@@ -79,6 +76,7 @@ class HomePage extends StatelessWidget {
                 builder: (context, notificationService, child) {
                   final unreadCount = notificationService.unreadCount;
                   return Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       Container(
                         decoration: BoxDecoration(
@@ -86,7 +84,7 @@ class HomePage extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
+                              color: Colors.black.withValues(alpha: 0.03),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -107,8 +105,8 @@ class HomePage extends StatelessWidget {
                       ),
                       if (unreadCount > 0)
                         Positioned(
-                          right: 0,
-                          top: 0,
+                          right: -2,
+                          top: -2,
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(
@@ -140,7 +138,17 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 32),
 
           // 2. Global Local Weather
-          if (currentWeather != null) ...[
+          if (weatherService.isLoadingWeather && currentWeather == null) ...[
+            const Center(child: CircularProgressIndicator()),
+            const SizedBox(height: 24),
+          ] else if (weatherService.weatherError != null && currentWeather == null) ...[
+            _buildWeatherErrorCard(
+              context,
+              error: weatherService.weatherError!,
+              onRetry: weatherService.fetchWeatherForLocation,
+            ),
+            const SizedBox(height: 24),
+          ] else if (currentWeather != null) ...[
             _buildLocalWeatherCard(context, currentWeather),
             const SizedBox(height: 24),
           ],
@@ -192,128 +200,116 @@ class HomePage extends StatelessWidget {
             icon: LucideIcons.clipboardList,
             title: 'Log Activity',
             subtitle: 'Record farm tasks & events',
-            onTap: () => context.read<NavigationService>().setIndex(3),
+            onTap: () => showFullActivityLogSheet(context, initialFilter: 'All'),
           ),
 
           const SizedBox(height: 32),
 
-          // 5. Smart Insights (Tip of the Day)
-          Text(
-            'Tip of the Day',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppTheme.primaryAccent,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 16),
-          FarmingCard(
-            padding: const EdgeInsets.all(20),
-            child: Row(
+          // 5. Recent Notifications
+          Builder(builder: (context) {
+            final notifications = context.watch<NotificationService>().notifications;
+            final recentNotifs = notifications.take(3).toList();
+            if (recentNotifs.isEmpty) return const SizedBox.shrink();
+            
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(LucideIcons.lightbulb, color: Colors.orangeAccent, size: 24),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    advice,
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      height: 1.5,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // 6. Recent Logs
-          if (logs.isNotEmpty) ...[
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
                 Text(
-                  'Recent Activity',
+                  'Recent Notifications',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppTheme.primaryAccent,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ...logs.take(2).map((log) => Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: FarmingCard(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                const SizedBox(height: 16),
+                ...recentNotifs.map((notif) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: FarmingCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryAccent.withOpacity(0.1),
+                            color: AppTheme.primaryAccent.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(LucideIcons.clipboardList, size: 16, color: AppTheme.primaryAccent),
+                          child: Icon(
+                            notif.type == NotificationType.weather || notif.type == NotificationType.pest || notif.type == NotificationType.system ? LucideIcons.alertTriangle : LucideIcons.bell, 
+                            size: 16, 
+                            color: AppTheme.primaryAccent
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: Text(
-                            log['title'] ?? 'Activity',
-                            style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          log['time'] ?? '',
-                          style: GoogleFonts.inter(
-                            color: Colors.grey.shade500,
-                            fontSize: 11,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                notif.title,
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                notif.message,
+                                style: GoogleFonts.inter(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 11,
+                                  height: 1.4,
+                                ),
+                              ),
+                              if (notif.aiAdvice != null && notif.aiAdvice!.isNotEmpty) ...[
+                                const SizedBox(height: 12),
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.indigo.shade50,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.indigo.withValues(alpha: 0.1)),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Icon(LucideIcons.sparkles, size: 14, color: Colors.indigo),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          notif.aiAdvice!,
+                                          style: GoogleFonts.inter(
+                                            color: Colors.indigo.shade900,
+                                            fontSize: 11,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ] else if (notif.isAnalyzing) ...[
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Getting AI advice...',
+                                  style: GoogleFonts.inter(
+                                    color: Colors.grey,
+                                    fontSize: 10,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ]
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    if ((log['advice'] ?? '').toString().isNotEmpty) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        'AI Advice:',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                          color: AppTheme.primaryAccent,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        log['advice'].toString(),
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                    ] else if (log['isGeneratingAdvice'] == true) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        'Generating AI advice...',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: Colors.grey,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            )),
-
-          ],
+                  ),
+                )),
+              ],
+            );
+          }),
           
           const SizedBox(height: 32),
         ],
@@ -345,7 +341,7 @@ class HomePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryAccent.withOpacity(0.3),
+            color: AppTheme.primaryAccent.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -513,21 +509,98 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget _buildWeatherErrorCard(BuildContext context, {required String error, required VoidCallback onRetry}) {
+    return FarmingCard(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey.shade800, Colors.grey.shade900],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(LucideIcons.cloudOff, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Weather Offline',
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      error,
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              icon: const Icon(LucideIcons.refreshCw, size: 16),
+              label: const Text('Try Refreshing'),
+              onPressed: onRetry,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.grey.shade900,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildAnalyticCard(BuildContext context, {required String title, required String value, required IconData icon}) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
+        border: Border.all(color: AppTheme.primaryAccent.withValues(alpha: 0.08)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppTheme.primaryAccent.withOpacity(0.5), size: 20),
+          Icon(icon, color: AppTheme.primaryAccent.withValues(alpha: 0.5), size: 20),
           const SizedBox(height: 12),
           Text(
             value,
@@ -558,9 +631,9 @@ class HomePage extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
+          border: Border.all(color: AppTheme.primaryAccent.withValues(alpha: 0.08)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: Row(
@@ -568,7 +641,7 @@ class HomePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.primaryAccent.withOpacity(0.08),
+                color: AppTheme.primaryAccent.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: AppTheme.primaryAccent, size: 20),

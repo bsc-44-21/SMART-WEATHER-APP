@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../core/ai_config.dart';
@@ -19,7 +20,7 @@ class OpenRouterAiService {
 
     for (int i = 0; i < modelsToTry.length; i++) {
       final model = modelsToTry[i];
-      print('[AI] Attempt ${i + 1}/${modelsToTry.length} with model: $model');
+      debugPrint('[AI] Attempt ${i + 1}/${modelsToTry.length} with model: $model');
 
       final result = await _callOpenRouterChat(model: model, userPrompt: userPrompt);
 
@@ -56,7 +57,7 @@ class OpenRouterAiService {
 
       // Safe preview
       final bodyPreview = AiConfig.safeSubstring(response.body, 500);
-      print('[AI] Response body: $bodyPreview');
+      debugPrint('[AI] Response body: $bodyPreview');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -72,7 +73,7 @@ class OpenRouterAiService {
 
       return 'HTTP ${response.statusCode}: ${response.body}';
     } catch (e) {
-      print('[AI] Exception: $e');
+      debugPrint('[AI] Exception: $e');
       return 'Exception occurred: $e';
     }
   }
@@ -123,7 +124,7 @@ class OpenRouterAiService {
       );
 
       if (result != null && _isValidAiResponse(result)) {
-        print('[AI] SUCCESS with $model');
+        debugPrint('[AI] SUCCESS with $model');
         return result;
       }
 
@@ -131,7 +132,7 @@ class OpenRouterAiService {
         lastError = result;
       }
 
-      print('[AI] Model $model failed, trying next fallback...');
+      debugPrint('[AI] Model $model failed, trying next fallback...');
       await Future.delayed(const Duration(milliseconds: 500));
     }
 
@@ -156,9 +157,9 @@ class OpenRouterAiService {
       previousAdvice: previousAdvice,
     );
 
-    print('[AI] Sending request with model $model');
-    print('[AI] API Key: ${AiConfig.safeSubstring(AiConfig.normalizedApiKey, 20)}...');
-    print('[AI] Prompt length: ${prompt.length} chars');
+    debugPrint('[AI] Sending request with model $model');
+    debugPrint('[AI] API Key: ${AiConfig.safeSubstring(AiConfig.normalizedApiKey, 20)}...');
+    debugPrint('[AI] Prompt length: ${prompt.length} chars');
 
     try {
       final requestBody = {
@@ -181,7 +182,7 @@ class OpenRouterAiService {
       ).timeout(Duration(seconds: AiConfig.requestTimeoutSeconds));
 
       final bodyPreview = AiConfig.safeSubstring(response.body, 500);
-      print('[AI] Response body preview: $bodyPreview');
+      debugPrint('[AI] Response body preview: $bodyPreview');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -208,25 +209,41 @@ class OpenRouterAiService {
     required Map<String, dynamic>? weatherData,
     required List<String> previousAdvice,
   }) {
+    final now = DateTime.now();
+    final inputDate = DateTime.tryParse(date) ?? now;
+    final dayDiff = inputDate.difference(DateTime(now.year, now.month, now.day)).inDays;
+    
     final buffer = StringBuffer();
-    buffer.writeln('You are an agricultural expert. Provide concise, actionable farming advice.');
-    buffer.writeln('Farmer Activity: $activity');
-    buffer.writeln('Plot: $plotName');
-    buffer.writeln('Crop: $cropName');
-    buffer.writeln('Date: $date');
-
-    if (weatherData != null) {
-      buffer.writeln('Weather Data: $weatherData');
+    buffer.writeln('CONTEXT:');
+    buffer.writeln('Today is: ${now.toString().substring(0, 10)}');
+    buffer.writeln('Farmer Activity Date: $date');
+    
+    if (dayDiff < 0) {
+      buffer.writeln('IMPORTANT: This is a PAST LOG (${dayDiff.abs()} days ago). Acknowledge that the date has passed but explain if the weather then was suitable.');
+    } else if (dayDiff == 0) {
+      buffer.writeln('IMPORTANT: This is for TODAY. Check the hourly forecast if available.');
+    } else {
+      buffer.writeln('IMPORTANT: This is for the FUTURE. Act as a predictive planner.');
     }
 
-    if (previousAdvice.isNotEmpty) {
-      buffer.writeln('Previous Advice:');
-      for (var advice in previousAdvice.take(3)) {
-        buffer.writeln('- $advice');
+    buffer.writeln('\nFARMING CASE:');
+    buffer.writeln('- Activity: $activity');
+    buffer.writeln('- Plot Name: $plotName');
+    buffer.writeln('- Crop: $cropName');
+    
+    if (weatherData != null) {
+      buffer.writeln('\nWEATHER FORECAST DATA:');
+      // Limit data sent to AI to keep it focused (7 days max)
+      if (weatherData['daily'] != null) {
+        buffer.writeln('7-Day Highs: ${weatherData['daily']['temperature_2m_max']}');
+        buffer.writeln('7-Day Rainfall Sums: ${weatherData['daily']['precipitation_sum']}');
+      }
+      if (weatherData['current'] != null) {
+        buffer.writeln('Current: ${weatherData['current']}');
       }
     }
 
-    buffer.writeln('Provide advice in 1-2 sentences.');
+    buffer.writeln('\nTASK: Provide professional agricultural advice in 1-2 concise sentences based on the Knowledge Base in your system prompt.');
     return buffer.toString();
   }
 }

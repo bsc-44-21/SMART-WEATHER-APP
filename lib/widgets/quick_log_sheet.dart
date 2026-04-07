@@ -38,7 +38,7 @@ void showQuickLogBottomSheet(BuildContext context) {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryAccent.withOpacity(0.1),
+                            color: AppTheme.primaryAccent.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(LucideIcons.clipboardList, size: 20, color: AppTheme.primaryAccent),
