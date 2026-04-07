@@ -160,10 +160,14 @@ class _PlotsPageState extends State<PlotsPage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showCreatePlotBottomSheet(context),
         backgroundColor: AppTheme.primaryAccent,
-        child: const Icon(LucideIcons.plus, color: Colors.white),
+        icon: const Icon(LucideIcons.plus, color: Colors.white, size: 20),
+        label: const Text(
+          "Add Plot",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
