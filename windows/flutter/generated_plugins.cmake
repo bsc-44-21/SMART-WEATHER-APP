@@ -9,9 +9,15 @@ list(APPEND FLUTTER_PLUGIN_LIST
   firebase_core
   geolocator_windows
   printing
+<<<<<<< HEAD
+=======
+  share_plus
+  url_launcher_windows
+>>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  flutter_local_notifications_windows
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

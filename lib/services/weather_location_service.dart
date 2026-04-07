@@ -27,18 +27,14 @@ class WeatherLocationService {
   }
 
   static Future<Map<String, dynamic>?> fetchWeather(
-      double lat, double lon) async {
-    const maxRetries = 3;
-    int retryCount = 0;
+    double latitude,
+    double longitude,
+  ) async {
+    try {
+      final String url =
+          'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,weather_code,precipitation,wind_speed_10m,rain&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=auto';
 
-    while (retryCount < maxRetries) {
-      try {
-        final url = Uri.parse(
-          'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation&timezone=auto',
-        );
-
-        print('[Weather Request] Attempt ${retryCount + 1}/$maxRetries - Location: $lat, $lon');
-        print('[Weather Request] URL: $url');
+      print('[Weather] Fetching weather from: $url');
 
         final response = await http
             .get(url)

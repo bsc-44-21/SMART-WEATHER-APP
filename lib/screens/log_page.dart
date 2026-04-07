@@ -1,10 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import '../widgets/common_widgets.dart';
 import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
-
+import '../services/ai_advisory_service.dart';
+import '../models/plot.dart';
+import 'log_detail_page.dart';
 class LogPage extends StatefulWidget {
   const LogPage({super.key});
 
@@ -13,242 +17,622 @@ class LogPage extends StatefulWidget {
 }
 
 class _LogPageState extends State<LogPage> {
-  final TextEditingController _activityController = TextEditingController();
-  final TextEditingController _plotController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController();
+  String _selectedFilter = 'All';
 
-  @override
-  void dispose() {
-    _activityController.dispose();
-    _plotController.dispose();
-    _dateController.dispose();
-    super.dispose();
+  String _getCropEmoji(String cropName) {
+    final lower = cropName.toLowerCase();
+    if (lower.contains('maize')) return '🌽';
+    if (lower.contains('tomato')) return '🍅';
+    if (lower.contains('nut') || lower.contains('g/nut')) return '🥜';
+    return '🌱';
   }
 
-  void _addActivity(BuildContext context) {
-    final activity = _activityController.text.trim();
-    final plot = _plotController.text.trim();
-    final date = _dateController.text.trim();
-
-    if (activity.isEmpty || plot.isEmpty || date.isEmpty) return;
-
-    context.read<WeatherSmartService>().addLog(
-      activity,
-      plot: plot,
-      date: date,
+  void _showAddActivitySheet(BuildContext context, String currentFilter) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _AddActivitySheet(initialFilter: currentFilter),
     );
-
-    _activityController.clear();
-    _plotController.clear();
-    _dateController.clear();
-
-    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   @override
   Widget build(BuildContext context) {
-    final logs = context.watch<WeatherSmartService>().logs;
+    final weatherService = context.watch<WeatherSmartService>();
+    final userPlots = weatherService.plots;
+    
+    // Filtering logic
+    final filteredLogs = weatherService.logs.where((log) {
+      if (_selectedFilter == 'All') return true;
+      return log['plot'] == _selectedFilter;
+    }).toList();
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Expanded(
-            child: FarmingCard(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // HEADER
-                  Row(
-                    children: [
-                      const AppLogo(
-                        size: 40,
-                        backgroundColor: Color(0xFFE3F2FD),
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text(
+          'Activity Log',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0,
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Filter Chips
+            if (userPlots.isNotEmpty)
+              Container(
+                height: 50,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    _filterChip('All'),
+                    ...userPlots.map((plot) => _filterChip(plot.name)),
+                  ],
+                ),
+              ),
+            
+            const SizedBox(height: 8),
+
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await weatherService.fetchWeatherForPlots();
+                },
+                child: filteredLogs.isEmpty
+                    ? _EmptyLogsState(hasFilter: _selectedFilter != 'All')
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(20),
+                        itemCount: filteredLogs.length,
+                        itemBuilder: (context, index) {
+                          final log = filteredLogs[index];
+                          final plotName = log['plot'] ?? 'General';
+                          
+                          // Look up the actual crop name from the plot models
+                          final plot = userPlots.where((p) => p.name == plotName).toList();
+                          final cropName = plot.isNotEmpty ? plot.first.cropName : 'General';
+                          
+                          return _ActivityLogTile(
+                            log: log,
+                            cropEmoji: _getCropEmoji(cropName),
+                          );
+                        },
                       ),
-                      const SizedBox(width: 16),
-                      Text(
-                        'Activity Log',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // PLOT INPUT
-                  TextField(
-                    controller: _plotController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter plot name',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // DATE INPUT
-                  TextField(
-                    controller: _dateController,
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      hintText: 'Select date',
-                      suffixIcon: const Icon(Icons.calendar_today),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onTap: () async {
-                      FocusScope.of(context).requestFocus(FocusNode());
-
-                      DateTime? picked = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2020),
-                        lastDate: DateTime(2100),
-                      );
-
-                      if (picked != null) {
-                        _dateController.text =
-                            "${picked.day}/${picked.month}/${picked.year}";
-                      }
-                    },
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // ACTIVITY INPUT
-                  TextField(
-                    controller: _activityController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: 'Record activity...',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // SEND BUTTON
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () => _addActivity(context),
-                      icon: const Icon(Icons.send),
-                      label: const Text("Send"),
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // LOG LIST WITH AI ADVICE
-                  Expanded(
-                    child: logs.isEmpty
-                        ? Center(
-                            child: Text('No activities yet'),
-                          )
-                        : ListView.builder(
-                            itemCount: logs.length,
-                            itemBuilder: (context, index) {
-                              final log = logs[index];
-
-                              return Card(
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Activity
-                                      Row(
-                                        children: [
-                                          const Icon(
-                                            LucideIcons.checkSquare,
-                                            color: AppTheme.primaryAccent,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Text(
-                                              log['title'] ?? '',
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                      const SizedBox(height: 4),
-
-                                      // Meta
-                                      Text(
-                                        "Plot: ${log['plot']} | Date: ${log['time']}",
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 8),
-
-                                      // 🔥 AI RESPONSE SECTION
-                                      if (log['isGeneratingAdvice'] == true)
-                                        Row(
-                                          children: const [
-                                            SizedBox(
-                                              width: 16,
-                                              height: 16,
-                                              child:
-                                                  CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                              ),
-                                            ),
-                                            SizedBox(width: 8),
-                                            Text("Generating advice..."),
-                                          ],
-                                        )
-                                      else if ((log['advice'] ?? '')
-                                          .toString()
-                                          .isNotEmpty)
-                                        Container(
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            color: Colors.green.shade50,
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Icon(Icons.smart_toy,
-                                                  size: 18,
-                                                  color: Colors.green),
-                                              const SizedBox(width: 6),
-                                              Expanded(
-                                                child: Text(
-                                                  log['advice'],
-                                                  style: const TextStyle(
-                                                      fontSize: 13),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
-                ],
               ),
             ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddActivitySheet(context, _selectedFilter),
+        backgroundColor: AppTheme.primaryAccent,
+        icon: const Icon(LucideIcons.plus, color: Colors.white, size: 20),
+        label: const Text(
+          "Log Activity",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _filterChip(String label) {
+    final isSelected = _selectedFilter == label;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: ChoiceChip(
+        label: Text(label),
+        selected: isSelected,
+        onSelected: (selected) {
+          if (selected) {
+            setState(() => _selectedFilter = label);
+          }
+        },
+        selectedColor: AppTheme.primaryAccent.withOpacity(0.2),
+        labelStyle: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? AppTheme.primaryAccent : Colors.grey.shade600,
+        ),
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: isSelected ? AppTheme.primaryAccent : Colors.grey.shade200,
+          ),
+        ),
+        showCheckmark: false,
+      ),
+    );
+  }
+}
+
+// --- FULL FEATURED BOTTOM SHEET ---
+
+class _AddActivitySheet extends StatefulWidget {
+  final String initialFilter;
+  const _AddActivitySheet({required this.initialFilter});
+
+  @override
+  State<_AddActivitySheet> createState() => _AddActivitySheetState();
+}
+
+class _AddActivitySheetState extends State<_AddActivitySheet> {
+  final TextEditingController _activityController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+  
+  PlotModel? _selectedPlot;
+  bool _isAnalyzing = false;
+  Map<String, dynamic>? _analysisResult;
+  String? _analysisError;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-select plot if a specific filter is active
+    if (widget.initialFilter != 'All') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final weatherService = context.read<WeatherSmartService>();
+        final filteredPlot = weatherService.plots.firstWhere(
+          (p) => p.name == widget.initialFilter,
+          orElse: () => weatherService.plots.first,
+        );
+        setState(() => _selectedPlot = filteredPlot);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _activityController.dispose();
+    _dateController.dispose();
+    super.dispose();
+  }
+
+  String _getCropEmoji(String cropName) {
+    final lower = cropName.toLowerCase();
+    if (lower.contains('maize')) return '🌽';
+    if (lower.contains('tomato')) return '🍅';
+    if (lower.contains('nut') || lower.contains('g/nut')) return '🥜';
+    return '🌱';
+  }
+
+  Future<void> _analyzeWithAI() async {
+    final activity = _activityController.text.trim();
+    final date = _dateController.text.trim();
+
+    if (activity.isEmpty || _selectedPlot == null || date.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete the details to get AI advice.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isAnalyzing = true;
+      _analysisResult = null;
+      _analysisError = null;
+    });
+
+    try {
+      final weatherService = context.read<WeatherSmartService>();
+      final weatherData = weatherService.getPlotWeather(_selectedPlot!.id);
+
+      if (weatherData == null) {
+        throw Exception("Weather data not available for this plot yet.");
+      }
+
+      final result = await AiAdvisoryService.analyzeActivity(
+        activity: activity,
+        date: date,
+        cropName: _selectedPlot!.cropName,
+        weatherData: weatherData,
+      );
+
+      setState(() => _analysisResult = result);
+    } catch (e) {
+      setState(() => _analysisError = e.toString().replaceAll("Exception: ", ""));
+    } finally {
+      setState(() => _isAnalyzing = false);
+    }
+  }
+
+  void _saveLog() {
+    final activity = _activityController.text.trim();
+    final date = _dateController.text.trim();
+
+    if (activity.isEmpty || _selectedPlot == null || date.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please complete the form.')),
+      );
+      return;
+    }
+
+    context.read<WeatherSmartService>().addLog(
+      activity,
+      plot: _selectedPlot!.name,
+      date: date,
+      isRecommended: _analysisResult != null ? _analysisResult!['is_recommended'] : null,
+      aiFeedback: _analysisResult != null ? _analysisResult!['feedback_message'] : null,
+    );
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Activity saved successfully!')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final allPlots = context.watch<WeatherSmartService>().plots;
+    // Filter internal carousel plots based on initial screen filter
+    final displayPlots = widget.initialFilter == 'All' 
+        ? allPlots 
+        : allPlots.where((p) => p.name == widget.initialFilter).toList();
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.9,
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Record Activity",
+                      style: GoogleFonts.cormorantGaramond(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(LucideIcons.x),
+                      onPressed: () => Navigator.pop(context),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Plot Carousel
+                Text("Target Plot", style: Theme.of(context).textTheme.labelLarge),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 110,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: displayPlots.length,
+                    itemBuilder: (context, index) {
+                      final plot = displayPlots[index];
+                      final isSelected = _selectedPlot?.id == plot.id;
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 12.0),
+                        child: _PlotSelectorCard(
+                          plot: plot,
+                          isSelected: isSelected,
+                          emoji: _getCropEmoji(plot.cropName),
+                          onTap: () => setState(() => _selectedPlot = plot),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Time/Date
+                _DateTimeCard(
+                  dateText: _dateController.text.isEmpty ? "Select Time & Date" : _dateController.text,
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime(2100),
+                    );
+                    if (pickedDate != null) {
+                      if (!context.mounted) return;
+                      TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (pickedTime != null) {
+                        final String period = pickedTime.period == DayPeriod.am ? 'AM' : 'PM';
+                        final int hour = pickedTime.hourOfPeriod == 0 ? 12 : pickedTime.hourOfPeriod;
+                        final String minute = pickedTime.minute.toString().padLeft(2, '0');
+                        setState(() {
+                          _dateController.text = "${pickedDate.day}/${pickedDate.month}/${pickedDate.year} at $hour:$minute $period";
+                        });
+                      }
+                    }
+                  },
+                ),
+
+                const SizedBox(height: 24),
+
+                // Activity Description
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.black.withOpacity(0.05)),
+                  ),
+                  child: TextField(
+                    controller: _activityController,
+                    minLines: 3,
+                    maxLines: 5,
+                    decoration: InputDecoration(
+                      hintText: "What are you planning to do?",
+                      hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 14),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // AI Result area
+                _buildAnalysisUI(),
+
+                const SizedBox(height: 100), // Spacing for floating buttons
+              ],
+            ),
+          ),
+          
+          // Action Buttons positioned at bottom
+          Positioned(
+            bottom: 24,
+            left: 24,
+            right: 24,
+            child: Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _isAnalyzing ? null : _analyzeWithAI,
+                    icon: const Icon(LucideIcons.sparkles, size: 20),
+                    label: Text(_isAnalyzing ? "Checking..." : "AI Advice"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo.shade50,
+                      foregroundColor: Colors.indigo.shade800,
+                      minimumSize: const Size(0, 64),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _saveLog,
+                    icon: const Icon(LucideIcons.save, size: 20),
+                    label: const Text("Save Log"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryAccent,
+                      minimumSize: const Size(0, 64),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAnalysisUI() {
+    if (_isAnalyzing) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: LinearProgressIndicator(color: AppTheme.primaryAccent, backgroundColor: Colors.transparent),
+      );
+    }
+    if (_analysisError != null) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: Colors.red.withOpacity(0.05), borderRadius: BorderRadius.circular(16)),
+        child: Text(_analysisError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+      );
+    }
+    if (_analysisResult != null) {
+      return _AdvisoryGlassCard(
+        isRecommended: _analysisResult!['is_recommended'] == true,
+        message: _analysisResult!['feedback_message'] ?? '',
+      );
+    }
+    return const SizedBox.shrink();
+  }
+}
+
+// --- SHARED UI COMPONENTS ---
+
+class _PlotSelectorCard extends StatelessWidget {
+  final PlotModel plot;
+  final bool isSelected;
+  final String emoji;
+  final VoidCallback onTap;
+
+  const _PlotSelectorCard({required this.plot, required this.isSelected, required this.emoji, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 130,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.primaryAccent : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: isSelected ? AppTheme.primaryAccent : Colors.black.withOpacity(0.05)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 8),
+            Text(
+              plot.name,
+              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black87),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DateTimeCard extends StatelessWidget {
+  final String dateText;
+  final VoidCallback onTap;
+  const _DateTimeCard({required this.dateText, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black.withOpacity(0.05))),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.calendar, size: 20, color: AppTheme.primaryAccent),
+            const SizedBox(width: 16),
+            Expanded(child: Text(dateText, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600))),
+            const Icon(LucideIcons.chevronRight, size: 20, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AdvisoryGlassCard extends StatelessWidget {
+  final bool isRecommended;
+  final String message;
+  const _AdvisoryGlassCard({required this.isRecommended, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isRecommended ? const Color(0xFF2E7D32) : const Color(0xFFE65100);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(color: color.withOpacity(0.05), border: Border.all(color: color.withOpacity(0.2)), borderRadius: BorderRadius.circular(24)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(isRecommended ? LucideIcons.checkCircle : LucideIcons.alertTriangle, color: color, size: 20),
+                  const SizedBox(width: 12),
+                  Text(isRecommended ? "Recommended" : "Caution", style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: color)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(message, style: GoogleFonts.inter(fontSize: 13, height: 1.5, color: color.withOpacity(0.8))),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityLogTile extends StatelessWidget {
+  final Map<String, dynamic> log;
+  final String cropEmoji;
+  const _ActivityLogTile({required this.log, required this.cropEmoji});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool? isRec = log['isRecommended'];
+    
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LogDetailPage(
+              log: log,
+              cropEmoji: cropEmoji,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black.withOpacity(0.04))),
+        child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: AppTheme.background, shape: BoxShape.circle),
+            child: Text(cropEmoji, style: const TextStyle(fontSize: 18)),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(log['title'] ?? '', style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16)),
+                Text("${log['plot']} • ${log['time']}", style: GoogleFonts.inter(fontSize: 12, color: Colors.grey.shade500)),
+              ],
+            ),
+          ),
+          if (isRec != null)
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: isRec ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isRec ? LucideIcons.check : LucideIcons.alertTriangle,
+                size: 14,
+                color: isRec ? Colors.green : Colors.orange,
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
+}
+}
+
+class _EmptyLogsState extends StatelessWidget {
+  final bool hasFilter;
+  const _EmptyLogsState({required this.hasFilter});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(LucideIcons.clipboardList, size: 60, color: Colors.grey.shade300),
+          const SizedBox(height: 16),
+          Text(
+            hasFilter ? "No logs found for this plot" : "No activities recorded yet",
+            style: GoogleFonts.inter(color: Colors.grey.shade500, fontWeight: FontWeight.normal),
           ),
         ],
       ),

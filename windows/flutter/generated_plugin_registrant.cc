@@ -12,6 +12,11 @@
 #include <firebase_core/firebase_core_plugin_c_api.h>
 #include <geolocator_windows/geolocator_windows.h>
 #include <printing/printing_plugin.h>
+<<<<<<< HEAD
+=======
+#include <share_plus/share_plus_windows_plugin_c_api.h>
+#include <url_launcher_windows/url_launcher_windows.h>
+>>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
   CloudFirestorePluginCApiRegisterWithRegistrar(
@@ -26,4 +31,11 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("GeolocatorWindows"));
   PrintingPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("PrintingPlugin"));
+<<<<<<< HEAD
+=======
+  SharePlusWindowsPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("SharePlusWindowsPluginCApi"));
+  UrlLauncherWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("UrlLauncherWindows"));
+>>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
 }

@@ -1,20 +1,22 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../core/mock_data.dart';
-import '../models/plot.dart';
 import 'firestore_service.dart';
 import 'weather_location_service.dart';
 import 'openrouter_ai_service.dart';
 import 'package:intl/intl.dart';
+import '../models/plot.dart';
+import '../models/activity_log.dart';
+import '../core/mock_data.dart';
+import 'package:uuid/uuid.dart';
 
 class WeatherSmartService extends ChangeNotifier {
   List<PlotModel> _plots = [];
-  final List<Map<String, dynamic>> _activities = List.from(MockData.activities);
-
+  List<Map<String, dynamic>> _activities = [];
   bool _isDarkMode = false;
 
   StreamSubscription? _plotsSubscription;
+  StreamSubscription? _logsSubscription;
   Timer? _weatherTimer;
 
   // Weather
@@ -35,25 +37,37 @@ class WeatherSmartService extends ChangeNotifier {
   WeatherSmartService() {
     FirebaseAuth.instance.authStateChanges().listen((user) {
       _plotsSubscription?.cancel();
+      _logsSubscription?.cancel();
       _weatherTimer?.cancel();
 
       if (user != null) {
-        _plotsSubscription = FirestoreService()
-            .getUserPlotsStream(user.uid)
-            .listen((plots) {
+        // Plots Stream
+        _plotsSubscription = FirestoreService().getUserPlotsStream(user.uid).listen((plots) {
           _plots = plots;
           notifyListeners();
+        }, onError: (e) {
+          print('[WeatherSmartService] Plots stream error: $e');
         });
-
-        // ✅ ONLY fetch current location weather
-        fetchWeatherForLocation();
-
-        // ✅ Slow safe refresh (every 15 minutes)
-        _weatherTimer = Timer.periodic(const Duration(minutes: 15), (_) {
+        
+        // Logs Stream
+        _logsSubscription = FirestoreService().getUserActivitiesStream(user.uid).listen((logs) {
+          _activities = logs.map((l) => l.toMap()).toList();
+          notifyListeners();
+        }, onError: (e) {
+          print('[WeatherSmartService] Logs stream error: $e');
+        });
+        
+        // Start periodic refresh every minute
+        _weatherTimer = Timer.periodic(const Duration(minutes: 1), (_) {
+          fetchWeatherForPlots();
           fetchWeatherForLocation();
         });
+
+        // Fetch weather when user logs in
+        fetchWeatherForLocation();
       } else {
         _plots = [];
+        _activities = [];
         _currentWeather = null;
         _plotWeather.clear();
         notifyListeners();
@@ -164,54 +178,31 @@ class WeatherSmartService extends ChangeNotifier {
     await FirestoreService().deletePlot(plotId);
   }
 
-  // ================= LOGS =================
-  void addLog(String activity, {String? plot, String? date}) {
-    final entryDate =
-        date ?? DateFormat('MMM d, yyyy').format(DateTime.now());
+  Future<void> addLog(String activity, {String? plot, String? date, bool? isRecommended, String? aiFeedback}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-    _activities.insert(0, {
-      'id': DateTime.now().millisecondsSinceEpoch.toString(),
-      'title': activity,
-      'plot': plot ?? 'General',
-      'time': entryDate,
-      'advice': '',
-      'isGeneratingAdvice': true,
-    });
+    final logId = const Uuid().v4();
+    final newLog = ActivityLogModel(
+      id: logId,
+      userId: user.uid,
+      plot: plot ?? 'General',
+      title: activity,
+      time: date ?? DateFormat('MMM d, yyyy').format(DateTime.now()),
+      isRecommended: isRecommended,
+      aiFeedback: aiFeedback,
+      createdAt: DateTime.now(),
+    );
 
-    notifyListeners();
-  }
-
-  // ================= AI =================
-  Future<void> askAIQuestion(String question) async {
-    if (question.trim().isEmpty) return;
-
-    _isGeneratingAdvice = true;
-    notifyListeners();
-
-    try {
-      final answer =
-          await OpenRouterAiService().generateCustomResponse(
-        userPrompt: question,
-      );
-
-      _currentAdvice = answer;
-
-      _previousAdvice.insert(0, answer);
-      if (_previousAdvice.length > _maxPreviousAdviceCount) {
-        _previousAdvice.removeLast();
-      }
-    } catch (e) {
-      _currentAdvice = 'AI unavailable.';
-    } finally {
-      _isGeneratingAdvice = false;
-      notifyListeners();
-    }
+    // Save to Firestore - the stream will update the local UI list
+    await FirestoreService().saveActivityLog(newLog);
   }
 
   // ================= CLEANUP =================
   @override
   void dispose() {
     _plotsSubscription?.cancel();
+    _logsSubscription?.cancel();
     _weatherTimer?.cancel();
     super.dispose();
   }

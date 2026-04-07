@@ -58,9 +58,20 @@ dependencies:
   # HTTP for API calls
   http: ^1.1.0
   image_picker: ^1.2.1
+<<<<<<< HEAD
   flutter_dotenv: ^6.0.0
   pdf: ^3.12.0
   printing: ^5.11.0
+=======
+  timeago: ^3.7.1
+  flutter_local_notifications: ^21.0.0
+  google_generative_ai: ^0.4.7
+  timezone: ^0.11.0
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  path_provider: ^2.1.5
+  share_plus: ^12.0.2
+>>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
 
 dev_dependencies:
   flutter_test:

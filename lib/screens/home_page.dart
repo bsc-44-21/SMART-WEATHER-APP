@@ -9,6 +9,7 @@ import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../services/navigation_service.dart';
+import '../services/notification_service.dart';
 import '../widgets/create_plot_sheet.dart';
 import 'notifications_page.dart';
 
@@ -49,33 +50,90 @@ class HomePage extends StatelessWidget {
           // 1. Welcome & Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _getGreeting(),
-                      style: GoogleFonts.inter(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _getGreeting(),
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      username,
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: AppTheme.primaryAccent,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -1,
-                      ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    username,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      color: AppTheme.primaryAccent,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -1,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              _buildNotificationIcon(context),
+              Consumer<NotificationService>(
+                builder: (context, notificationService, child) {
+                  final unreadCount = notificationService.unreadCount;
+                  return Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: const Icon(LucideIcons.bell),
+                          color: AppTheme.primaryAccent,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NotificationsPage(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.redAccent,
+                              shape: BoxShape.circle,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            child: Text(
+                              '$unreadCount',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+              ),
             ],
           ),
 
@@ -296,6 +354,7 @@ class HomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+<<<<<<< HEAD
           // Header with temperature
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -306,6 +365,38 @@ class HomePage extends StatelessWidget {
                   children: [
                     Text(
                       'Local Weather',
+=======
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Local Weather',
+                style: GoogleFonts.inter(
+                  color: Colors.white70,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '$temp°',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      height: 1.0,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      desc,
+>>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
                       style: GoogleFonts.inter(
                         color: Colors.white70,
                         fontSize: 12,
@@ -343,10 +434,13 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
+<<<<<<< HEAD
               Text(
                 emoji,
                 style: const TextStyle(fontSize: 48),
               ),
+=======
+>>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
             ],
           ),
           
@@ -506,31 +600,6 @@ class HomePage extends StatelessWidget {
             Icon(LucideIcons.chevronRight, color: Colors.grey.shade300, size: 20),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationIcon(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const NotificationsPage()),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          shape: BoxShape.circle,
-          border: Border.all(color: AppTheme.primaryAccent.withOpacity(0.08)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: const Icon(LucideIcons.bell, color: AppTheme.primaryAccent, size: 24),
       ),
     );
   }

@@ -5,6 +5,7 @@ import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../services/auth_service.dart';
 import '../models/plot.dart';
+import '../services/notification_service.dart';
 import 'package:flutter/services.dart';
 
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
@@ -48,15 +49,14 @@ final bool isEditing = existingPlot != null;
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+            child: Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(isEditing ? 'Edit Plot' : 'Create New Plot', style: 
                     Theme.of(context).textTheme.headlineMedium),
                     const SizedBox(height: 24),
@@ -222,6 +222,13 @@ final bool isEditing = existingPlot != null;
                                 }
 
                                 if (context.mounted) {
+                                  final weatherService = context.read<WeatherSmartService>();
+                                  final logs = weatherService.logs;
+                                  final plotWeather = weatherService.getPlotWeather(plot.id);
+                                  context.read<NotificationService>().schedulePlotMilestones(plot, logs, plotWeather: plotWeather);
+                                }
+
+                                if (context.mounted) {
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
@@ -252,8 +259,7 @@ final bool isEditing = existingPlot != null;
                 ),
               ),
             ),
-          ),
-        );
+          );
         },
       );
     },

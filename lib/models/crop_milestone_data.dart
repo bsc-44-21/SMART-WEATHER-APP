@@ -1,7 +1,7 @@
 class CropMilestoneData {
-    static List<Map<String, dynamic>> getMilestonesForCrop(String cropName, String plotName) {
+  static List<Map<String, dynamic>> getMilestonesForCrop(String cropName, String plotName) {
     String normalizedCrop = cropName.toLowerCase().trim();
-
+    
     if (normalizedCrop.contains('maize')) {
       return [
         {
@@ -9,7 +9,7 @@ class CropMilestoneData {
           'title': 'First Weeding',
           'body': 'Your Maize plot "$plotName" is 3 weeks old. Start weeding to prevent nutrient competition.',
         },
-         {
+        {
           'dap': 45,
           'title': 'Top Dressing (Urea)',
           'body': 'Time to apply nitrogen fertilizer to "$plotName" for optimal stalk and leaf growth.',
@@ -20,7 +20,7 @@ class CropMilestoneData {
           'body': 'Your Maize at "$plotName" should be reaching maturity. Check for dry husks.',
         },
       ];
-      } else if (normalizedCrop.contains('tomato')) {
+    } else if (normalizedCrop.contains('tomato')) {
       return [
         {
           'dap': 14,
