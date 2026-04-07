@@ -1,8 +1,22 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 
 class WeatherLocationService {
+  static DateTime _nextAllowedRequestTime = DateTime.now();
+
+  static Future<void> _rateLimit() async {
+    final now = DateTime.now();
+    if (_nextAllowedRequestTime.isAfter(now)) {
+      final delay = _nextAllowedRequestTime.difference(now);
+      _nextAllowedRequestTime = _nextAllowedRequestTime.add(const Duration(milliseconds: 2000));
+      await Future.delayed(delay);
+    } else {
+      _nextAllowedRequestTime = now.add(const Duration(milliseconds: 2000));
+    }
+  }
 
   static Future<Position?> getLocationWithPermission() async {
     try {
@@ -26,42 +40,50 @@ class WeatherLocationService {
       }
 
      
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
+      Position? position;
+      try {
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 10),
+        );
+      } catch (e) {
+        debugPrint('Timeout getting current position, trying last known...');
+        position = await Geolocator.getLastKnownPosition();
+      }
 
       return position;
     } catch (e) {
-      print('Error getting location: $e');
-      return null;
+      debugPrint('Error getting location: $e');
+      throw Exception('Failed to get location: $e. Make sure location is turned on in device settings.');
     }
   }
 
-  static Future<Map<String, dynamic>?> fetchWeather(
+  static Future<Map<String, dynamic>> fetchWeather(
     double latitude,
     double longitude,
   ) async {
+    await _rateLimit();
+    
     try {
       final String url =
-          'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,weather_code,precipitation,wind_speed_10m,rain&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=auto';
+          'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,relative_humidity_2m,weather_code,precipitation,wind_speed_10m,rain&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max&timezone=GMT';
 
-      print('[Weather] Fetching weather from: $url');
+      debugPrint('[Weather] Fetching weather from: $url');
 
       final response = await http
           .get(Uri.parse(url))
           .timeout(
             const Duration(seconds: 15),
             onTimeout: () {
-              print('[Weather] Request timeout after 15 seconds');
-              return http.Response('Error', 408);
+              throw Exception('Request timeout after 15 seconds');
             },
           );
 
-      print('[Weather] API Response Status: ${response.statusCode}');
+      debugPrint('[Weather] API Response Status: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        print('[Weather] Successfully fetched weather data');
+        debugPrint('[Weather] Successfully fetched weather data');
         return {
           'latitude': jsonResponse['latitude'],
           'longitude': jsonResponse['longitude'],
@@ -71,12 +93,16 @@ class WeatherLocationService {
           'daily': jsonResponse['daily'],
         };
       } else {
-        print('[Weather] API Error: ${response.statusCode} - ${response.body}');
+        final errorMsg = 'API Error: ${response.statusCode} - ${response.body}';
+        debugPrint('[Weather] $errorMsg');
+        throw Exception(errorMsg);
       }
-      return null;
     } catch (e) {
-      print('[Weather] Exception fetching weather: $e');
-      return null;
+      debugPrint('[Weather] Exception fetching weather: $e');
+      if (e is SocketException || e is HandshakeException) {
+        throw Exception('Network error. Trying to fetch weather from an insecure connection may be blocked on this device.');
+      }
+      rethrow;
     }
   }
 

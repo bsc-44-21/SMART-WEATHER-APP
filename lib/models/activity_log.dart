@@ -4,6 +4,7 @@ class ActivityLogModel {
   final String id;
   final String userId;
   final String plot;
+  final String? plotId; // Added plotId for robust filtering
   final String title;
   final String time;
   final bool? isRecommended;
@@ -14,6 +15,7 @@ class ActivityLogModel {
     required this.id,
     required this.userId,
     required this.plot,
+    this.plotId,
     required this.title,
     required this.time,
     this.isRecommended,
@@ -26,6 +28,7 @@ class ActivityLogModel {
       'id': id,
       'userId': userId,
       'plot': plot,
+      'plotId': plotId,
       'title': title,
       'time': time,
       'isRecommended': isRecommended,
@@ -39,6 +42,7 @@ class ActivityLogModel {
       id: docId,
       userId: map['userId'] ?? '',
       plot: map['plot'] ?? '',
+      plotId: map['plotId'],
       title: map['title'] ?? '',
       time: map['time'] ?? '',
       isRecommended: map['isRecommended'],

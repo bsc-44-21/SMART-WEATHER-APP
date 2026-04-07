@@ -45,6 +45,15 @@ class FirestoreService {
     }
   }
 
+  // Delete an activity log
+  Future<void> deleteActivityLog(String logId) async {
+    try {
+      await _db.collection('activity_logs').doc(logId).delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Get a real-time stream of activities for a specific user
   Stream<List<ActivityLogModel>> getUserActivitiesStream(String userId) {
     return _db
@@ -53,7 +62,7 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) {
           final docs = snapshot.docs
-            .map((doc) => ActivityLogModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+            .map((doc) => ActivityLogModel.fromMap(doc.data(), doc.id))
             .toList();
           
           // Sort client-side to avoid requiring a composite index in Firestore

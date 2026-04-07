@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firestore_service.dart';
 import 'weather_location_service.dart';
-import 'openrouter_ai_service.dart';
 import 'package:intl/intl.dart';
 import '../models/plot.dart';
 import '../models/activity_log.dart';
@@ -25,8 +24,8 @@ class WeatherSmartService extends ChangeNotifier {
   String? _weatherError;
   
   // AI Advice data
-  String _currentAdvice = '';
-  bool _isGeneratingAdvice = false;
+  final String _currentAdvice = '';
+  final bool _isGeneratingAdvice = false;
   final List<String> _previousAdvice = [];
   final int _maxPreviousAdviceCount = 5;
 
@@ -42,7 +41,7 @@ class WeatherSmartService extends ChangeNotifier {
           fetchWeatherForPlots(); // Fetch weather for each plot
           notifyListeners();
         }, onError: (e) {
-          print('[WeatherSmartService] Plots stream error: $e');
+          debugPrint('[WeatherSmartService] Plots stream error: $e');
         });
         
         // Logs Stream
@@ -50,7 +49,7 @@ class WeatherSmartService extends ChangeNotifier {
           _activities = logs.map((l) => l.toMap()).toList();
           notifyListeners();
         }, onError: (e) {
-          print('[WeatherSmartService] Logs stream error: $e');
+          debugPrint('[WeatherSmartService] Logs stream error: $e');
         });
         
         // Start periodic refresh every minute
@@ -94,38 +93,32 @@ class WeatherSmartService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      print('[Weather] Starting weather fetch...');
+      debugPrint('[Weather] Starting weather fetch...');
       
       // Get location with permission
       final position = await WeatherLocationService.getLocationWithPermission();
       
       if (position == null) {
         _weatherError = 'Location permission denied. Enable location access in settings.';
-        print('[Weather] Location permission denied');
+        debugPrint('[Weather] Location permission denied');
         _isLoadingWeather = false;
         notifyListeners();
         return;
       }
 
-      print('[Weather] Location obtained: ${position.latitude}, ${position.longitude}');
+      debugPrint('[Weather] Location obtained: ${position.latitude}, ${position.longitude}');
 
-      // Fetch weather from Open-Meteo
       final weather = await WeatherLocationService.fetchWeather(
         position.latitude,
         position.longitude,
       );
 
-      if (weather != null) {
-        _currentWeather = weather;
-        _weatherError = null;
-        print('[Weather] Weather fetched successfully');
-      } else {
-        _weatherError = 'Failed to fetch weather. Check your internet connection.';
-        print('[Weather] Weather data was null');
-      }
+      _currentWeather = weather;
+      _weatherError = null;
+      debugPrint('[Weather] Weather fetched successfully');
     } catch (e) {
-      _weatherError = 'Error: ${e.toString()}';
-      print('[Weather] Exception: $e');
+      _weatherError = e.toString().replaceAll('Exception: ', '');
+      debugPrint('[Weather] Exception: $e');
     } finally {
       _isLoadingWeather = false;
       notifyListeners();
@@ -144,13 +137,11 @@ class WeatherSmartService extends ChangeNotifier {
         final lat = double.parse(plot.latitude);
         final lng = double.parse(plot.longitude);
         final weather = await WeatherLocationService.fetchWeather(lat, lng);
-        if (weather != null) {
-          weather['fetched_at'] = DateTime.now().toIso8601String();
-          _plotWeather[plot.id] = weather;
-          notifyListeners();
-        }
+        weather['fetched_at'] = DateTime.now().toIso8601String();
+        _plotWeather[plot.id] = weather;
+        notifyListeners();
       } catch (e) {
-        print('[WeatherSmartService] Error fetching weather for plot ${plot.id}: $e');
+        debugPrint('[WeatherSmartService] Error fetching weather for plot ${plot.id}: $e');
       }
     }
   }
@@ -169,7 +160,7 @@ class WeatherSmartService extends ChangeNotifier {
     await FirestoreService().deletePlot(plotId);
   }
 
-  Future<void> addLog(String activity, {String? plot, String? date, bool? isRecommended, String? aiFeedback}) async {
+  Future<void> addLog(String activity, {String? plot, String? plotId, String? date, bool? isRecommended, String? aiFeedback}) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -178,6 +169,7 @@ class WeatherSmartService extends ChangeNotifier {
       id: logId,
       userId: user.uid,
       plot: plot ?? 'General',
+      plotId: plotId,
       title: activity,
       time: date ?? DateFormat('MMM d, yyyy').format(DateTime.now()),
       isRecommended: isRecommended,
@@ -187,6 +179,10 @@ class WeatherSmartService extends ChangeNotifier {
 
     // Save to Firestore - the stream will update the local UI list
     await FirestoreService().saveActivityLog(newLog);
+  }
+
+  Future<void> deleteLog(String logId) async {
+    await FirestoreService().deleteActivityLog(logId);
   }
 
   @override

@@ -10,7 +10,6 @@ import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
-import '../services/pest_detection_service.dart';
 import '../services/ai_advisory_service.dart';
 import '../models/pest_detection.dart';
 import '../models/plot.dart';
@@ -366,7 +365,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
               ),
             if (_selectedImage != null)
               Positioned.fill(
-                child: Container(color: Colors.black.withOpacity(0.3)),
+                child: Container(color: Colors.black.withValues(alpha: 0.3)),
               ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
@@ -377,7 +376,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryAccent.withOpacity(0.05),
+                        color: AppTheme.primaryAccent.withValues(alpha: 0.05),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -408,34 +407,23 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
                       onPressed: _isProcessing ? null : _scanPest,
-                      icon: const Icon(LucideIcons.camera),
-                      label: const Text('Tap to Scan'),
+                      icon: const Icon(LucideIcons.camera, color: Colors.white),
+                      label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: AppTheme.primaryAccent,
+                        disabledBackgroundColor: AppTheme.primaryAccent.withValues(alpha: 0.5),
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30), 
+                        ),
+                        elevation: 0,
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 32),
-          ElevatedButton.icon(
-            onPressed: _isProcessing ? null : _scanPest,
-            icon: const Icon(LucideIcons.camera),
-            label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            style: ElevatedButton.styleFrom(
-              foregroundColor: const Color(0xFF5A5A40), // Deep Olive
-              backgroundColor: Colors.white,
-              disabledBackgroundColor: Colors.white.withOpacity(0.7),
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30), 
-              ),
-              elevation: 0,
-            ),
-          ),
-        ],
-            label: const Text('Tap to Scan'),
-          ),
-        ],
             if (_isProcessing)
               Positioned.fill(
                 child: LayoutBuilder(
@@ -454,7 +442,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                                 decoration: BoxDecoration(
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppTheme.primaryAccent.withOpacity(0.5),
+                                      color: AppTheme.primaryAccent.withValues(alpha: 0.5),
                                       blurRadius: 10,
                                       spreadRadius: 2,
                                     ),
@@ -464,7 +452,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                               ),
                             ),
                             Container(
-                              color: AppTheme.primaryAccent.withOpacity(0.05),
+                              color: AppTheme.primaryAccent.withValues(alpha: 0.05),
                             ),
                           ],
                         );
@@ -536,8 +524,8 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
           borderRadius: BorderRadius.circular(20),
           side: BorderSide(
             color: Theme.of(context).brightness == Brightness.dark
-                ? Colors.white.withOpacity(0.1)
-                : Colors.black.withOpacity(0.05),
+                ? Colors.white.withValues(alpha: 0.1)
+                : Colors.black.withValues(alpha: 0.05),
           ),
         ),
         child: Padding(
@@ -548,8 +536,8 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: isCritical
-                    ? Colors.red.withOpacity(0.1)
-                    : Colors.green.withOpacity(0.1),
+                    ? Colors.red.withValues(alpha: 0.1)
+                    : Colors.green.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -585,8 +573,8 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: isCritical
-                    ? Colors.red.withOpacity(0.1)
-                    : Colors.green.withOpacity(0.1),
+                    ? Colors.red.withValues(alpha: 0.1)
+                    : Colors.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(

@@ -88,8 +88,8 @@ class DetectionResultPage extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    riskColor.withOpacity(0.3),
-                    riskColor.withOpacity(0.8),
+                    riskColor.withValues(alpha: 0.3),
+                    riskColor.withValues(alpha: 0.8),
                   ],
                 ),
               ),
@@ -98,7 +98,7 @@ class DetectionResultPage extends StatelessWidget {
               child: Icon(
                 riskColor == Colors.red ? LucideIcons.bug : LucideIcons.checkCircle,
                 size: 80,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -125,10 +125,10 @@ class DetectionResultPage extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: riskColor.withOpacity(0.1),
+            color: riskColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: riskColor.withOpacity(0.3),
+              color: riskColor.withValues(alpha: 0.3),
             ),
           ),
           child: Row(
@@ -180,7 +180,7 @@ class DetectionResultPage extends StatelessWidget {
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 10,
-            backgroundColor: Colors.grey.withOpacity(0.1),
+            backgroundColor: Colors.grey.withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation<Color>(riskColor),
           ),
         ),
@@ -192,9 +192,9 @@ class DetectionResultPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.05),
+        color: Colors.blue.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blue.withOpacity(0.1)),
+        border: Border.all(color: Colors.blue.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -269,7 +269,7 @@ class DetectionResultPage extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+        side: BorderSide(color: Colors.grey.withValues(alpha: 0.1)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -316,7 +316,7 @@ class DetectionResultPage extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 6.0),
           child: Row(
             children: [
-              Icon(Icons.check_circle_outline, size: 16, color: color.withOpacity(0.5)),
+              Icon(Icons.check_circle_outline, size: 16, color: color.withValues(alpha: 0.5)),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -326,7 +326,7 @@ class DetectionResultPage extends StatelessWidget {
               ),
             ],
           ),
-        )).toList(),
+        )),
       ],
     );
   }
