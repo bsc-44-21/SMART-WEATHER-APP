@@ -407,12 +407,12 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
                       onPressed: _isProcessing ? null : _scanPest,
-                      icon: const Icon(LucideIcons.camera),
-                      label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      icon: const Icon(LucideIcons.camera, color: Colors.white),
+                      label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color(0xFF5A5A40),
-                        backgroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.white.withValues(alpha: 0.7),
+                        foregroundColor: Colors.white,
+                        backgroundColor: AppTheme.primaryAccent,
+                        disabledBackgroundColor: AppTheme.primaryAccent.withValues(alpha: 0.5),
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30), 
