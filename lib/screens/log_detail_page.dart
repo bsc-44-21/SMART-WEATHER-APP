@@ -46,10 +46,10 @@ class LogDetailPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.black.withOpacity(0.04)),
+                border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withValues(alpha: 0.02),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -146,7 +146,7 @@ class LogDetailPage extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.black.withOpacity(0.04)),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,8 +194,8 @@ class _AdvisoryStatusCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.05),
-            border: Border.all(color: color.withOpacity(0.2)),
+            color: color.withValues(alpha: 0.05),
+            border: Border.all(color: color.withValues(alpha: 0.2)),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -225,7 +225,7 @@ class _AdvisoryStatusCard extends StatelessWidget {
                           : "Be careful! The weather conditions might not be ideal.",
                       style: GoogleFonts.inter(
                         fontSize: 13,
-                        color: color.withOpacity(0.8),
+                        color: color.withValues(alpha: 0.8),
                       ),
                     ),
                   ],

@@ -8,14 +8,14 @@ class AppTheme {
   static const Color background = Color(0xFFF5F5F0); // Warm Cream
   static const Color surface = Colors.white; // Pure White
   static const Color textPrimary = Color(0xFF1A1A1A); // Charcoal
-  static final Color textMuted = const Color(0xFF5A5A40).withOpacity(0.60);
+  static final Color textMuted = const Color(0xFF5A5A40).withValues(alpha: 0.60);
   static const Color inputBorder = Color(0xFFE0E0E0);
   
   // Dark Color Palette
   static const Color darkBackground = Color(0xFF0E110F); // Deeper Charcoal
   static const Color darkSurface = Color(0xFF1E211E); // Distinct Surface
   static const Color darkTextPrimary = Colors.white; // Pure White
-  static final Color darkTextMuted = Colors.white.withOpacity(0.80); // Clearer Muted Text
+  static final Color darkTextMuted = Colors.white.withValues(alpha: 0.80); // Clearer Muted Text
   static const Color darkInputBorder = Color(0xFF3A3C38);
   static const Color darkPrimaryAccent = Color(0xFF4CAF50); // Vibrant Emerald
 
@@ -26,7 +26,7 @@ class AppTheme {
         seedColor: primaryAccent,
         primary: primaryAccent,
         surface: surface,
-        surfaceVariant: background,
+        surfaceContainerHighest: Color(0xFFF1F5E6),
         onSurface: textPrimary,
       ),
       scaffoldBackgroundColor: background,
@@ -96,7 +96,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(44),
-          side: BorderSide(color: Colors.black.withOpacity(0.05)),
+          side: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
         ),
       ),
 
@@ -120,7 +120,7 @@ class AppTheme {
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surface,
         selectedItemColor: primaryAccent,
-        unselectedItemColor: primaryAccent.withOpacity(0.4),
+        unselectedItemColor: primaryAccent.withValues(alpha: 0.4),
         type: BottomNavigationBarType.fixed,
         elevation: 0,
         selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.5),
@@ -209,10 +209,10 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: darkSurface,
         elevation: 8,
-        shadowColor: Colors.black.withOpacity(0.5),
+        shadowColor: Colors.black.withValues(alpha: 0.5),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32),
-          side: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1),
         ),
       ),
 

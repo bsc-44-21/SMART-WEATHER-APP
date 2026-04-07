@@ -215,7 +215,7 @@ class NotificationService extends ChangeNotifier {
 
       notification.aiAdvice = advice['feedback_message'];
     } catch (e) {
-      print('[NotificationService] AI Advice Error: $e');
+      debugPrint('[NotificationService] AI Advice Error: $e');
     } finally {
       notification.isAnalyzing = false;
       notifyListeners();

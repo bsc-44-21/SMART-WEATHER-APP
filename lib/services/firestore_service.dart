@@ -53,7 +53,7 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) {
           final docs = snapshot.docs
-            .map((doc) => ActivityLogModel.fromMap(doc.data() as Map<String, dynamic>, doc.id))
+            .map((doc) => ActivityLogModel.fromMap(doc.data(), doc.id))
             .toList();
           
           // Sort client-side to avoid requiring a composite index in Firestore

@@ -3,12 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
-import '../widgets/common_widgets.dart';
 import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/ai_advisory_service.dart';
 import '../models/plot.dart';
 import 'log_detail_page.dart';
+
+// Public access to the fully featured log bottom sheet
+void showFullActivityLogSheet(BuildContext context, {String initialFilter = 'All'}) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => _AddActivitySheet(initialFilter: initialFilter),
+  );
+}
+
 class LogPage extends StatefulWidget {
   const LogPage({super.key});
 
@@ -28,12 +38,7 @@ class _LogPageState extends State<LogPage> {
   }
 
   void _showAddActivitySheet(BuildContext context, String currentFilter) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _AddActivitySheet(initialFilter: currentFilter),
-    );
+    showFullActivityLogSheet(context, initialFilter: currentFilter);
   }
 
   @override
@@ -133,7 +138,7 @@ class _LogPageState extends State<LogPage> {
             setState(() => _selectedFilter = label);
           }
         },
-        selectedColor: AppTheme.primaryAccent.withOpacity(0.2),
+        selectedColor: AppTheme.primaryAccent.withValues(alpha: 0.2),
         labelStyle: GoogleFonts.inter(
           fontSize: 13,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -368,7 +373,7 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.black.withOpacity(0.05)),
+                    border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
                   ),
                   child: TextField(
                     controller: _activityController,
@@ -441,7 +446,7 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
     if (_analysisError != null) {
       return Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.red.withOpacity(0.05), borderRadius: BorderRadius.circular(16)),
+        decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(16)),
         child: Text(_analysisError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
       );
     }
@@ -475,7 +480,7 @@ class _PlotSelectorCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected ? AppTheme.primaryAccent : Colors.white,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? AppTheme.primaryAccent : Colors.black.withOpacity(0.05)),
+          border: Border.all(color: isSelected ? AppTheme.primaryAccent : Colors.black.withValues(alpha: 0.05)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -507,7 +512,7 @@ class _DateTimeCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(20),
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black.withOpacity(0.05))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black.withValues(alpha: 0.05))),
         child: Row(
           children: [
             const Icon(LucideIcons.calendar, size: 20, color: AppTheme.primaryAccent),
@@ -535,7 +540,7 @@ class _AdvisoryGlassCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
         child: Container(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(color: color.withOpacity(0.05), border: Border.all(color: color.withOpacity(0.2)), borderRadius: BorderRadius.circular(24)),
+          decoration: BoxDecoration(color: color.withValues(alpha: 0.05), border: Border.all(color: color.withValues(alpha: 0.2)), borderRadius: BorderRadius.circular(24)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -547,7 +552,7 @@ class _AdvisoryGlassCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              Text(message, style: GoogleFonts.inter(fontSize: 13, height: 1.5, color: color.withOpacity(0.8))),
+              Text(message, style: GoogleFonts.inter(fontSize: 13, height: 1.5, color: color.withValues(alpha: 0.8))),
             ],
           ),
         ),
@@ -580,7 +585,7 @@ class _ActivityLogTile extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black.withOpacity(0.04))),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black.withValues(alpha: 0.04))),
         child: Row(
         children: [
           Container(
@@ -602,7 +607,7 @@ class _ActivityLogTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: isRec ? Colors.green.withOpacity(0.1) : Colors.orange.withOpacity(0.1),
+                color: isRec ? Colors.green.withValues(alpha: 0.1) : Colors.orange.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(

@@ -96,7 +96,7 @@ class ProfileSettingsPage extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppTheme.primaryAccent.withOpacity(0.1),
+              color: AppTheme.primaryAccent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
               border: Border.all(color: AppTheme.primaryAccent, width: 2),
             ),
@@ -135,7 +135,7 @@ class ProfileSettingsPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -187,7 +187,7 @@ class _SettingsTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: AppTheme.primaryAccent.withOpacity(0.1),
+                color: AppTheme.primaryAccent.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, size: 20, color: AppTheme.primaryAccent),
@@ -210,7 +210,7 @@ class _SettingsTile extends StatelessWidget {
               Switch(
                 value: switchValue,
                 onChanged: onChanged,
-                activeColor: AppTheme.primaryAccent,
+                activeThumbColor: AppTheme.primaryAccent,
               )
 else
               const Icon(LucideIcons.chevronRight, size: 20, color: Colors.grey),
