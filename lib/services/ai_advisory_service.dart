@@ -6,14 +6,6 @@ import '../core/secrets.dart';
 class AiAdvisoryService {
   static const String _apiKey = AppSecrets.geminiKey;
 
-  static bool isRetryableError(dynamic e) {
-    if (e == null) return false;
-    final errorStr = e.toString().toLowerCase();
-    return errorStr.contains('503') || 
-           errorStr.contains('unavailable') || 
-           errorStr.contains('high demand');
-  }
-
   static Future<Map<String, dynamic>> analyzeActivity({
     required String activity,
     required String date,
@@ -85,8 +77,6 @@ Analyze the weather and determine if it is safe, optimal, or risky to perform th
       } else {
         throw Exception("Empty response from AI");
       }
-    } on GenerativeAIException catch (e) {
-      throw Exception('AI Service is currently busy (503). Please try again in a moment.');
     } catch (e) {
       throw Exception('Failed to analyze activity: $e');
     }
@@ -173,8 +163,6 @@ Respond ONLY in JSON format.
       } else {
         throw Exception("Empty response from AI");
       }
-    } on GenerativeAIException catch (e) {
-      throw Exception('AI Service is currently busy (503). Please try again in a moment.');
     } catch (e) {
       throw Exception('Failed to analyze image: $e');
     }
@@ -237,8 +225,6 @@ Respond ONLY in JSON format.
       } else {
         throw Exception("Empty response from AI");
       }
-    } on GenerativeAIException catch (e) {
-      throw Exception('AI Service is currently busy (503). Please try again in a moment.');
     } catch (e) {
       throw Exception('Failed to get pest advice: $e');
     }

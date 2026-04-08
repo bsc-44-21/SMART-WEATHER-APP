@@ -445,54 +445,10 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
       );
     }
     if (_analysisError != null) {
-      final isRetryable = AiAdvisoryService.isRetryableError(_analysisError);
       return Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.red.withValues(alpha: 0.02),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.1), shape: BoxShape.circle),
-                  child: const Icon(LucideIcons.alertCircle, color: Colors.redAccent, size: 16),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _analysisError!,
-                    style: GoogleFonts.inter(color: Colors.red.shade800, fontSize: 13, fontWeight: FontWeight.w500),
-                  ),
-                ),
-              ],
-            ),
-            if (isRetryable) ...[
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton.icon(
-                  onPressed: _analyzeWithAI,
-                  icon: const Icon(LucideIcons.refreshCw, size: 14),
-                  label: Text("Try Again", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.redAccent,
-                    backgroundColor: Colors.red.withValues(alpha: 0.05),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.1)),
-                    ),
-                  ),
-                ),
-              ),
-            ]
-          ],
-        ),
+        decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(16)),
+        child: Text(_analysisError!, style: const TextStyle(color: Colors.red, fontSize: 13)),
       );
     }
     if (_analysisResult != null) {
