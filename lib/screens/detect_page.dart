@@ -27,6 +27,9 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
   final ImagePicker _picker = ImagePicker();
   bool _isProcessing = false;
   File? _selectedImage;
+  PlotModel? _lastSelectedPlot;
+  String? _errorMessage;
+  bool _isRetryable = false;
   
   // Animation for scanning line
   late AnimationController _scanController;
@@ -72,7 +75,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
     _scanController.stop();
   }
 
-  Future<void> _scanPest() async {
+  Future<void> _scanPest({File? existingImage}) async {
     final authService = Provider.of<AuthService>(context, listen: false);
     final firestoreService = Provider.of<FirestoreService>(context, listen: false);
     final weatherService = Provider.of<WeatherSmartService>(context, listen: false);
@@ -85,174 +88,181 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
       return;
     }
 
-    // 1. Plot Selection (Linked to User's Plots)
-    final List<PlotModel> userPlots = weatherService.plots;
+    // 1. Plot Selection
+    PlotModel? selectedPlot = _lastSelectedPlot;
+    
+    if (existingImage == null || selectedPlot == null) {
+      final List<PlotModel> userPlots = weatherService.plots;
 
-    if (userPlots.isEmpty) {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('No Plots Found'),
-            content: const Text('You need to create a plot first to detect pests. This helps us know what crop we are analyzing.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  // Navigation handled by the app's main bottom nav or a dedicated route
-                },
-                child: const Text('Go to Plots'),
-              ),
-            ],
-          ),
-        );
-      }
-      return;
-    }
-
-    final PlotModel? selectedPlot = await showDialog<PlotModel>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Affected Plot'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: userPlots.length,
-            itemBuilder: (context, index) {
-              final plot = userPlots[index];
-              return ListTile(
-                leading: Text(
-                  plot.cropName.toLowerCase().contains('maize') ? '🌽' : 
-                  plot.cropName.toLowerCase().contains('tomato') ? '🍅' : '🥜',
-                  style: const TextStyle(fontSize: 24),
+      if (userPlots.isEmpty) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('No Plots Found'),
+              content: const Text('You need to create a plot first to detect pests. This helps us know what crop we are analyzing.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
                 ),
-                title: Text(plot.name),
-                subtitle: Text('Crop: ${plot.cropName}'),
-                onTap: () => Navigator.pop(context, plot),
-              );
-            },
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Go to Plots'),
+                ),
+              ],
+            ),
+          );
+        }
+        return;
+      }
+
+      selectedPlot = await showDialog<PlotModel>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Select Affected Plot'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: userPlots.length,
+              itemBuilder: (context, index) {
+                final plot = userPlots[index];
+                return ListTile(
+                  leading: Text(
+                    plot.cropName.toLowerCase().contains('maize') ? '🌽' : 
+                    plot.cropName.toLowerCase().contains('tomato') ? '🍅' : '🥜',
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  title: Text(plot.name),
+                  subtitle: Text('Crop: ${plot.cropName}'),
+                  onTap: () => Navigator.pop(context, plot),
+                );
+              },
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    if (selectedPlot == null) return;
+      if (selectedPlot == null) return;
+      _lastSelectedPlot = selectedPlot;
+    }
+
     final selectedCrop = selectedPlot.cropName;
     final plotName = selectedPlot.name;
 
     // 2. Image Selection
-    final ImageSource? source = await showModalBottomSheet<ImageSource>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(LucideIcons.camera),
-              title: const Text('Camera'),
-              onTap: () => Navigator.pop(context, ImageSource.camera),
-            ),
-            ListTile(
-              leading: const Icon(LucideIcons.image),
-              title: const Text('Gallery'),
-              onTap: () => Navigator.pop(context, ImageSource.gallery),
-            ),
-          ],
+    File? imageFile = existingImage;
+    if (imageFile == null) {
+      final ImageSource? source = await showModalBottomSheet<ImageSource>(
+        context: context,
+        builder: (context) => SafeArea(
+          child: Wrap(
+            children: [
+              ListTile(
+                leading: const Icon(LucideIcons.camera),
+                title: const Text('Camera'),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+              ListTile(
+                leading: const Icon(LucideIcons.image),
+                title: const Text('Gallery'),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
-    if (source == null) return;
+      if (source == null) return;
+
+      final XFile? image = await _picker.pickImage(source: source);
+      if (image == null) return;
+      imageFile = File(image.path);
+    }
 
     try {
-      final XFile? image = await _picker.pickImage(source: source);
-      
-      if (image != null) {
+      if (mounted) {
         setState(() {
-          _selectedImage = File(image.path);
+          _selectedImage = imageFile;
           _isProcessing = true;
+          _errorMessage = null;
         });
         _startAIStatusCycle();
-        
-        // 3. AI Detection & Advisory (Gemini Vision)
-        // Get current weather context for "Smart Advisory"
-        final weatherSummary = weatherService.currentWeather != null 
-          ? "Condition: ${WeatherLocationService.getWeatherDescription(weatherService.currentWeather!['daily']['weather_code'][0])}"
-          : null;
+      }
+      
+      // 3. AI Detection & Advisory (Gemini Vision)
+      final weatherSummary = weatherService.currentWeather != null 
+        ? "Condition: ${WeatherLocationService.getWeatherDescription(weatherService.currentWeather!['daily']['weather_code'][0])}"
+        : null;
 
-        final Map<String, dynamic> advice = await AiAdvisoryService.getPestReportFromImage(
-          imageFile: File(image.path),
-          cropName: selectedCrop,
-          weatherSummary: weatherSummary,
-        );
+      final Map<String, dynamic> advice = await AiAdvisoryService.getPestReportFromImage(
+        imageFile: imageFile!,
+        cropName: selectedCrop,
+        weatherSummary: weatherSummary,
+      );
 
-        if (advice['is_valid'] == false) {
-          setState(() {
-            _isProcessing = false;
-            _selectedImage = null;
-          });
-          _stopAIStatusCycle();
-          if (mounted) {
-            _showInvalidImageDialog(advice['rejection_reason'] ?? 'This image does not appear to be a related crop.');
-          }
-          return;
-        }
-        
-        // 4. Save to Firestore
-        final detection = PestDetectionModel(
-          id: const Uuid().v4(),
-          userId: userId,
-          cropType: selectedCrop,
-          plotName: plotName, // Added
-          pestName: advice['pest_name'] ?? 'Unknown Pest',
-          symptoms: List<String>.from(advice['signs_symptoms'] ?? []),
-          impact: advice['bad_impact'] ?? '',
-          naturalRecommendations: List<String>.from(advice['natural_recommendations'] ?? []),
-          chemicalRecommendations: List<String>.from(advice['chemical_recommendations'] ?? []),
-          riskLevel: advice['risk_level'] ?? 'Low',
-          timestamp: DateTime.now(),
-          weatherAdvice: advice['smart_weather_advice'],
-        );
-
-        await firestoreService.savePestDetection(detection);
-
+      if (advice['is_valid'] == false) {
         setState(() {
           _isProcessing = false;
+          _selectedImage = null;
+          _lastSelectedPlot = null;
         });
         _stopAIStatusCycle();
-
         if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DetectionResultPage(detection: detection),
-            ),
-          ).then((_) {
-            if (mounted) {
-              setState(() {
-                _selectedImage = null;
-              });
-            }
-          });
+          _showInvalidImageDialog(advice['rejection_reason'] ?? 'This image does not appear to be a related crop.');
         }
+        return;
+      }
+      
+      // 4. Save to Firestore
+      final detection = PestDetectionModel(
+        id: const Uuid().v4(),
+        userId: userId,
+        cropType: selectedCrop,
+        plotName: plotName,
+        pestName: advice['pest_name'] ?? 'Unknown Pest',
+        symptoms: List<String>.from(advice['signs_symptoms'] ?? []),
+        impact: advice['bad_impact'] ?? '',
+        naturalRecommendations: List<String>.from(advice['natural_recommendations'] ?? []),
+        chemicalRecommendations: List<String>.from(advice['chemical_recommendations'] ?? []),
+        riskLevel: advice['risk_level'] ?? 'Low',
+        timestamp: DateTime.now(),
+        weatherAdvice: advice['smart_weather_advice'],
+      );
+
+      await firestoreService.savePestDetection(detection);
+
+      setState(() {
+        _isProcessing = false;
+        _lastSelectedPlot = null; 
+      });
+      _stopAIStatusCycle();
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetectionResultPage(detection: detection),
+          ),
+        ).then((_) {
+          if (mounted) {
+            setState(() {
+              _selectedImage = null;
+            });
+          }
+        });
       }
     } catch (e) {
       _stopAIStatusCycle();
       if (mounted) {
         setState(() {
-          _isProcessing = false;
-          _selectedImage = null;
+          _isProcessing = true; 
+          _errorMessage = e.toString().replaceAll("Exception: ", "");
+          _isRetryable = AiAdvisoryService.isRetryableError(e);
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.redAccent,
-          ),
-        );
       }
     }
   }
@@ -428,6 +438,73 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
               Positioned.fill(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
+                    if (_errorMessage != null) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        color: Colors.white.withValues(alpha: 0.95),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.red.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(LucideIcons.alertCircle, color: Colors.redAccent, size: 40),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Scan Failed',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _errorMessage!,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                color: Colors.grey.shade600,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _errorMessage = null;
+                                      _selectedImage = null;
+                                      _isProcessing = false;
+                                    });
+                                  },
+                                  child: Text('Cancel', style: TextStyle(color: Colors.grey.shade600)),
+                                ),
+                                const SizedBox(width: 12),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    final img = _selectedImage;
+                                    setState(() => _errorMessage = null);
+                                    _scanPest(existingImage: img);
+                                  },
+                                  icon: const Icon(LucideIcons.refreshCw, size: 16, color: Colors.white),
+                                  label: const Text('Try Again', style: TextStyle(color: Colors.white)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppTheme.primaryAccent,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    
                     return AnimatedBuilder(
                       animation: _scanController,
                       builder: (context, child) {
