@@ -282,17 +282,18 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
         : allPlots.where((p) => p.name == widget.initialFilter).toList();
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.9,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
       ),
-      child: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -393,47 +394,41 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
                 // AI Result area
                 _buildAnalysisUI(),
 
-                const SizedBox(height: 100), // Spacing for floating buttons
+                const SizedBox(height: 24),
+                
+                // Action Buttons securely inside scroll view
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _isAnalyzing ? null : _analyzeWithAI,
+                        icon: const Icon(LucideIcons.sparkles, size: 20),
+                        label: Text(_isAnalyzing ? "Checking..." : "Get Advice"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.indigo.shade50,
+                          foregroundColor: Colors.indigo.shade800,
+                          minimumSize: const Size(0, 64),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _saveLog,
+                        icon: const Icon(LucideIcons.save, size: 20),
+                        label: const Text("Save Log"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryAccent,
+                          minimumSize: const Size(0, 64),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
               ],
             ),
           ),
-          
-          // Action Buttons positioned at bottom
-          Positioned(
-            bottom: 24,
-            left: 24,
-            right: 24,
-            child: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _isAnalyzing ? null : _analyzeWithAI,
-                    icon: const Icon(LucideIcons.sparkles, size: 20),
-                    label: Text(_isAnalyzing ? "Checking..." : "AI Advice"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo.shade50,
-                      foregroundColor: Colors.indigo.shade800,
-                      minimumSize: const Size(0, 64),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _saveLog,
-                    icon: const Icon(LucideIcons.save, size: 20),
-                    label: const Text("Save Log"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryAccent,
-                      minimumSize: const Size(0, 64),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 
