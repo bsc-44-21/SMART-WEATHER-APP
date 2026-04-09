@@ -218,7 +218,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
           weatherAdvice: advice['smart_weather_advice'],
         );
 
-        await firestoreService.savePestDetection(detection);
+        unawaited(firestoreService.savePestDetection(detection));
 
         setState(() {
           _isProcessing = false;

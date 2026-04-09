@@ -52,10 +52,11 @@ final bool isEditing = existingPlot != null;
               padding: const EdgeInsets.all(32.0),
               child: Form(
                 key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     Text(isEditing ? 'Edit Plot' : 'Create New Plot', style: 
                     Theme.of(context).textTheme.headlineMedium),
                     const SizedBox(height: 24),
@@ -255,6 +256,7 @@ final bool isEditing = existingPlot != null;
                       ),
                     ),
                   ],
+                ),
                 ),
               ),
             ),

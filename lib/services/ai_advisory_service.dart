@@ -6,6 +6,30 @@ import '../core/secrets.dart';
 class AiAdvisoryService {
   static const String _apiKey = AppSecrets.geminiKey;
 
+  static Future<GenerateContentResponse> _generateContentWithRetry(
+      GenerativeModel model, List<Content> content, {int maxRetries = 3}) async {
+    int attempt = 0;
+    while (attempt < maxRetries) {
+      try {
+        return await model.generateContent(content);
+      } catch (e) {
+        attempt++;
+        if (attempt >= maxRetries) {
+          final errorString = e.toString();
+          if (errorString.contains('503') || errorString.contains('unavailable') || errorString.contains('demand')) {
+            throw Exception('Google AI servers are currently experiencing high demand. Please try again in a few moments.');
+          } else if (errorString.contains('quota') || errorString.contains('429')) {
+            throw Exception('API limit reached. Please wait a minute and try again, or check your API key billing details.');
+          }
+          rethrow;
+        }
+        // Exponential backoff: 2s, 4s...
+        await Future.delayed(Duration(seconds: 2 * attempt));
+      }
+    }
+    throw Exception('Failed to generate content after $maxRetries attempts');
+  }
+
   static Future<Map<String, dynamic>> analyzeActivity({
     required String activity,
     required String date,
@@ -68,7 +92,7 @@ Analyze the weather and determine if it is safe, optimal, or risky to perform th
 ''';
 
       final content = [Content.text(prompt)];
-      final response = await model.generateContent(content);
+      final response = await _generateContentWithRetry(model, content);
       
       if (response.text != null) {
         final cleanJson = response.text!.replaceAll('```json', '').replaceAll('```', '').trim();
@@ -78,7 +102,8 @@ Analyze the weather and determine if it is safe, optimal, or risky to perform th
         throw Exception("Empty response from AI");
       }
     } catch (e) {
-      throw Exception('Failed to analyze activity: $e');
+      final msg = e.toString().replaceAll('Exception: ', '');
+      throw Exception(msg);
     }
   }
 
@@ -155,7 +180,7 @@ Respond ONLY in JSON format.
         ])
       ];
 
-      final response = await model.generateContent(content);
+      final response = await _generateContentWithRetry(model, content);
       
       if (response.text != null) {
         final cleanJson = response.text!.replaceAll('```json', '').replaceAll('```', '').trim();
@@ -164,7 +189,8 @@ Respond ONLY in JSON format.
         throw Exception("Empty response from AI");
       }
     } catch (e) {
-      throw Exception('Failed to analyze image: $e');
+      final msg = e.toString().replaceAll('Exception: ', '');
+      throw Exception(msg);
     }
   }
 
@@ -217,7 +243,7 @@ Respond ONLY in JSON format.
 ''';
 
       final content = [Content.text(prompt)];
-      final response = await model.generateContent(content);
+      final response = await _generateContentWithRetry(model, content);
       
       if (response.text != null) {
         final cleanJson = response.text!.replaceAll('```json', '').replaceAll('```', '').trim();
@@ -226,7 +252,8 @@ Respond ONLY in JSON format.
         throw Exception("Empty response from AI");
       }
     } catch (e) {
-      throw Exception('Failed to get pest advice: $e');
+      final msg = e.toString().replaceAll('Exception: ', '');
+      throw Exception(msg);
     }
   }
 }
