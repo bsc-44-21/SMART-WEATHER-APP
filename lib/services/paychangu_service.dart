@@ -15,3 +15,11 @@ class PaychanguService {
   static const String _baseUrl = 'https://api.paychangu.com/payment';
   static const String _verifyUrl = 'https://api.paychangu.com/verify-payment';
 
+ static Future<PaychanguResponse?> createPaymentSession({
+    required String email,
+    required String firstName,
+    required String lastName,
+    required double amount,
+  }) async {
+    final transactionRef = 'tx-${const Uuid().v4().substring(0, 8)}';
+    
