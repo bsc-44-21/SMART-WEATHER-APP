@@ -11,3 +11,7 @@ class PaychanguResponse {
   PaychanguResponse({this.checkoutUrl, required this.txRef});
 }
 
+class PaychanguService {
+  static const String _baseUrl = 'https://api.paychangu.com/payment';
+  static const String _verifyUrl = 'https://api.paychangu.com/verify-payment';
+
