@@ -115,3 +115,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
             "uuid": "${const Uuid().v4()}",
             "source": "flutter_app"
           }
+             });
+      } catch (e) {
+        console.error("Paychangu Error:", e);
+        document.getElementById('loading-ui').innerHTML = '<p style="color:red">Error initializing payment. Please try again.</p>';
+      }
+    }
