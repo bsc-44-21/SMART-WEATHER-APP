@@ -70,3 +70,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+      button { 
+      padding: 16px 32px; 
+      font-size: 16px; 
+      font-weight: bold; 
+      background-color: #E65C4F; 
+      color: white; 
+      border: none; 
+      border-radius: 12px; 
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
