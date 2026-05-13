@@ -107,3 +107,23 @@ class _PaychanguWebViewScreenState extends State<PaychanguWebViewScreen> {
               : const SizedBox.shrink(),
         ),
       ),
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (_isLoading)
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircularProgressIndicator(color: AppTheme.primaryAccent),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading Payment Gateway...',
+                    style: GoogleFonts.inter(
+                      color: Colors.grey.shade600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
