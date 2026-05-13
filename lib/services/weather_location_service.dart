@@ -1,10 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class WeatherLocationService {
   // --- Step 1: Basic Location Permissions ---
+
   static Future<Position?> getLocationWithPermission() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -160,9 +162,10 @@ class WeatherLocationService {
       debugPrint('[Weather] MET Norway Exception: $e');
       return null;
     }
+
+    return null;
   }
 
-  // --- Step 3: Compatibility Fix (Map Cloud Symbols to Integer Codes) ---
   static int _getInternalCode(String symbol) {
     if (symbol.contains('clearsky')) return 0;
     if (symbol.contains('fair')) return 1;
@@ -178,6 +181,7 @@ class WeatherLocationService {
 
   static String getWeatherDescription(int weatherCode) {
     const Map<int, String> weatherDescriptions = {
+
       0: 'Clear sky',
       1: 'Mainly clear',
       2: 'Partly cloudy',
