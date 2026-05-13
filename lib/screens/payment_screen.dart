@@ -121,3 +121,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
         document.getElementById('loading-ui').innerHTML = '<p style="color:red">Error initializing payment. Please try again.</p>';
       }
     }
+
+    // Automatically trigger payment when page loads
+    window.onload = function() {
+      // Give a small delay to ensure script is ready
+      setTimeout(function() {
+        makePayment();
+        // Show button only if it doesn't auto-open after 3 seconds
+        setTimeout(function() {
+          document.getElementById('pay-button').style.display = 'block';
+        }, 3000);
+      }, 500);
+    };
+  </script>
+</body>
+</html>
+''';
