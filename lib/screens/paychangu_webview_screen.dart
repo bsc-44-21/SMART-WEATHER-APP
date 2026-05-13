@@ -3,3 +3,13 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
+
+
+class PaychanguWebViewScreen extends StatefulWidget {
+  final String htmlContent;
+
+  const PaychanguWebViewScreen({super.key, required this.htmlContent});
+
+  @override
+  State<PaychanguWebViewScreen> createState() => _PaychanguWebViewScreenState();
+}
