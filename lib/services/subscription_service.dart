@@ -77,4 +77,10 @@ class SubscriptionService extends ChangeNotifier {
         _userProfile!.lastPestScanDate.year != now.year) {
       return true;
     }
+return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
+  }
+
+  Future<void> incrementPestScan() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || isPremium || _userProfile == null) return;
 
