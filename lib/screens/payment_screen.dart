@@ -17,3 +17,8 @@ class PaymentScreen extends StatefulWidget {
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
 }
+
+class _PaymentScreenState extends State<PaymentScreen> {
+  bool _isLoading = false;
+  bool _isVerifying = false;
+  String? _lastTxRef;
