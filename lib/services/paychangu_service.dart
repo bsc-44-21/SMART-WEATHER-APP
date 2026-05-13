@@ -67,4 +67,12 @@ body: jsonEncode({
           );
         }
       }
+  
+      return null;
+    } catch (e) {
+      developer.log('Paychangu Error: $e', name: 'PaychanguService', error: e);
+      return null;
+    }
+  }
+
      
