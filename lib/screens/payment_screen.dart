@@ -9,3 +9,11 @@ import '../services/firestore_service.dart';
 import 'package:uuid/uuid.dart';
 import '../core/secrets.dart';
 import 'paychangu_webview_screen.dart';
+import 'paychangu_webview_screen.dart';
+
+class PaymentScreen extends StatefulWidget {
+  const PaymentScreen({super.key});
+
+  @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
