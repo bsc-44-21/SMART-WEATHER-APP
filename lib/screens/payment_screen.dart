@@ -283,3 +283,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text('Pay with Paychangu (Airtel/Mpamba)', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
+                  ),
