@@ -58,3 +58,13 @@ body: jsonEncode({
 
       developer.log('Paychangu Response: ${response.statusCode} - ${response.body}', name: 'PaychanguService');
 
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        if (data['status'] == 'success') {
+          return PaychanguResponse(
+            checkoutUrl: data['data']['checkout_url'],
+            txRef: transactionRef,
+          );
+        }
+      }
+     
