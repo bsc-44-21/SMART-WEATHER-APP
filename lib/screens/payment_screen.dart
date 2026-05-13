@@ -91,3 +91,27 @@ class _PaymentScreenState extends State<PaymentScreen> {
   </div>
   
   <div id="wrapper"></div>
+
+  <script>
+    function makePayment(){
+      try {
+        PaychanguCheckout({
+          "public_key": "$publicKey",
+          "tx_ref": "$_lastTxRef",
+          "amount": 2500,
+          "currency": "MWK",
+          "callback_url": "https://smartweather.app/success",
+          "return_url": "https://smartweather.app/success",
+          "customer":{
+            "email": "${user.email ?? 'user@weathersmart.com'}",
+            "first_name": "${user.displayName?.split(' ').first ?? 'Smart'}",
+            "last_name": "${user.displayName?.split(' ').last ?? 'Farmer'}"
+          },
+          "customization": {
+            "title": "Smart Weather Premium",
+            "description": "Payment for Premium Subscription"
+          },
+          "meta": {
+            "uuid": "${const Uuid().v4()}",
+            "source": "flutter_app"
+          }
