@@ -9,7 +9,6 @@ import '../services/firestore_service.dart';
 import 'package:uuid/uuid.dart';
 import '../core/secrets.dart';
 import 'paychangu_webview_screen.dart';
-import 'paychangu_webview_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -39,7 +38,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final String publicKey = AppSecrets.paychanguPublicKey;
       
       final htmlContent = '''
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -70,7 +69,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-      button { 
+    button { 
       padding: 16px 32px; 
       font-size: 16px; 
       font-weight: bold; 
@@ -81,7 +80,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       cursor: pointer;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
-      </style>
+  </style>
 </head>
 <body>
   <div class="loading-container" id="loading-ui">
@@ -115,7 +114,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             "uuid": "${const Uuid().v4()}",
             "source": "flutter_app"
           }
-             });
+        });
       } catch (e) {
         console.error("Paychangu Error:", e);
         document.getElementById('loading-ui').innerHTML = '<p style="color:red">Error initializing payment. Please try again.</p>';
@@ -164,7 +163,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           }
         }
       }
-      } catch (e) {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
@@ -197,7 +196,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           );
         }
       }
-      } catch (e) {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Verification error: $e'), backgroundColor: Colors.red),
@@ -227,7 +226,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-       body: SingleChildScrollView(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -242,7 +241,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-                   borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(color: AppTheme.primaryAccent.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10)),
                   ],
@@ -254,7 +253,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Text(
                       'Smart Weather Premium',
                       style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                       ),
+                    ),
                     const SizedBox(height: 8),
                     Text(
                       'MWK 2,500 / month',
@@ -263,7 +262,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ],
                 ),
               ),
-                const SizedBox(height: 32),
+              const SizedBox(height: 32),
               Text('Premium Features', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               _buildFeatureItem('7-day weather forecast'),
@@ -274,7 +273,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
               const SizedBox(height: 48),
               if (!_isVerifying)
                 SizedBox(
-                    width: double.infinity,
+                  width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _upgradeToPremium,
                     style: ElevatedButton.styleFrom(
@@ -287,7 +286,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ? const CircularProgressIndicator(color: Colors.white)
                         : Text('Pay with Paychangu (Airtel/Mpamba)', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
-                       )
+                )
               else
                 Column(
                   children: [
@@ -301,7 +300,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
-                          child: _isLoading
+                        child: _isLoading
                             ? const CircularProgressIndicator(color: Colors.white)
                             : Text('I have paid (Verify Transaction)', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
