@@ -108,5 +108,15 @@ body: jsonEncode({
             }
           }
           
+      return isPaid;
+        }
+      }
+      return false;
+    } catch (e) {
+      developer.log('Verify Error: $e', name: 'PaychanguService', error: e);
+      return false;
+    }
+  }
+}
 
      
