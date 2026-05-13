@@ -84,5 +84,14 @@ body: jsonEncode({
           'Authorization': 'Bearer ${AppSecrets.paychanguSecretKey}',
         },
       );
+      developer.log('Verify Response: ${response.statusCode} - ${response.body}', name: 'PaychanguService');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        // IMPORTANT: Paychangu's top-level 'status' is the API request status.
+        // The actual payment status is inside the 'data' object.
+        final paymentData = data['data'];
+        
 
      
