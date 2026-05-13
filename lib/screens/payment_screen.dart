@@ -306,3 +306,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             : Text('I have paid (Verify Transaction)', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () => setState(() => _isVerifying = false),
+                      child: Text('Cancel / Try again', style: GoogleFonts.inter(color: Colors.redAccent)),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
