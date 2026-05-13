@@ -254,4 +254,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Text(
                       'Smart Weather Premium',
                       style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-                      
+                       ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'MWK 2,500 / month',
+                      style: GoogleFonts.inter(fontSize: 18, color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
