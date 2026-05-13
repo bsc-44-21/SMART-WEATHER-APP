@@ -22,3 +22,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
   bool _isLoading = false;
   bool _isVerifying = false;
   String? _lastTxRef;
+
+  Future<void> _upgradeToPremium() async {
+    final user = context.read<AuthService>().user;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in first.')),
+      );
+      return;
+    }
