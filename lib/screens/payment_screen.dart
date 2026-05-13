@@ -263,3 +263,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ],
                 ),
               ),
+                const SizedBox(height: 32),
+              Text('Premium Features', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              _buildFeatureItem('7-day weather forecast'),
+              _buildFeatureItem('Unlimited plots tracking'),
+              _buildFeatureItem('Unlimited AI Agricultural advice'),
+              _buildFeatureItem('Unlimited Pest & Disease scans'),
+              _buildFeatureItem('Professional, unbranded PDF reports'),
+              const SizedBox(height: 48),
+              if (!_isVerifying)
+                SizedBox(
