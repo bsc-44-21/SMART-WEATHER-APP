@@ -217,3 +217,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
       Navigator.pop(context);
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(
+        title: Text('Upgrade to Premium', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
