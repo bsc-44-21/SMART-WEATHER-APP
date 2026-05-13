@@ -39,3 +39,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
       final String publicKey = AppSecrets.paychanguPublicKey;
       
       final htmlContent = '''
+      <!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://in.paychangu.com/js/popup.js"></script>
+  <style>
+    body { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0; 
+      background-color: #ffffff; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .loading-container {
+      text-align: center;
+    }
