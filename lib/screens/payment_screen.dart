@@ -319,3 +319,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
       ),
     );
   }
+
+  Widget _buildFeatureItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          const Icon(LucideIcons.checkCircle, color: AppTheme.primaryAccent, size: 24),
+          const SizedBox(width: 12),
+          Expanded(child: Text(text, style: GoogleFonts.inter(fontSize: 16))),
+        ],
+      ),
+    );
+  }
+}
