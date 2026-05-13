@@ -32,6 +32,7 @@ class SubscriptionService extends ChangeNotifier {
       }
     });
   }
+
   bool get isPremium => _userProfile?.isPremium ?? false;
 
   // AI Advisory
@@ -63,6 +64,7 @@ class SubscriptionService extends ChangeNotifier {
         _userProfile!.lastAiQueryDate.year != now.year) {
       newCount = 1;
     }
+
     await FirestoreService().updateAIUsage(user.uid, newCount, now);
   }
 
@@ -77,13 +79,15 @@ class SubscriptionService extends ChangeNotifier {
         _userProfile!.lastPestScanDate.year != now.year) {
       return true;
     }
-return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
+
+    return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
   }
 
   Future<void> incrementPestScan() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || isPremium || _userProfile == null) return;
-     final now = DateTime.now();
+
+    final now = DateTime.now();
     int newCount = _userProfile!.pestScansThisMonth + 1;
 
     if (_userProfile!.lastPestScanDate.month != now.month ||
@@ -93,7 +97,8 @@ return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
 
     await FirestoreService().updatePestScanUsage(user.uid, newCount, now);
   }
-   // Plots
+
+  // Plots
   bool canAddPlot(int currentPlotCount) {
     if (isPremium) return true;
     return currentPlotCount < maxFreePlots;
@@ -105,5 +110,3 @@ return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
     super.dispose();
   }
 }
-
-

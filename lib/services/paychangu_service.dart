@@ -15,7 +15,7 @@ class PaychanguService {
   static const String _baseUrl = 'https://api.paychangu.com/payment';
   static const String _verifyUrl = 'https://api.paychangu.com/verify-payment';
 
- static Future<PaychanguResponse?> createPaymentSession({
+  static Future<PaychanguResponse?> createPaymentSession({
     required String email,
     required String firstName,
     required String lastName,
@@ -23,7 +23,6 @@ class PaychanguService {
   }) async {
     final transactionRef = 'tx-${const Uuid().v4().substring(0, 8)}';
     
-   
     try {
       developer.log('Initializing Paychangu payment for $email', name: 'PaychanguService');
       
@@ -34,7 +33,7 @@ class PaychanguService {
           'Authorization': 'Bearer ${AppSecrets.paychanguSecretKey}',
           'Content-Type': 'application/json',
         },
-body: jsonEncode({
+        body: jsonEncode({
           'public_key': AppSecrets.paychanguPublicKey,
           'amount': amount,
           'currency': 'MWK',
@@ -55,7 +54,6 @@ body: jsonEncode({
         }),
       );
 
-
       developer.log('Paychangu Response: ${response.statusCode} - ${response.body}', name: 'PaychanguService');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -67,7 +65,7 @@ body: jsonEncode({
           );
         }
       }
-  
+      
       return null;
     } catch (e) {
       developer.log('Paychangu Error: $e', name: 'PaychanguService', error: e);
@@ -75,7 +73,7 @@ body: jsonEncode({
     }
   }
 
- static Future<bool> verifyTransaction(String txRef, {double? expectedAmount}) async {
+  static Future<bool> verifyTransaction(String txRef, {double? expectedAmount}) async {
     try {
       final response = await http.get(
         Uri.parse('$_verifyUrl/$txRef'),
@@ -84,6 +82,7 @@ body: jsonEncode({
           'Authorization': 'Bearer ${AppSecrets.paychanguSecretKey}',
         },
       );
+
       developer.log('Verify Response: ${response.statusCode} - ${response.body}', name: 'PaychanguService');
 
       if (response.statusCode == 200) {
@@ -108,7 +107,7 @@ body: jsonEncode({
             }
           }
           
-      return isPaid;
+          return isPaid;
         }
       }
       return false;
@@ -118,5 +117,3 @@ body: jsonEncode({
     }
   }
 }
-
-     
