@@ -63,3 +63,18 @@ class SubscriptionService extends ChangeNotifier {
         _userProfile!.lastAiQueryDate.year != now.year) {
       newCount = 1;
     }
+    await FirestoreService().updateAIUsage(user.uid, newCount, now);
+  }
+
+  // Pest Detection
+  bool canScanPest() {
+    if (isPremium) return true;
+    if (_userProfile == null) return false;
+
+    final now = DateTime.now();
+    // Reset if it's a new month
+    if (_userProfile!.lastPestScanDate.month != now.month ||
+        _userProfile!.lastPestScanDate.year != now.year) {
+      return true;
+    }
+
