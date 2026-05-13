@@ -83,4 +83,15 @@ return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
   Future<void> incrementPestScan() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null || isPremium || _userProfile == null) return;
+     final now = DateTime.now();
+    int newCount = _userProfile!.pestScansThisMonth + 1;
+
+    if (_userProfile!.lastPestScanDate.month != now.month ||
+        _userProfile!.lastPestScanDate.year != now.year) {
+      newCount = 1;
+    }
+
+    await FirestoreService().updatePestScanUsage(user.uid, newCount, now);
+  }
+
 
