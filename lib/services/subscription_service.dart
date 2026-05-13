@@ -32,3 +32,34 @@ class SubscriptionService extends ChangeNotifier {
       }
     });
   }
+  bool get isPremium => _userProfile?.isPremium ?? false;
+
+  // AI Advisory
+  bool canQueryAI() {
+    if (isPremium) return true;
+    if (_userProfile == null) return false;
+
+    // Reset daily counter if it's a new day
+    final now = DateTime.now();
+    if (_userProfile!.lastAiQueryDate.day != now.day ||
+        _userProfile!.lastAiQueryDate.month != now.month ||
+        _userProfile!.lastAiQueryDate.year != now.year) {
+      return true; // Counter will be reset to 1
+    }
+
+    return _userProfile!.aiQueriesToday < maxFreeAiQueriesToday;
+  }
+
+  Future<void> incrementAIQuery() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null || isPremium || _userProfile == null) return;
+
+    final now = DateTime.now();
+    int newCount = _userProfile!.aiQueriesToday + 1;
+
+    // If it is a new day, reset counter to 1
+    if (_userProfile!.lastAiQueryDate.day != now.day ||
+        _userProfile!.lastAiQueryDate.month != now.month ||
+        _userProfile!.lastAiQueryDate.year != now.year) {
+      newCount = 1;
+    }
