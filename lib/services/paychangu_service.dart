@@ -23,3 +23,14 @@ class PaychanguService {
   }) async {
     final transactionRef = 'tx-${const Uuid().v4().substring(0, 8)}';
     
+   
+    try {
+      developer.log('Initializing Paychangu payment for $email', name: 'PaychanguService');
+      
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${AppSecrets.paychanguSecretKey}',
+          'Content-Type': 'application/json',
+        },
