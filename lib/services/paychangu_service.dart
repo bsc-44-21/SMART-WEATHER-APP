@@ -34,3 +34,24 @@ class PaychanguService {
           'Authorization': 'Bearer ${AppSecrets.paychanguSecretKey}',
           'Content-Type': 'application/json',
         },
+body: jsonEncode({
+          'public_key': AppSecrets.paychanguPublicKey,
+          'amount': amount,
+          'currency': 'MWK',
+          'email': email,
+          'first_name': firstName,
+          'last_name': lastName,
+          'callback_url': 'https://smartweather.app/success',
+          'return_url': 'https://smartweather.app/success',
+          'tx_ref': transactionRef,
+          'customization': {
+            'title': 'Smart Weather Premium',
+            'description': 'Payment for Premium Subscription',
+          },
+          'meta': {
+            'uuid': const Uuid().v4(),
+            'source': 'flutter_app'
+          }
+        }),
+      );
+
