@@ -60,13 +60,13 @@ class _MainLayoutState extends State<MainLayout> {
         child: _pages[selectedIndex],
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(top: 8, bottom: 8),
+        padding: const EdgeInsets.only(top: 8, bottom: 24), // Extra bottom padding for modern feel
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 15,
               offset: const Offset(0, -5),
             ),
           ],
@@ -98,7 +98,7 @@ class _MainLayoutState extends State<MainLayout> {
       icon: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.background : Colors.transparent,
+          color: isSelected ? AppTheme.primaryAccent.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Icon(icon, size: 24),

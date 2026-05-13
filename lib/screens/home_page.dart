@@ -267,20 +267,20 @@ class HomePage extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: Colors.indigo.shade50,
+                                    color: AppTheme.terracotta.withValues(alpha: 0.08),
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.indigo.withValues(alpha: 0.1)),
+                                    border: Border.all(color: AppTheme.terracotta.withValues(alpha: 0.15)),
                                   ),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(LucideIcons.sparkles, size: 14, color: Colors.indigo),
+                                      const Icon(LucideIcons.sparkles, size: 14, color: AppTheme.terracotta),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
                                           notif.aiAdvice!,
                                           style: GoogleFonts.inter(
-                                            color: Colors.indigo.shade900,
+                                            color: AppTheme.terracotta,
                                             fontSize: 11,
                                             height: 1.4,
                                           ),
@@ -333,15 +333,15 @@ class HomePage extends StatelessWidget {
     return FarmingCard(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryAccent, AppTheme.primaryAccent.withOpacity(0.8)],
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryAccent, Color(0xFF1B3F1A)], // Lush Green to Deep Green
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryAccent.withValues(alpha: 0.3),
+            color: AppTheme.primaryAccent.withValues(alpha: 0.2),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
