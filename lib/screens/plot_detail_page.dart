@@ -10,6 +10,7 @@ import '../services/weather_location_service.dart';
 import '../widgets/common_widgets.dart';
 import '../widgets/create_plot_sheet.dart';
 import '../widgets/delete_confirmation_dialog.dart';
+import 'payment_screen.dart';
 
 class PlotDetailPage extends StatefulWidget {
   final PlotModel initialPlot;
@@ -97,6 +98,8 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
                      _buildDailyForecast(weatherData['daily']),
                    ],
                    const SizedBox(height: 32),
+                   _buildAgriculturalIndices(),
+                   const SizedBox(height: 32),
                    _buildPlotActivities(),
                    const SizedBox(height: 32),
                  ] else ...[
@@ -121,6 +124,105 @@ class _PlotDetailPageState extends State<PlotDetailPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAgriculturalIndices() {
+    final weatherService = context.watch<WeatherSmartService>();
+    final indices = weatherService.agriculturalIndices;
+    final isPremium = indices != null;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                "Agricultural Indices",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (!isPremium)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade100,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    "PRO",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade900,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (isPremium)
+            Row(
+              children: [
+                _WeatherStatBox(
+                  icon: LucideIcons.droplets,
+                  value: indices['soil_moisture'] ?? '--',
+                  label: "Soil Moisture",
+                ),
+                const SizedBox(width: 12),
+                _WeatherStatBox(
+                  icon: LucideIcons.thermometer,
+                  value: indices['gdd'] ?? '--',
+                  label: "GDD (Growing)",
+                ),
+                const SizedBox(width: 12),
+                _WeatherStatBox(
+                  icon: LucideIcons.wind,
+                  value: indices['evapotranspiration'] ?? '--',
+                  label: "Evapotranspiration",
+                ),
+              ],
+            )
+          else
+            FarmingCard(
+              padding: const EdgeInsets.all(20),
+              onTap: () {
+                // Navigate to payment screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PaymentScreen()),
+                );
+              },
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.lock, color: Colors.grey),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Unlock Agricultural Indices",
+                          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        Text(
+                          "Soil moisture, GDD, and ET are available in Premium.",
+                          style: GoogleFonts.inter(color: Colors.grey, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(LucideIcons.chevronRight, size: 16, color: Colors.grey),
+                ],
+              ),
+            ),
+        ],
       ),
     );
   }

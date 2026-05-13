@@ -8,6 +8,8 @@ import '../services/auth_service.dart';
 import 'auth_screen.dart';
 import 'notifications_page.dart';
 import '../services/notification_service.dart';
+import '../services/subscription_service.dart';
+import 'payment_screen.dart';
 
 class ProfileSettingsPage extends StatelessWidget {
   const ProfileSettingsPage({super.key});
@@ -87,8 +89,9 @@ class ProfileSettingsPage extends StatelessWidget {
       ),
     );
   }
-   Widget _buildProfileHeader(BuildContext context) {
+  Widget _buildProfileHeader(BuildContext context) {
     final user = context.watch<AuthService>().user;
+    final isPremium = context.watch<SubscriptionService>().isPremium;
     
     return FarmingCard(
       padding: const EdgeInsets.all(24),
@@ -114,14 +117,43 @@ class ProfileSettingsPage extends StatelessWidget {
                 Text(user?.displayName ?? 'Smart Farmer', style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 4),
                 Text(user?.email ?? 'Loading...', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textMuted)),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryAccent,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                   child: const Text('Premium Plan', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: isPremium ? AppTheme.primaryAccent : Colors.grey.shade400,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                       child: Row(
+                         children: [
+                           Icon(isPremium ? LucideIcons.crown : LucideIcons.user, color: Colors.white, size: 14),
+                           const SizedBox(width: 6),
+                           Text(isPremium ? 'Premium Plan' : 'Free Plan', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+                         ],
+                       ),
+                    ),
+                    if (!isPremium) ...[
+                      const SizedBox(width: 8),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          backgroundColor: Colors.amber.withValues(alpha: 0.2),
+                          foregroundColor: Colors.amber.shade900,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PaymentScreen()),
+                          );
+                        },
+                        child: const Text('Upgrade', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      ),
+                    ]
+                  ],
                 ),
               ],
             ),

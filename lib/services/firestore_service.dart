@@ -17,21 +17,22 @@ class FirestoreService {
   // Update an existing plot in Firestore
   Future<void> updatePlot(PlotModel plot) async {
     try {
-      await _db.collection('plots').doc(plot.id).update(plot.toMap());
+      await _db.collection('plots').doc(plot.id).set(plot.toMap(), SetOptions(merge: true));
     } catch (e) {
       rethrow;
     }
   }
   // Get a real-time stream of plots for a specific user
   Stream<List<PlotModel>> getUserPlotsStream(String userId) {
-    // Handling both legacy 'userId' and new 'user_id'
+    // We search both 'userId' (new) and 'user_id' (legacy) if needed, 
+    // but primarily we should move to 'userId'.
     return _db
         .collection('plots')
+        .where('userId', isEqualTo: userId)
         .snapshots()
         .map((snapshot) {
           return snapshot.docs
             .map((doc) => PlotModel.fromMap(doc.data(), doc.id))
-            .where((plot) => plot.userId == userId)
             .toList();
         });
   }
@@ -129,4 +130,43 @@ class FirestoreService {
       rethrow;
     }
   }
-}
+
+  // --- Freemium User Profile ---
+  Future<void> createUserProfileIfNotExists(String userId) async {
+    final docRef = _db.collection('users').doc(userId);
+    final docSnap = await docRef.get();
+    if (!docSnap.exists) {
+      await docRef.set({
+        'isPremium': false,
+        'aiQueriesToday': 0,
+        'lastAiQueryDate': FieldValue.serverTimestamp(),
+        'pestScansThisMonth': 0,
+        'lastPestScanDate': FieldValue.serverTimestamp(),
+      });
+    }
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getUserProfileStream(String userId) {
+    return _db.collection('users').doc(userId).snapshots();
+  }
+
+  Future<void> updateUserSubscription(String userId, bool isPremium) async {
+    await _db.collection('users').doc(userId).set({
+      'isPremium': isPremium,
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> updateAIUsage(String userId, int count, DateTime date) async {
+    await _db.collection('users').doc(userId).set({
+      'aiQueriesToday': count,
+      'lastAiQueryDate': date,
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> updatePestScanUsage(String userId, int count, DateTime date) async {
+    await _db.collection('users').doc(userId).set({
+      'pestScansThisMonth': count,
+      'lastPestScanDate': date,
+    }, SetOptions(merge: true));
+  }
+}
