@@ -145,3 +145,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
             builder: (context) => PaychanguWebViewScreen(htmlContent: htmlContent),
           ),
         );
+
+        if (mounted) {
+          if (success == true) {
+            // Auto-verify if we detected a success return URL
+            await _verifyPayment();
+          } else {
+            setState(() {
+              _isVerifying = true;
+              _isLoading = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Please click Verify if you have completed the payment.'),
+                duration: Duration(seconds: 5),
+              ),
+            );
+          }
+        }
+      }
