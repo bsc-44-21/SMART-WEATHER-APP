@@ -173,3 +173,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
     }
   }
+
+  Future<void> _verifyPayment() async {
+    if (_lastTxRef == null) return;
+    
+    final user = context.read<AuthService>().user;
+    if (user == null) return;
+
+    setState(() => _isLoading = true);
