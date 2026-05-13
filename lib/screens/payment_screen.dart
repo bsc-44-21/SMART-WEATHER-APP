@@ -81,3 +81,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
       cursor: pointer;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
+      </style>
+</head>
+<body>
+  <div class="loading-container" id="loading-ui">
+    <div class="loader"></div>
+    <p>Preparing secure payment...</p>
+    <button type="button" id="pay-button" style="display:none;" onClick="makePayment()">Pay Now</button>
+  </div>
+  
+  <div id="wrapper"></div>
