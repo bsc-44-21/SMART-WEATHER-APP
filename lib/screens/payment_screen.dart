@@ -181,3 +181,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
     if (user == null) return;
 
     setState(() => _isLoading = true);
+
+    try {
+      final isSuccess = await PaychanguService.verifyTransaction(_lastTxRef!, expectedAmount: 2500.0);
+      
+      if (isSuccess) {
+        await _handleSuccessfulPayment(user.uid);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Payment not yet verified. Please ensure you have completed the transaction.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
