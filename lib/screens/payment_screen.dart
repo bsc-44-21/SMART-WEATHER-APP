@@ -31,3 +31,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
       return;
     }
+
+    setState(() => _isLoading = true);
+
+    try {
+      _lastTxRef = 'tx-${const Uuid().v4().substring(0, 8)}';
+      final String publicKey = AppSecrets.paychanguPublicKey;
+      
+      final htmlContent = '''
