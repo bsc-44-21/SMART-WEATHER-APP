@@ -127,3 +127,36 @@ class _PaychanguWebViewScreenState extends State<PaychanguWebViewScreen> {
                 ],
               ),
             ),
+             if (_error != null)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(LucideIcons.alertCircle, color: Colors.red, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Connection Error',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => _controller.reload(),
+                      child: const Text('Try Again'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
