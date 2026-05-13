@@ -207,3 +207,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+
+  Future<void> _handleSuccessfulPayment(String userId) async {
+    await Provider.of<FirestoreService>(context, listen: false).updateUserSubscription(userId, true);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Successfully upgraded to Premium!'), backgroundColor: Colors.green),
+      );
+      Navigator.pop(context);
+    }
+  }
