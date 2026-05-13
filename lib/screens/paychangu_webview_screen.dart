@@ -74,3 +74,17 @@ class _PaychanguWebViewScreenState extends State<PaychanguWebViewScreen> {
       )
       ..loadHtmlString(widget.htmlContent);
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(
+          'Secure Checkout',
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: AppTheme.textPrimary,
+          ),
+        ),
