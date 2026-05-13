@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:google_generative_ai/google_generative_ai.dart';
-import '../core/secrets.dart';
+
 
 class AiAdvisoryService {
-  static const String _apiKey = AppSecrets.geminiKey;
+  static const String _apiKey = ''; // TODO: Add your Gemini API key here
 
   static Future<GenerateContentResponse> _generateContentWithRetry(
       GenerativeModel model, List<Content> content, {int maxRetries = 3}) async {
