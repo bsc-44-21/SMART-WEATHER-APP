@@ -93,5 +93,17 @@ return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
 
     await FirestoreService().updatePestScanUsage(user.uid, newCount, now);
   }
+   // Plots
+  bool canAddPlot(int currentPlotCount) {
+    if (isPremium) return true;
+    return currentPlotCount < maxFreePlots;
+  }
+
+  @override
+  void dispose() {
+    _profileSub?.cancel();
+    super.dispose();
+  }
+}
 
 
