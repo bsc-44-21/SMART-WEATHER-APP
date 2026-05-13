@@ -350,7 +350,6 @@ class HomePage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-<<<<<<< HEAD
           // Header with temperature
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -361,38 +360,6 @@ class HomePage extends StatelessWidget {
                   children: [
                     Text(
                       'Local Weather',
-=======
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Local Weather',
-                style: GoogleFonts.inter(
-                  color: Colors.white70,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '$temp°',
-                    style: GoogleFonts.inter(
-                      color: Colors.white,
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                      height: 1.0,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Text(
-                      desc,
->>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
                       style: GoogleFonts.inter(
                         color: Colors.white70,
                         fontSize: 12,
@@ -430,13 +397,10 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
-<<<<<<< HEAD
               Text(
                 emoji,
                 style: const TextStyle(fontSize: 48),
               ),
-=======
->>>>>>> ec92c3d034004b71c4bfeee6128e73920aa13109
             ],
           ),
           

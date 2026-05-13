@@ -1,19 +1,12 @@
-<<<<<<< HEAD
 import 'dart:async';
-=======
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
->>>>>>> 65007e94a81e8d42ab68a6ab666cd0dc8fc8c255
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:geolocator/geolocator.dart';
 
 class WeatherLocationService {
-<<<<<<< HEAD
-=======
   // --- Step 1: Basic Location Permissions ---
->>>>>>> 65007e94a81e8d42ab68a6ab666cd0dc8fc8c255
+
   static Future<Position?> getLocationWithPermission() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -32,11 +25,7 @@ class WeatherLocationService {
         timeLimit: const Duration(seconds: 10),
       );
     } catch (e) {
-<<<<<<< HEAD
-      print('Location error: $e');
-=======
       debugPrint('[Weather] Location error: $e');
->>>>>>> 65007e94a81e8d42ab68a6ab666cd0dc8fc8c255
       return null;
     }
   }
@@ -55,61 +44,6 @@ class WeatherLocationService {
 
       debugPrint('[Weather] Fetching from MET Norway: $url');
 
-<<<<<<< HEAD
-        final response = await http
-            .get(url)
-            .timeout(const Duration(seconds: 10));
-
-        print('[Weather Response] Status Code: ${response.statusCode}');
-
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          print('═══════════════════════════════════════════════════');
-          print('✅ OPEN METEO API SUCCESS - Location: $lat, $lon');
-          print('═══════════════════════════════════════════════════');
-          if (data['current'] != null) {
-            print('🌤️  CURRENT WEATHER DATA:');
-            print('   Temperature: ${data['current']['temperature_2m']}°');
-            print('   Feels Like: ${data['current']['apparent_temperature']}°');
-            print('   Humidity: ${data['current']['relative_humidity_2m']}%');
-            print('   Wind Speed: ${data['current']['wind_speed_10m']} km/h');
-            print('   Precipitation: ${data['current']['precipitation']} mm');
-            print('   Weather Code: ${data['current']['weather_code']}');
-          }
-          print('═══════════════════════════════════════════════════\n');
-          return data;
-        } else if (response.statusCode == 502 || response.statusCode == 503) {
-          // Server error - retry with delay
-          retryCount++;
-          if (retryCount < maxRetries) {
-            final delaySeconds = (retryCount * 2); // Exponential backoff: 2s, 4s
-            print('[Weather] Server Error ${response.statusCode}, retrying in ${delaySeconds}s...');
-            await Future.delayed(Duration(seconds: delaySeconds));
-            continue;
-          } else {
-            print('[Weather] Server Error ${response.statusCode} - Max retries reached');
-            return null;
-          }
-        } else {
-          print('[Weather] API Error: ${response.statusCode}');
-          print('[Weather Response Body]: ${response.body}');
-          return null;
-        }
-      } on TimeoutException {
-        retryCount++;
-        if (retryCount < maxRetries) {
-          print('[Weather] Timeout - Retrying (Attempt ${retryCount + 1}/$maxRetries)...');
-          await Future.delayed(Duration(seconds: retryCount * 2));
-          continue;
-        } else {
-          print('[Weather] Timeout - Max retries reached');
-          return null;
-        }
-      } catch (e) {
-        print('[Weather] Error: $e');
-        return null;
-      }
-=======
       final response = await http.get(
         url,
         headers: {
@@ -226,17 +160,11 @@ class WeatherLocationService {
     } catch (e) {
       debugPrint('[Weather] MET Norway Exception: $e');
       return null;
->>>>>>> 65007e94a81e8d42ab68a6ab666cd0dc8fc8c255
     }
 
     return null;
   }
 
-<<<<<<< HEAD
-  static String getWeatherDescription(int weatherCode) {
-    const Map<int, String> descriptions = {
-=======
-  // --- Step 3: Compatibility Fix (Map Cloud Symbols to Integer Codes) ---
   static int _getInternalCode(String symbol) {
     if (symbol.contains('clearsky')) return 0;
     if (symbol.contains('fair')) return 1;
@@ -252,7 +180,7 @@ class WeatherLocationService {
 
   static String getWeatherDescription(int weatherCode) {
     const Map<int, String> weatherDescriptions = {
->>>>>>> 65007e94a81e8d42ab68a6ab666cd0dc8fc8c255
+
       0: 'Clear sky',
       1: 'Mainly clear',
       2: 'Partly cloudy',
@@ -278,11 +206,7 @@ class WeatherLocationService {
       96: 'Thunderstorm with slight hail',
       99: 'Thunderstorm with heavy hail',
     };
-<<<<<<< HEAD
-    return descriptions[weatherCode] ?? 'Unknown';
-=======
     return weatherDescriptions[weatherCode] ?? 'Unknown';
->>>>>>> 65007e94a81e8d42ab68a6ab666cd0dc8fc8c255
   }
 
   static String getWeatherEmoji(int weatherCode) {
