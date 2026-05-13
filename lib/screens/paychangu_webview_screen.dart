@@ -88,3 +88,22 @@ class _PaychanguWebViewScreenState extends State<PaychanguWebViewScreen> {
             color: AppTheme.textPrimary,
           ),
         ),
+          centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(LucideIcons.x, color: Colors.black),
+          onPressed: () => Navigator.pop(context, false),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: _progress < 1.0
+              ? LinearProgressIndicator(
+                  value: _progress,
+                  backgroundColor: Colors.grey.shade100,
+                  color: AppTheme.primaryAccent,
+                  minHeight: 2,
+                )
+              : const SizedBox.shrink(),
+        ),
+      ),
