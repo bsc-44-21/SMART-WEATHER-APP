@@ -75,4 +75,14 @@ body: jsonEncode({
     }
   }
 
+ static Future<bool> verifyTransaction(String txRef, {double? expectedAmount}) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_verifyUrl/$txRef'),
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${AppSecrets.paychanguSecretKey}',
+        },
+      );
+
      
