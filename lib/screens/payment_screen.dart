@@ -242,3 +242,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
+                   borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(color: AppTheme.primaryAccent.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10)),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const Icon(LucideIcons.crown, color: Colors.amber, size: 48),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Smart Weather Premium',
+                      style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+                      
