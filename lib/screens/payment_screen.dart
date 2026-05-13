@@ -274,3 +274,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
               const SizedBox(height: 48),
               if (!_isVerifying)
                 SizedBox(
+                    width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _upgradeToPremium,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.terracotta,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
