@@ -27,24 +27,42 @@ class FarmingCard extends StatelessWidget {
       decoration: decoration ?? BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(32),
+        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(32),
-          child: Padding(
-            padding: padding ?? const EdgeInsets.all(32.0),
-            child: child,
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned(
+            right: -20,
+            bottom: -20,
+            child: Opacity(
+              opacity: 0.03,
+              child: Icon(
+                LucideIcons.leaf,
+                size: 120,
+                color: AppTheme.terracotta,
+              ),
+            ),
           ),
-        ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(32),
+              child: Padding(
+                padding: padding ?? const EdgeInsets.all(32.0),
+                child: child,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -7,9 +7,13 @@ import 'package:intl/intl.dart';
 import '../models/plot.dart';
 import '../models/activity_log.dart';
 import '../core/mock_data.dart';
+import '../core/mock_data.dart';
 import 'package:uuid/uuid.dart';
+import 'subscription_service.dart';
+import 'openrouter_ai_service.dart';
 
 class WeatherSmartService extends ChangeNotifier {
+  SubscriptionService? _subscriptionService;
   List<PlotModel> _plots = [];
   List<Map<String, dynamic>> _activities = [];
   bool _isDarkMode = false;
@@ -24,10 +28,13 @@ class WeatherSmartService extends ChangeNotifier {
   String? _weatherError;
   
   // AI Advice data
-  final String _currentAdvice = '';
-  final bool _isGeneratingAdvice = false;
+  String _currentAdvice = '';
+  bool _isGeneratingAdvice = false;
   final List<String> _previousAdvice = [];
   final int _maxPreviousAdviceCount = 5;
+
+  // Agricultural Indices (Premium only)
+  Map<String, dynamic>? _agriculturalIndices;
 
  WeatherSmartService() {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
@@ -88,6 +95,20 @@ class WeatherSmartService extends ChangeNotifier {
   bool get isLoadingWeather => _isLoadingWeather;
   String? get weatherError => _weatherError;
 
+  void updateSubscription(SubscriptionService subscriptionService) {
+    bool previousPremium = _subscriptionService?.isPremium ?? false;
+    _subscriptionService = subscriptionService;
+    
+    // If upgraded to premium, re-fetch weather data to get the 7-day forecast instead of 24h
+    if (!previousPremium && subscriptionService.isPremium) {
+      if (_plots.isNotEmpty) {
+        fetchWeatherForPlots(force: true);
+      }
+      fetchWeatherForLocation();
+    }
+    _updateAgriculturalIndices();
+  }
+
   void toggleDarkMode(bool value) {
     _isDarkMode = value;
     notifyListeners();
@@ -111,9 +132,11 @@ class WeatherSmartService extends ChangeNotifier {
         return;
       }
 
+      final isPremium = _subscriptionService?.isPremium ?? false;
       final weather = await WeatherLocationService.fetchWeather(
         position.latitude,
         position.longitude,
+        isPremium: isPremium,
       );
 
       _currentWeather = weather;
@@ -139,9 +162,13 @@ class WeatherSmartService extends ChangeNotifier {
   Future<void> fetchWeatherForPlot(PlotModel plot) async {
     if (plot.latitude.isNotEmpty && plot.longitude.isNotEmpty) {
       try {
-        final lat = double.parse(plot.latitude);
-        final lng = double.parse(plot.longitude);
-        final weather = await WeatherLocationService.fetchWeather(lat, lng);
+        final lat = double.tryParse(plot.latitude);
+        final lng = double.tryParse(plot.longitude);
+        
+        if (lat == null || lng == null) return;
+
+        final isPremium = _subscriptionService?.isPremium ?? false;
+        final weather = await WeatherLocationService.fetchWeather(lat, lng, isPremium: isPremium);
         
         if (weather != null) {
           final updatedWeather = Map<String, dynamic>.from(weather);
@@ -192,6 +219,50 @@ class WeatherSmartService extends ChangeNotifier {
 
   Future<void> deleteLog(String logId) async {
     await FirestoreService().deleteActivityLog(logId);
+  }
+
+  Map<String, dynamic>? get agriculturalIndices => _agriculturalIndices;
+
+  Future<void> askAIQuestion(String question) async {
+    final subscriptionService = _subscriptionService;
+    if (subscriptionService == null) return;
+
+    if (!subscriptionService.canQueryAI()) {
+       _currentAdvice = "Daily AI limit reached. Upgrade to Premium for unlimited queries!";
+       notifyListeners();
+       return;
+    }
+
+    _isGeneratingAdvice = true;
+    _currentAdvice = '';
+    notifyListeners();
+
+    try {
+      final response = await OpenRouterAiService().generateCustomResponse(
+        userPrompt: question,
+        isPremium: subscriptionService.isPremium,
+      );
+      _currentAdvice = response;
+      await subscriptionService.incrementAIQuery();
+    } catch (e) {
+      _currentAdvice = "Sorry, I couldn't process that question right now.";
+    } finally {
+      _isGeneratingAdvice = false;
+      notifyListeners();
+    }
+  }
+
+  // Generate mock agricultural indices for premium users
+  void _updateAgriculturalIndices() {
+    if (_subscriptionService?.isPremium ?? false) {
+      _agriculturalIndices = {
+        'soil_moisture': '68%',
+        'gdd': '1240',
+        'evapotranspiration': '4.2 mm/day',
+      };
+    } else {
+      _agriculturalIndices = null;
+    }
   }
 
   @override

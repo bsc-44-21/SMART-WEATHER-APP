@@ -3,21 +3,23 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Color Palette
-  static const Color primaryAccent = Color(0xFF5A5A40); // Deep Olive
-  static const Color primaryHover = Color(0xFF4A4A30); // Darker Olive
-  static const Color background = Color(0xFFF5F5F0); // Warm Cream
-  static const Color surface = Colors.white; // Pure White
-  static const Color textPrimary = Color(0xFF1A1A1A); // Charcoal
-  static final Color textMuted = const Color(0xFF5A5A40).withValues(alpha: 0.60);
-  static const Color inputBorder = Color(0xFFE0E0E0);
+  // Color Palette - Nature's Palette
+  static const Color primaryAccent = Color(0xFF2D5A27); // Lush Forest Green
+  static const Color primaryHover = Color(0xFF1E3F1A); // Darker Forest Green
+  static const Color background = Color(0xFFFDF5E6); // Soft Wheat/Parchment
+  static const Color surface = Colors.white; 
+  static const Color terracotta = Color(0xFFA0522D); // Rich Soil/Terracotta
+  static const Color textPrimary = Color(0xFF1B1F1B); // Deep Forest Charcoal
+  static final Color textMuted = const Color(0xFF2D5A27).withValues(alpha: 0.60);
+  static const Color inputBorder = Color(0xFFD4CDC3); // Muted Clay Border
   
-  // Dark Color Palette
-  static const Color darkBackground = Color(0xFF0E110F); // Deeper Charcoal
-  static const Color darkSurface = Color(0xFF1E211E); // Distinct Surface
-  static const Color darkTextPrimary = Colors.white; // Pure White
-  static final Color darkTextMuted = Colors.white.withValues(alpha: 0.80); // Clearer Muted Text
-  static const Color darkInputBorder = Color(0xFF3A3C38);
-  static const Color darkPrimaryAccent = Color(0xFF4CAF50); // Vibrant Emerald
+  // Dark Color Palette - Midnight Meadow
+  static const Color darkBackground = Color(0xFF081408); // Deep Midnight Forest
+  static const Color darkSurface = Color(0xFF122312); // Dark Moss Surface
+  static const Color darkTextPrimary = Color(0xFFE8F5E9); // Minty White
+  static final Color darkTextMuted = const Color(0xFFE8F5E9).withValues(alpha: 0.70);
+  static const Color darkInputBorder = Color(0xFF1B301B);
+  static const Color darkPrimaryAccent = Color(0xFF81C784); // Bright Sprout Green
 
   static ThemeData get theme {
     return ThemeData(
@@ -25,25 +27,28 @@ class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryAccent,
         primary: primaryAccent,
+        secondary: terracotta,
         surface: surface,
-        surfaceContainerHighest: Color(0xFFF1F5E6),
+        surfaceContainerHighest: const Color(0xFFF4EDE0),
         onSurface: textPrimary,
       ),
       scaffoldBackgroundColor: background,
       
       // Typography
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.cormorantGaramond(
+        displayLarge: GoogleFonts.outfit(
           fontSize: 36,
+          fontWeight: FontWeight.w700,
+          color: textPrimary,
+          letterSpacing: -0.5,
+        ),
+        displayMedium: GoogleFonts.outfit(
+          fontSize: 32,
           fontWeight: FontWeight.w600,
           color: textPrimary,
+          letterSpacing: -0.5,
         ),
-        displayMedium: GoogleFonts.cormorantGaramond(
-          fontSize: 32,
-          fontWeight: FontWeight.w500,
-          color: textPrimary,
-        ),
-        titleLarge: GoogleFonts.cormorantGaramond(
+        titleLarge: GoogleFonts.outfit(
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: textPrimary,
@@ -95,8 +100,8 @@ class AppTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(44),
-          side: BorderSide(color: Colors.black.withValues(alpha: 0.05)),
+          borderRadius: BorderRadius.circular(32),
+          side: BorderSide(color: terracotta.withValues(alpha: 0.1)),
         ),
       ),
 
@@ -137,24 +142,26 @@ class AppTheme {
         brightness: Brightness.dark,
         seedColor: darkPrimaryAccent,
         primary: darkPrimaryAccent,
+        secondary: const Color(0xFF66BB6A),
         surface: darkSurface,
         onSurface: darkTextPrimary,
-        secondary: const Color(0xFF66BB6A),
       ),
       scaffoldBackgroundColor: darkBackground,
       
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.cormorantGaramond(
+        displayLarge: GoogleFonts.outfit(
           fontSize: 36,
           fontWeight: FontWeight.bold,
           color: darkTextPrimary,
+          letterSpacing: -0.5,
         ),
-        displayMedium: GoogleFonts.cormorantGaramond(
+        displayMedium: GoogleFonts.outfit(
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: darkTextPrimary,
+          letterSpacing: -0.5,
         ),
-        titleLarge: GoogleFonts.cormorantGaramond(
+        titleLarge: GoogleFonts.outfit(
           fontSize: 24,
           fontWeight: FontWeight.bold,
           color: darkTextPrimary,
@@ -208,11 +215,11 @@ class AppTheme {
 
       cardTheme: CardThemeData(
         color: darkSurface,
-        elevation: 8,
-        shadowColor: Colors.black.withValues(alpha: 0.5),
+        elevation: 4,
+        shadowColor: Colors.black.withValues(alpha: 0.3),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32),
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.1), width: 1),
+          side: BorderSide(color: darkPrimaryAccent.withValues(alpha: 0.05), width: 1),
         ),
       ),
 
