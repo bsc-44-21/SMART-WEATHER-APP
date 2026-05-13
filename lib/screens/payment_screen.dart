@@ -287,3 +287,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         ? const CircularProgressIndicator(color: Colors.white)
                         : Text('Pay with Paychangu (Airtel/Mpamba)', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
+                       )
+              else
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _verifyPayment,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 20),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
