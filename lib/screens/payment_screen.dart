@@ -137,3 +137,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
 </body>
 </html>
 ''';
+
+      if (mounted) {
+        final bool? success = await Navigator.push<bool>(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaychanguWebViewScreen(htmlContent: htmlContent),
+          ),
+        );
