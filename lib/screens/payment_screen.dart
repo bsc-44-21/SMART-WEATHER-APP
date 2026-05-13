@@ -57,3 +57,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
     .loading-container {
       text-align: center;
     }
+    .loader {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #E65C4F;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
