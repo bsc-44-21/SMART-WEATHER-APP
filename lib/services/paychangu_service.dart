@@ -93,5 +93,20 @@ body: jsonEncode({
         // The actual payment status is inside the 'data' object.
         final paymentData = data['data'];
         
+        if (paymentData != null) {
+          final String paymentStatus = paymentData['status'].toString().toLowerCase();
+          final dynamic amountPaid = paymentData['amount'];
+          
+          bool isPaid = paymentStatus == 'success';
+          
+          if (isPaid && expectedAmount != null) {
+            double actualAmount = double.tryParse(amountPaid.toString()) ?? 0;
+            // Allow for minor differences if any, but usually should match
+            if (actualAmount < expectedAmount) {
+              developer.log('Payment amount mismatch: Expected $expectedAmount, got $actualAmount', name: 'PaychanguService');
+              return false;
+            }
+          }
+          
 
      
