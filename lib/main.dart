@@ -11,6 +11,8 @@ import 'services/navigation_service.dart';
 import 'services/notification_service.dart';
 import 'services/firestore_service.dart';
 
+import 'services/subscription_service.dart';
+
 import 'dart:io';
 
 class MyHttpOverrides extends HttpOverrides{
@@ -29,12 +31,20 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => WeatherSmartService()),
+        ChangeNotifierProvider(create: (context) => SubscriptionService()),
+        ChangeNotifierProxyProvider<SubscriptionService, WeatherSmartService>(
+          create: (context) => WeatherSmartService(),
+          update: (context, subscriptionService, weatherSmartService) {
+            weatherSmartService!.updateSubscription(subscriptionService);
+            return weatherSmartService;
+          },
+        ),
         ChangeNotifierProvider(create: (context) => AuthService()),
         ChangeNotifierProvider(create: (context) => NavigationService()),
         ChangeNotifierProvider(create: (context) => NotificationService()),
         Provider(create: (context) => FirestoreService()),
       ],
+
       child: const WeatherSmartApp(),
     ),
   );

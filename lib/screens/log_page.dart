@@ -7,6 +7,7 @@ import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/ai_advisory_service.dart';
 import '../models/plot.dart';
+import '../services/subscription_service.dart';
 import 'log_detail_page.dart';
 
 // Public access to the fully featured log bottom sheet
@@ -223,6 +224,18 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
       _analysisResult = null;
       _analysisError = null;
     });
+    
+    final subscriptionService = context.read<SubscriptionService>();
+    if (!subscriptionService.canQueryAI()) {
+      setState(() => _isAnalyzing = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Free limit reached (3 AI Queries/day). Upgrade to Premium.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
     try {
       final weatherService = context.read<WeatherSmartService>();
@@ -238,6 +251,8 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
         cropName: _selectedPlot!.cropName,
         weatherData: weatherData,
       );
+      
+      await subscriptionService.incrementAIQuery();
 
       setState(() => _analysisResult = result);
     } catch (e) {
@@ -405,9 +420,11 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
                         icon: const Icon(LucideIcons.sparkles, size: 20),
                         label: Text(_isAnalyzing ? "Checking..." : "Get Advice"),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.indigo.shade50,
-                          foregroundColor: Colors.indigo.shade800,
+                          backgroundColor: AppTheme.terracotta.withValues(alpha: 0.1),
+                          foregroundColor: AppTheme.terracotta,
                           minimumSize: const Size(0, 64),
+                          elevation: 0,
+                          side: BorderSide(color: AppTheme.terracotta.withValues(alpha: 0.2)),
                         ),
                       ),
                     ),

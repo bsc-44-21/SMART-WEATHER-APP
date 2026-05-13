@@ -9,8 +9,9 @@ import 'package:uuid/uuid.dart';
 import '../core/theme.dart';
 import '../services/weather_smart_service.dart';
 import '../services/auth_service.dart';
-import '../services/firestore_service.dart';
 import '../services/ai_advisory_service.dart';
+import '../services/subscription_service.dart';
+import '../services/firestore_service.dart';
 import '../models/pest_detection.dart';
 import '../models/plot.dart';
 import '../services/weather_location_service.dart';
@@ -81,6 +82,17 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
     if (userId == null) {
        ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please login to use this feature.')),
+      );
+      return;
+    }
+
+    final subscriptionService = Provider.of<SubscriptionService>(context, listen: false);
+    if (!subscriptionService.canScanPest()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Free limit reached (3 scans/month). Upgrade to Premium for unlimited scans.'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -202,6 +214,8 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
           return;
         }
         
+        await subscriptionService.incrementPestScan();
+
         // 4. Save to Firestore
         final detection = PestDetectionModel(
           id: const Uuid().v4(),
@@ -218,7 +232,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
           weatherAdvice: advice['smart_weather_advice'],
         );
 
-        unawaited(firestoreService.savePestDetection(detection));
+        await firestoreService.savePestDetection(detection);
 
         setState(() {
           _isProcessing = false;

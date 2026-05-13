@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../services/weather_smart_service.dart';
 import '../services/weather_location_service.dart';
 import '../services/auth_service.dart';
+import '../services/subscription_service.dart';
 import '../models/plot.dart';
 import '../services/notification_service.dart';
 
@@ -218,7 +219,23 @@ final bool isEditing = existingPlot != null;
                                 if (isEditing) {
                                   await context.read<WeatherSmartService>().updatePlot(plot);
                                 } else {
-                                  await context.read<WeatherSmartService>().addPlot(plot);
+                                  final weatherService = context.read<WeatherSmartService>();
+                                  final subscriptionService = context.read<SubscriptionService>();
+                                  
+                                  if (!subscriptionService.canAddPlot(weatherService.plots.length)) {
+                                    setModalState(() => isSaving = false);
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Free tier limit reached (1 plot). Upgrade to Premium for unlimited plots.'),
+                                          backgroundColor: Colors.orange,
+                                          duration: Duration(seconds: 4),
+                                        ),
+                                      );
+                                    }
+                                    return;
+                                  }
+                                  await weatherService.addPlot(plot);
                                 }
 
                                 if (context.mounted) {

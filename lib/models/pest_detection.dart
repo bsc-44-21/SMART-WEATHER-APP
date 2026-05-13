@@ -60,7 +60,7 @@ class PestDetectionModel {
       naturalRecommendations: List<String>.from(map['naturalRecommendations'] ?? []),
       chemicalRecommendations: List<String>.from(map['chemicalRecommendations'] ?? []),
       riskLevel: map['riskLevel'] ?? 'Low',
-      timestamp: (map['timestamp'] as Timestamp).toDate(),
+      timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
       imageUrl: map['imageUrl'],
       weatherAdvice: map['weatherAdvice'],
     );

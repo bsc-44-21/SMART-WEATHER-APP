@@ -102,17 +102,19 @@ class _PlotsPageState extends State<PlotsPage> {
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFFE8F5E9),
+                                      color: AppTheme.primaryAccent.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: AppTheme.primaryAccent.withValues(alpha: 0.1)),
                                     ),
                                     child: Text(
-                                      plot.status,
+                                      plot.status.toUpperCase(),
                                       style: GoogleFonts.inter(
-                                        color: const Color(0xFF2E7D32),
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
+                                        color: AppTheme.primaryAccent,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.5,
                                       ),
                                     ),
                                   ),

@@ -11,16 +11,18 @@ class OpenRouterAiService {
   OpenRouterAiService._internal();
 
   /// Generate AI response for a user prompt
-  Future<String> generateCustomResponse({required String userPrompt}) async {
+  Future<String> generateCustomResponse({required String userPrompt, bool isPremium = false}) async {
     if (!AiConfig.hasApiKey) {
       return 'API key is missing or invalid. Please set OPENROUTER_API_KEY and ensure it has no quotes.';
     }
 
-    final modelsToTry = [AiConfig.primaryModel, ...AiConfig.fallbackModels];
+    // Tier-based model selection
+    final String modelToUse = isPremium ? "openai/gpt-4o" : "openai/gpt-4o-mini";
+    final List<String> modelsToTry = [modelToUse, ...AiConfig.fallbackModels];
 
     for (int i = 0; i < modelsToTry.length; i++) {
       final model = modelsToTry[i];
-      debugPrint('[AI] Attempt ${i + 1}/${modelsToTry.length} with model: $model');
+      debugPrint('[AI] Attempt ${i + 1}/${modelsToTry.length} with model: $model (Premium: $isPremium)');
 
       final result = await _callOpenRouterChat(model: model, userPrompt: userPrompt);
 

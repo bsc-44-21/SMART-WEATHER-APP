@@ -31,8 +31,9 @@ class WeatherLocationService {
   // --- Step 2: MET Norway Data Fetch (Compact) ---
   static Future<Map<String, dynamic>?> fetchWeather(
     double latitude,
-    double longitude,
-  ) async {
+    double longitude, {
+    bool isPremium = false,
+  }) async {
     try {
       // Switching to api.met.no (Strictly Free & More Stable)
       final Uri url = Uri.https('api.met.no', '/weatherapi/locationforecast/2.0/compact', {
@@ -76,14 +77,13 @@ class WeatherLocationService {
             hourlyPops.add(0); 
           }
 
-          // 2. Build Daily (7 days)
+          // --- Step 2: Build Daily (7 days for Premium, 1 day for Free) ---
           final List<String> dailyTimes = [];
           final List<double> dailyMax = [];
           final List<double> dailyMin = [];
           final List<int> dailyCodes = [];
           final List<double> dailyPrecip = [];
           
-          // Simple Daily Mapping: Group entries by date
           final Map<String, List<Map<String, dynamic>>> groupedByDay = {};
           for (var entry in timeseries) {
             final date = (entry['time'] as String).substring(0, 10);
@@ -91,7 +91,9 @@ class WeatherLocationService {
           }
 
           final sortedDates = groupedByDay.keys.toList()..sort();
-          for (int i = 0; i < sortedDates.length && i < 7; i++) {
+          final int maxDays = isPremium ? 7 : 1; 
+
+          for (int i = 0; i < sortedDates.length && i < maxDays; i++) {
             final dayEntries = groupedByDay[sortedDates[i]]!;
             dailyTimes.add(sortedDates[i]);
             
@@ -105,7 +107,6 @@ class WeatherLocationService {
               if (temp > max) max = temp;
               if (temp < min) min = temp;
               
-              // Sum up visible precipitation
               final p = (entry['data']['next_1_hours']?['details']?['precipitation_amount'] as num?)?.toDouble() ?? 0.0;
               totalPrecip += p;
 
