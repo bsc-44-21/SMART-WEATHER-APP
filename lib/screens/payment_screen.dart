@@ -164,3 +164,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
           }
         }
       }
+      } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+        setState(() => _isLoading = false);
+      }
+    }
+  }
