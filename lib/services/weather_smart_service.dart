@@ -26,6 +26,7 @@ class WeatherSmartService extends ChangeNotifier {
   Map<String, dynamic>? _currentWeather;
   final Map<String, Map<String, dynamic>> _plotWeather = {};
   bool _isLoadingWeather = false;
+  bool _isFetchingWeather = false;
   String? _weatherError;
   
   // AI Advice data
