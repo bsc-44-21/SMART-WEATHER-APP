@@ -17,12 +17,11 @@ class WeatherSmartService extends ChangeNotifier {
   List<PlotModel> _plots = [];
   List<Map<String, dynamic>> _activities = [];
   bool _isDarkMode = false;
-
   StreamSubscription? _plotsSubscription;
   StreamSubscription? _logsSubscription;
   Timer? _weatherTimer;
-
-  // Weather
+  
+  // Weather data
   Map<String, dynamic>? _currentWeather;
   final Map<String, Map<String, dynamic>> _plotWeather = {};
   bool _isLoadingWeather = false;
@@ -43,7 +42,6 @@ class WeatherSmartService extends ChangeNotifier {
       _plotsSubscription?.cancel();
       _logsSubscription?.cancel();
       _weatherTimer?.cancel();
-
       if (user != null) {
         // Plots Stream
         // Plots Stream
@@ -87,19 +85,14 @@ class WeatherSmartService extends ChangeNotifier {
     });
   }
 
-  // ================= GETTERS =================
   List<PlotModel> get plots => _plots;
   List<Map<String, dynamic>> get logs => _activities;
-
-  String get advice =>
-      _currentAdvice.isNotEmpty ? _currentAdvice : MockData.farmingAdvice;
-
+  String get advice => _currentAdvice.isNotEmpty ? _currentAdvice : MockData.farmingAdvice;
   String get currentAdvice => _currentAdvice;
   bool get isGeneratingAdvice => _isGeneratingAdvice;
   bool get isDarkMode => _isDarkMode;
-
   Map<String, dynamic>? get currentWeather => _currentWeather;
-
+  Map<String, dynamic>? getPlotWeather(String plotId) => _plotWeather[plotId];
   bool get isLoadingWeather => _isLoadingWeather;
   String? get weatherError => _weatherError;
 
@@ -122,12 +115,10 @@ class WeatherSmartService extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= WEATHER =================
+  // Fetch weather for current location
   Future<void> fetchWeatherForLocation() async {
-    if (_isFetchingWeather) return;
-
-    _isFetchingWeather = true;
     _isLoadingWeather = true;
+    _weatherError = null;
     notifyListeners();
 
     try {
@@ -153,7 +144,6 @@ class WeatherSmartService extends ChangeNotifier {
     } catch (e) {
       debugPrint('[Weather] Location fetch error: $e');
     } finally {
-      _isFetchingWeather = false;
       _isLoadingWeather = false;
       notifyListeners();
     }
@@ -193,9 +183,6 @@ class WeatherSmartService extends ChangeNotifier {
     }
   }
 
-  Map<String, dynamic>? getPlotWeather(String plotId) => _plotWeather[plotId];
-
-  // ================= PLOTS =================
   Future<void> addPlot(PlotModel plot) async {
     await FirestoreService().savePlot(plot);
     await fetchWeatherForPlot(plot);

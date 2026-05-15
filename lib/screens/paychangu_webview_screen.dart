@@ -4,7 +4,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 
-
 class PaychanguWebViewScreen extends StatefulWidget {
   final String htmlContent;
 
@@ -88,7 +87,7 @@ class _PaychanguWebViewScreenState extends State<PaychanguWebViewScreen> {
             color: AppTheme.textPrimary,
           ),
         ),
-          centerTitle: true,
+        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -127,7 +126,7 @@ class _PaychanguWebViewScreenState extends State<PaychanguWebViewScreen> {
                 ],
               ),
             ),
-             if (_error != null)
+          if (_error != null)
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(32.0),
