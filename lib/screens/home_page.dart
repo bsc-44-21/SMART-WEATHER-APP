@@ -322,10 +322,6 @@ class HomePage extends StatelessWidget {
     if (current == null) return const SizedBox.shrink();
 
     final temp = current['temperature_2m'];
-    final feelsLike = current['apparent_temperature'];
-    final humidity = current['relative_humidity_2m'];
-    final windSpeed = current['wind_speed_10m'];
-    final precipitation = current['precipitation'];
     final weatherCode = current['weather_code'];
     final emoji = WeatherLocationService.getWeatherEmoji(weatherCode);
     final desc = WeatherLocationService.getWeatherDescription(weatherCode);
@@ -402,71 +398,6 @@ class HomePage extends StatelessWidget {
                 style: const TextStyle(fontSize: 48),
               ),
             ],
-          ),
-          
-          const SizedBox(height: 20),
-          
-          // Divider
-          Container(
-            height: 1,
-            color: Colors.white.withOpacity(0.2),
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Weather Details Grid
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.4,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            children: [
-              _buildWeatherDetailCard('Feels Like', '$feelsLike°', '🌡️'),
-              _buildWeatherDetailCard('Humidity', '$humidity%', '💧'),
-              _buildWeatherDetailCard('Wind Speed', '${windSpeed.toStringAsFixed(1)} km/h', '💨'),
-              _buildWeatherDetailCard('Precipitation', '${precipitation.toStringAsFixed(1)} mm', '🌧️'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildWeatherDetailCard(String label, String value, String emoji) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            emoji,
-            style: const TextStyle(fontSize: 20),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              color: Colors.white70,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: GoogleFonts.inter(
-              color: Colors.white,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
           ),
         ],
       ),
