@@ -61,3 +61,11 @@ const SizedBox(height: 32),
                     if (context.mounted) {
                       // Fallback: Copy to clipboard
                       await Clipboard.setData(const ClipboardData(text: 'smartweatherapp@gmail.com'));
+if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Email copied to clipboard: smartweatherapp@gmail.com'),
+                            duration: Duration(seconds: 4),
+                          ),
+                        );
+                        
