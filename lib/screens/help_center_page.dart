@@ -52,3 +52,5 @@ const SizedBox(height: 32),
                 onPressed: () async {
                   final Uri emailLaunchUri = Uri(
                     scheme: 'mailto',
+                    path: 'smartweatherapp@gmail.com',
+                    query: 'subject=Smart Weather App Support Request',
