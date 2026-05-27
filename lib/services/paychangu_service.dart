@@ -15,7 +15,7 @@ class PaychanguService {
   static const String _baseUrl = 'https://api.paychangu.com/payment';
   static const String _verifyUrl = 'https://api.paychangu.com/verify-payment';
 
-  static Future<PaychanguResponse?> createPaymentSession({
+  static Future<PaychanguResponse> createPaymentSession({
     required String email,
     required String firstName,
     required String lastName,
@@ -25,6 +25,7 @@ class PaychanguService {
     
     try {
       developer.log('Initializing Paychangu payment for $email', name: 'PaychanguService');
+      developer.log('Using public key: ${AppSecrets.paychanguPublicKey.substring(0, 10)}...', name: 'PaychanguService');
       
       final response = await http.post(
         Uri.parse(_baseUrl),
@@ -52,24 +53,42 @@ class PaychanguService {
             'source': 'flutter_app'
           }
         }),
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw Exception('Payment request timed out. Please check your internet connection.');
+        },
       );
 
-      developer.log('Paychangu Response: ${response.statusCode} - ${response.body}', name: 'PaychanguService');
+      developer.log('Paychangu Response Status: ${response.statusCode}', name: 'PaychanguService');
+      developer.log('Paychangu Response Body: ${response.body}', name: 'PaychanguService');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        if (data['status'] == 'success') {
-          return PaychanguResponse(
-            checkoutUrl: data['data']['checkout_url'],
-            txRef: transactionRef,
-          );
+        developer.log('Decoded response: $data', name: 'PaychanguService');
+        
+        if (data['status'] == 'success' && data['data'] != null) {
+          final checkoutUrl = data['data']['checkout_url'];
+          if (checkoutUrl != null && checkoutUrl.isNotEmpty) {
+            return PaychanguResponse(
+              checkoutUrl: checkoutUrl,
+              txRef: transactionRef,
+            );
+          } else {
+            throw Exception('No checkout URL received from payment gateway');
+          }
+        } else {
+          final message = data['message'] ?? 'Payment initialization failed';
+          throw Exception('Payment error: $message');
         }
+      } else {
+        final errorBody = response.body;
+        developer.log('API Error: $errorBody', name: 'PaychanguService');
+        throw Exception('Payment API error: ${response.statusCode} - $errorBody');
       }
-      
-      return null;
     } catch (e) {
       developer.log('Paychangu Error: $e', name: 'PaychanguService', error: e);
-      return null;
+      rethrow;
     }
   }
 

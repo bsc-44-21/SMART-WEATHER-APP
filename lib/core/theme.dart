@@ -20,6 +20,7 @@ class AppTheme {
   static final Color darkTextMuted = const Color(0xFFFFFFFF).withValues(alpha: 0.70);
   static const Color darkInputBorder = Color(0xFF1B301B);
   static const Color darkPrimaryAccent = Color(0xFF81C784); // Bright Sprout Green
+  static const Color creamSurface = Color(0xFFF7F2E8); // Light cream for cards/buttons
 
   static ThemeData get theme {
     return ThemeData(
@@ -33,6 +34,18 @@ class AppTheme {
         onSurface: textPrimary,
       ),
       scaffoldBackgroundColor: background,
+      appBarTheme: AppBarTheme(
+        backgroundColor: background,
+        foregroundColor: textPrimary,
+        iconTheme: const IconThemeData(color: Color(0xFF1B1F1B)),
+        elevation: 0,
+        titleTextStyle: GoogleFonts.outfit(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: textPrimary,
+        ),
+      ),
+      iconTheme: const IconThemeData(color: Color(0xFF1B1F1B)),
       
       // Typography
       textTheme: TextTheme(
@@ -77,7 +90,7 @@ class AppTheme {
       // Input Decoration
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: surface,
         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -138,15 +151,51 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
+      colorScheme: ColorScheme(
         brightness: Brightness.dark,
-        seedColor: darkPrimaryAccent,
         primary: darkPrimaryAccent,
-        secondary: const Color(0xFF66BB6A),
-        surface: darkSurface,
-        onSurface: darkTextPrimary,
+        onPrimary: darkBackground,
+        secondary: darkPrimaryAccent,
+        onSecondary: darkBackground,
+        background: darkBackground,
+        onBackground: darkTextPrimary,
+        surface: creamSurface,
+        onSurface: Colors.black,
+        surfaceVariant: creamSurface,
+        onSurfaceVariant: Colors.black87,
+        error: Colors.red.shade400,
+        onError: Colors.white,
+        inverseSurface: darkSurface,
+        inversePrimary: darkPrimaryAccent,
+        shadow: Colors.black,
       ),
       scaffoldBackgroundColor: darkBackground,
+      canvasColor: darkSurface,
+      dialogBackgroundColor: darkSurface,
+      appBarTheme: AppBarTheme(
+        backgroundColor: darkBackground,
+        foregroundColor: darkTextPrimary,
+        iconTheme: const IconThemeData(color: Color(0xFFE8F5E9)),
+        titleTextStyle: GoogleFonts.outfit(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: darkTextPrimary,
+        ),
+        elevation: 0,
+      ),
+      iconTheme: const IconThemeData(color: Color(0xFFE8F5E9)),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: Colors.black,
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.black,
+          backgroundColor: creamSurface,
+          side: BorderSide(color: Colors.black.withOpacity(0.12)),
+        ),
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: darkSurface,
         foregroundColor: Colors.white,
@@ -223,19 +272,19 @@ class AppTheme {
       ),
 
       cardTheme: CardThemeData(
-        color: darkSurface,
+        color: creamSurface,
         elevation: 4,
-        shadowColor: Colors.black.withValues(alpha: 0.3),
+        shadowColor: Colors.black.withOpacity(0.15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(32),
-          side: BorderSide(color: darkPrimaryAccent.withValues(alpha: 0.05), width: 1),
+          side: BorderSide(color: Colors.black.withOpacity(0.06), width: 1),
         ),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: darkPrimaryAccent,
-          foregroundColor: darkBackground,
+          backgroundColor: creamSurface,
+          foregroundColor: Colors.black,
           minimumSize: const Size(double.infinity, 64),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(32),
@@ -243,6 +292,7 @@ class AppTheme {
           textStyle: GoogleFonts.inter(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: Colors.black,
           ),
           elevation: 4,
         ),
@@ -258,6 +308,12 @@ class AppTheme {
         elevation: 10,
         selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
         unselectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: darkSurface,
+        indicatorColor: creamSurface,
+        iconTheme: MaterialStateProperty.all(const IconThemeData(color: Color(0xFFE8F5E9))),
+        labelTextStyle: MaterialStateProperty.all(GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: darkTextPrimary)),
       ),
     );
   }

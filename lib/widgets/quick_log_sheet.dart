@@ -13,6 +13,7 @@ void showQuickLogBottomSheet(BuildContext context) {
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (context) {
+      final colorScheme = Theme.of(context).colorScheme;
       bool isSaving = false;
 
       return StatefulBuilder(
@@ -38,17 +39,17 @@ void showQuickLogBottomSheet(BuildContext context) {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryAccent.withValues(alpha: 0.1),
+                            color: colorScheme.primary.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(LucideIcons.clipboardList, size: 20, color: AppTheme.primaryAccent),
+                          child: Icon(LucideIcons.clipboardList, size: 20, color: colorScheme.primary),
                         ),
                         const SizedBox(width: 16),
                         Text(
                           'Record Activity',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: AppTheme.primaryAccent,
+                            color: colorScheme.primary,
                           ),
                         ),
                       ],
@@ -57,7 +58,7 @@ void showQuickLogBottomSheet(BuildContext context) {
                     Text(
                       'What did you do on the farm today?',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.9),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -66,22 +67,22 @@ void showQuickLogBottomSheet(BuildContext context) {
                       enabled: !isSaving,
                       autofocus: true,
                       maxLines: 3,
-                      decoration: InputDecoration(
+                        decoration: InputDecoration(
                         hintText: 'e.g., Applied fertilizer to North Plot, Started maize harvest...',
-                        hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
+                        hintStyle: TextStyle(color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.6), fontSize: 14),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: Theme.of(context).colorScheme.surface,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.grey.shade200),
+                          borderSide: BorderSide(color: Theme.of(context).dividerColor),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(color: Colors.grey.shade200),
+                          borderSide: BorderSide(color: Theme.of(context).dividerColor),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: const BorderSide(color: AppTheme.primaryAccent, width: 2),
+                          borderSide: BorderSide(color: colorScheme.primary, width: 2),
                         ),
                       ),
                       validator: (value) => value == null || value.trim().isEmpty ? 'Please enter some activity' : null,
@@ -107,7 +108,7 @@ void showQuickLogBottomSheet(BuildContext context) {
                                     SnackBar(
                                       content: Row(
                                         children: [
-                                          const Icon(LucideIcons.checkCircle, color: Colors.white, size: 20),
+                                              Icon(LucideIcons.checkCircle, color: Theme.of(context).colorScheme.onPrimary, size: 20),
                                           const SizedBox(width: 12),
                                           Expanded(child: Text('Activity logged: "$activity"')),
                                         ],
@@ -135,12 +136,12 @@ void showQuickLogBottomSheet(BuildContext context) {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                         child: isSaving 
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.onPrimary),
                             )
-                          : const Text('Save Activity', style: TextStyle(fontWeight: FontWeight.bold)),
+                          : Text('Save Activity', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color)),
                       ),
                     ),
                   ],
