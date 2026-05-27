@@ -137,21 +137,12 @@ class HomePage extends StatelessWidget {
 
           const SizedBox(height: 32),
 
-          // 2. Global Local Weather
-          if (weatherService.isLoadingWeather && currentWeather == null) ...[
-            const Center(child: CircularProgressIndicator()),
-            const SizedBox(height: 24),
-          ] else if (weatherService.weatherError != null && currentWeather == null) ...[
-            _buildWeatherErrorCard(
-              context,
-              error: weatherService.weatherError!,
-              onRetry: weatherService.fetchWeatherForLocation,
-            ),
-            const SizedBox(height: 24),
-          ] else if (currentWeather != null) ...[
-            _buildLocalWeatherCard(context, currentWeather),
-            const SizedBox(height: 24),
-          ],
+          // 2. Banner Ads (replaces the Local Weather section)
+          // Place your banner images under `assets/banners/` and update
+          // `pubspec.yaml` to include them. This widget will gracefully
+          // fall back to a placeholder if an asset isn't found.
+          _buildBannerAds(context),
+          const SizedBox(height: 24),
 
           // 3. Farm Analytics
           Row(
@@ -568,6 +559,72 @@ class HomePage extends StatelessWidget {
             Icon(LucideIcons.chevronRight, color: Colors.grey.shade300, size: 20),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBannerAds(BuildContext context) {
+    // Update these paths with your own banner images (assets or network URLs).
+    final List<String> bannerImages = [
+      'assets/banners/banner1.png',
+      'assets/banners/banner2.png',
+      'assets/banners/banner3.png',
+    ];
+
+    return FarmingCard(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Sponsored',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppTheme.primaryAccent,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: bannerImages.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final path = bannerImages[index];
+                return ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    width: MediaQuery.of(context).size.width - 96,
+                    color: Colors.grey.shade200,
+                    child: Image.asset(
+                      path,
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, error, stack) {
+                        return Container(
+                          color: Colors.grey.shade300,
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Add ${path.split('/').last} to assets',
+                                  style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
