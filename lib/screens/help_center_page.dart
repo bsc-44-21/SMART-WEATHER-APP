@@ -22,3 +22,10 @@ class HelpCenterPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
+               'How can we help you?',
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
+            const SizedBox(height: 24),
+            _buildFaqItem(
+              context,
+
