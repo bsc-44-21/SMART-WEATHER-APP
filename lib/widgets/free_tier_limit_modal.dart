@@ -13,3 +13,12 @@ void showFreeTierLimitModal(BuildContext context, {required String featureName, 
     ),
   );
 }
+
+class _FreeTierLimitModal extends StatelessWidget {
+  final String featureName;
+  final String limitText;
+
+  const _FreeTierLimitModal({
+    required this.featureName,
+    required this.limitText,
+  });
