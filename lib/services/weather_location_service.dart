@@ -37,74 +37,29 @@ class WeatherLocationService {
     bool isPremium = false,
   }) async {
     try {
-      final Uri url = Uri.https('api.open-meteo.com', '/v1/forecast', {
-        'latitude': latitude.toStringAsFixed(4),
-        'longitude': longitude.toStringAsFixed(4),
-        'current_weather': 'true',
-        'hourly': 'temperature_2m,relativehumidity_2m,precipitation,precipitation_probability,weathercode,windspeed_10m',
-        'daily': 'temperature_2m_max,temperature_2m_min,precipitation_sum,weathercode',
-        'timezone': 'auto',
-        'forecast_days': '7',
-      });
+      final int maxDays = isPremium ? 7 : 1;
+      final Uri url = Uri.parse(
+          'https://api.open-meteo.com/v1/forecast?'
+          'latitude=${latitude.toStringAsFixed(4)}&longitude=${longitude.toStringAsFixed(4)}'
+          '&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m'
+          '&hourly=temperature_2m,precipitation_probability,weather_code'
+          '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum'
+          '&forecast_days=$maxDays');
 
       debugPrint('[Weather] Fetching from Open-Meteo: $url');
 
-      final response = await http.get(
-        url,
-        headers: {
-          'Accept': 'application/json',
-        },
-      ).timeout(const Duration(seconds: 30));
+      final response = await http.get(url).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        final currentWeather = jsonResponse['current_weather'] as Map<String, dynamic>?;
-        final hourly = jsonResponse['hourly'] as Map<String, dynamic>?;
-        final daily = jsonResponse['daily'] as Map<String, dynamic>?;
-
-        if (currentWeather != null && hourly != null && daily != null) {
-          final hourlyTimes = List<String>.from(hourly['time'] as List<dynamic>);
-          final currentIndex = hourlyTimes.indexOf(currentWeather['time'] as String).clamp(0, hourlyTimes.length - 1);
-
-          final hourlyTemps = (hourly['temperature_2m'] as List<dynamic>).map((item) => (item as num).toDouble()).toList();
-          final hourlyCodes = (hourly['weathercode'] as List<dynamic>).map((item) => (item as num).toInt()).toList();
-          final hourlyPops = (hourly['precipitation_probability'] as List<dynamic>).map((item) => (item as num).toInt()).toList();
-          final hourlyPrecip = (hourly['precipitation'] as List<dynamic>).map((item) => (item as num).toDouble()).toList();
-
-          final dailyTimes = List<String>.from(daily['time'] as List<dynamic>);
-          final dailyMax = (daily['temperature_2m_max'] as List<dynamic>).map((item) => (item as num).toDouble()).toList();
-          final dailyMin = (daily['temperature_2m_min'] as List<dynamic>).map((item) => (item as num).toDouble()).toList();
-          final dailyCodes = (daily['weathercode'] as List<dynamic>).map((item) => (item as num).toInt()).toList();
-          final dailyPrecip = (daily['precipitation_sum'] as List<dynamic>).map((item) => (item as num).toDouble()).toList();
-
-          final int maxDays = isPremium ? 7 : 1;
-          return {
-            'latitude': latitude,
-            'longitude': longitude,
-            'current': {
-              'temperature_2m': (currentWeather['temperature'] as num).toDouble(),
-              'relative_humidity_2m': (hourly['relativehumidity_2m'][currentIndex] as num).toDouble(),
-              'wind_speed_10m': (currentWeather['windspeed'] as num).toDouble(),
-              'precipitation': hourlyPrecip[currentIndex],
-              'weather_code': (currentWeather['weathercode'] as num).toInt(),
-              'weather_code_string': 'open-meteo:${currentWeather['weathercode']}',
-            },
-            'hourly': {
-              'time': hourlyTimes.take(24).toList(),
-              'temperature_2m': hourlyTemps.take(24).toList(),
-              'weather_code': hourlyCodes.take(24).toList(),
-              'precipitation_probability': hourlyPops.take(24).toList(),
-            },
-            'daily': {
-              'time': dailyTimes.take(maxDays).toList(),
-              'temperature_2m_max': dailyMax.take(maxDays).toList(),
-              'temperature_2m_min': dailyMin.take(maxDays).toList(),
-              'weather_code': dailyCodes.take(maxDays).toList(),
-              'precipitation_sum': dailyPrecip.take(maxDays).toList(),
-            },
-          };
-        }
-        return null;
+        
+        return {
+          'latitude': latitude,
+          'longitude': longitude,
+          'current': jsonResponse['current'],
+          'hourly': jsonResponse['hourly'],
+          'daily': jsonResponse['daily'],
+        };
       } else {
         debugPrint('[Weather] Open-Meteo Error: ${response.statusCode}');
         return null;
@@ -113,21 +68,6 @@ class WeatherLocationService {
       debugPrint('[Weather] Open-Meteo Exception: $e');
       return null;
     }
-
-    return null;
-  }
-
-  static int _getInternalCode(String symbol) {
-    if (symbol.contains('clearsky')) return 0;
-    if (symbol.contains('fair')) return 1;
-    if (symbol.contains('partlycloudy')) return 2;
-    if (symbol.contains('cloudy')) return 3;
-    if (symbol.contains('fog')) return 45;
-    if (symbol.contains('lightrain')) return 61;
-    if (symbol.contains('rain')) return 63;
-    if (symbol.contains('heavyrain')) return 65;
-    if (symbol.contains('thunderstorm')) return 95;
-    return 3; // Default to cloudy
   }
 
   static String getWeatherDescription(int weatherCode) {
