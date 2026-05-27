@@ -54,3 +54,10 @@ const SizedBox(height: 32),
                     scheme: 'mailto',
                     path: 'smartweatherapp@gmail.com',
                     query: 'subject=Smart Weather App Support Request',
+);
+                  if (await canLaunchUrl(emailLaunchUri)) {
+                    await launchUrl(emailLaunchUri);
+                  } else {
+                    if (context.mounted) {
+                      // Fallback: Copy to clipboard
+                      await Clipboard.setData(const ClipboardData(text: 'smartweatherapp@gmail.com'));
