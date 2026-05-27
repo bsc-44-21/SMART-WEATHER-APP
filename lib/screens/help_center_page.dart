@@ -110,4 +110,9 @@ if (context.mounted) {
       ),
       child: ExpansionTile(
         title: Text(question, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+iconColor: AppTheme.primaryAccent,
+        collapsedIconColor: AppTheme.primaryAccent,
+        childrenPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        expandedCrossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
