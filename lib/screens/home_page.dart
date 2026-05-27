@@ -320,6 +320,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather) {
+    final colorScheme = Theme.of(context).colorScheme;
     final current = weather['current'];
     if (current == null) return const SizedBox.shrink();
 
@@ -484,6 +485,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildAnalyticCard(BuildContext context, {required String title, required String value, required IconData icon}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -521,6 +523,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildQuickAction(BuildContext context, {required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(

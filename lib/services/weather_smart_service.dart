@@ -122,8 +122,7 @@ class WeatherSmartService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      debugPrint('[Weather] Starting location fetch (3s delay for safety)...');
-      await Future.delayed(const Duration(seconds: 3));
+      debugPrint('[Weather] Starting location fetch...');
       final position = await WeatherLocationService.getLocationWithPermission();
       
       if (position == null) {
