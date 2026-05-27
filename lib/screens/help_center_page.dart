@@ -45,4 +45,6 @@ _buildFaqItem(
               'How do I upgrade to Premium?', 
               'Go to your Profile Preferences and tap the "Upgrade" button. Payments are processed securely via Paychangu. Premium gives you unlimited AI queries.'
             ),
+const SizedBox(height: 32),
+            Center(
 
