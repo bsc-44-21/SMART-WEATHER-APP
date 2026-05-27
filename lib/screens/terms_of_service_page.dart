@@ -34,5 +34,11 @@ class PrivacyPolicyPage extends StatelessWidget {
               '1. Information We Collect',
               'We collect information you provide directly to us when creating an account, including your email and display name.',
             ),
+             _buildSection(
+              context,
+              '2. Farm and Location Data',
+              'To provide hyper-local weather forecasts and accurate AI advice, we collect data about your farm plots. This includes the plot latitude and longitude coordinates, crop types (Maize, Tomato, or Groundnuts), and planting dates.',
+            ),
+
 
 
