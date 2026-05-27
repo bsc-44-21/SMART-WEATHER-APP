@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -564,7 +565,6 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildBannerAds(BuildContext context) {
-    // Update these paths with your own banner images (assets or network URLs).
     final List<String> bannerImages = [
       'assets/banners/banner1.png',
       'assets/banners/banner2.png',
@@ -572,7 +572,7 @@ class HomePage extends StatelessWidget {
     ];
 
     return FarmingCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -585,47 +585,107 @@ class HomePage extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: bannerImages.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final path = bannerImages[index];
-                return ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width - 96,
-                    color: Colors.grey.shade200,
-                    child: Image.asset(
-                      path,
-                      fit: BoxFit.cover,
-                      errorBuilder: (ctx, error, stack) {
-                        return Container(
-                          color: Colors.grey.shade300,
-                          child: Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Add ${path.split('/').last} to assets',
-                                  style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
+            height: 200, // a little longer as requested
+            child: BannerCarousel(images: bannerImages),
           ),
         ],
       ),
+    );
+  }
+
+}
+
+class BannerCarousel extends StatefulWidget {
+  final List<String> images;
+  final Duration interval;
+  const BannerCarousel({super.key, required this.images, this.interval = const Duration(seconds: 4)});
+
+  @override
+  State<BannerCarousel> createState() => _BannerCarouselState();
+}
+
+class _BannerCarouselState extends State<BannerCarousel> {
+  late final PageController _controller;
+  Timer? _timer;
+  int _current = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: 0);
+    if (widget.images.length > 1) {
+      _timer = Timer.periodic(widget.interval, (_) {
+        final next = (_current + 1) % widget.images.length;
+        if (mounted) {
+          _controller.animateToPage(next, duration: const Duration(milliseconds: 600), curve: Curves.easeInOut);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: widget.images.length,
+            onPageChanged: (p) => setState(() => _current = p),
+            itemBuilder: (context, index) {
+              final path = widget.images[index];
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  color: Colors.grey.shade200,
+                  child: Image.asset(
+                    path,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (ctx, error, stack) => Container(
+                      color: Colors.grey.shade300,
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
+                            const SizedBox(height: 8),
+                            Text('Add ${path.split('/').last} to assets', style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(widget.images.length, (i) {
+            final bool active = i == _current;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: active ? 18 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: active ? AppTheme.primaryAccent : Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }
