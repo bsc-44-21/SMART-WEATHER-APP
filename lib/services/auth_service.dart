@@ -86,6 +86,25 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // Forgot Password
+  Future<bool> sendPasswordResetEmail(String email) async {
+    _setLoading(true);
+    _setError(null);
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      _setLoading(false);
+      return true;
+    } on FirebaseAuthException catch (e) {
+      _setLoading(false);
+      _setError(_getFriendlyErrorMessage(e.code));
+      return false;
+    } catch (e) {
+      _setLoading(false);
+      _setError("Failed to send reset email. Try again.");
+      return false;
+    }
+  }
+
   // Map Firebase Errors to User-Friendly Strings
   String _getFriendlyErrorMessage(String code) {
     switch (code) {

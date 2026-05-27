@@ -9,6 +9,9 @@ import '../models/plot.dart';
 import '../services/notification_service.dart';
 
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
+  // Keep a reference to the parent context so we can show SnackBars
+  // on the underlying Scaffold after the bottom sheet is closed.
+  final parentContext = context;
   final nameController = TextEditingController(text: existingPlot?.name);
   final locationController = TextEditingController(text: existingPlot?.location);
   final sizeController = TextEditingController(text: existingPlot?.fieldSize);
@@ -246,13 +249,17 @@ final bool isEditing = existingPlot != null;
                                 }
 
                                 if (context.mounted) {
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(isEditing ? 'Plot "$plotName" updated!' : 'Plot "$plotName" successfully created!'),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
+                                    // Close the bottom sheet using the sheet's context
+                                    FocusScope.of(context).unfocus();
+                                    Navigator.pop(context);
+                                    // Show the confirmation on the parent scaffold
+                                    ScaffoldMessenger.of(parentContext).showSnackBar(
+                                      SnackBar(
+                                        content: Text(isEditing ? 'Plot "${plotName}" updated!' : 'Plot "${plotName}" successfully created!'),
+                                        backgroundColor: Colors.green,
+                                        duration: const Duration(seconds: 3),
+                                      ),
+                                    );
                                 }
                               } catch (e) {
                                 if (context.mounted) {
