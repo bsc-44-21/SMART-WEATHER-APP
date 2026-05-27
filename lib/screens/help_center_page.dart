@@ -68,4 +68,13 @@ if (context.mounted) {
                             duration: Duration(seconds: 4),
                           ),
                         );
-                        
+                      // Show dialog with the email clearly
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Contact Support'),
+                            content: const SelectableText(
+                              'smartweatherapp@gmail.com',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.center,
+                            ),  
