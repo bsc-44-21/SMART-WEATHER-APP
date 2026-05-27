@@ -69,11 +69,12 @@ class PrivacyPolicyPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 24.0),
       child: Column(
          crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+         children: [
           Text(
-             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
+            title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
           ),
-            title
+
 
 
 
