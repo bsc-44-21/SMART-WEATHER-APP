@@ -15,6 +15,7 @@ import 'notifications_page.dart';
 import 'log_page.dart';
 import 'detect_page.dart';
 import '../models/notification_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -325,10 +326,9 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather) {
-    final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather, {Key? key}) {
     final current = weather['current'];
-    if (current == null) return const SizedBox.shrink();
+    if (current == null) return SizedBox.shrink(key: key);
 
     final temp = current['temperature_2m'];
     final weatherCode = current['weather_code'];
@@ -336,6 +336,7 @@ class HomePage extends StatelessWidget {
     final desc = WeatherLocationService.getWeatherDescription(weatherCode);
 
     return FarmingCard(
+      key: key,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -353,9 +354,9 @@ class HomePage extends StatelessWidget {
         ],
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with temperature
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -662,47 +663,56 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Container(
             color: Colors.grey.shade200,
-            child: Image.asset(
-              path,
-              fit: BoxFit.cover,
-              errorBuilder: (ctx, error, stack) => Container(
-                color: Colors.grey.shade300,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
-                      const SizedBox(height: 8),
-                      Text('Add ${path.split('/').last} to assets', style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12)),
-                    ],
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  path,
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, error, stack) => Container(
+                    color: Colors.grey.shade300,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
+                          const SizedBox(height: 8),
+                          Text('Add ${path.split('/').last} to assets', style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12)),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'SPONSORED',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       );
     }
 
-    return FarmingCard(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Sponsored',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppTheme.primaryAccent,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: BannerCarousel(items: banners),
-          ),
-        ],
-      ),
+    return SizedBox(
+      height: 180,
+      child: BannerCarousel(items: banners),
     );
   }
 

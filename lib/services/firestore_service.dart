@@ -169,4 +169,4 @@ class FirestoreService {
       'lastPestScanDate': date,
     }, SetOptions(merge: true));
   }
-}
+}
