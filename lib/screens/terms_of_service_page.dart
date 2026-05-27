@@ -14,3 +14,12 @@ class TermsOfServicePage extends StatelessWidget {
         elevation: 0,
         iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color),
       ),
+ body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Terms and Conditions',
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
