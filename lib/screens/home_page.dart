@@ -645,47 +645,56 @@ class HomePage extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Container(
             color: Colors.grey.shade200,
-            child: Image.asset(
-              path,
-              fit: BoxFit.cover,
-              errorBuilder: (ctx, error, stack) => Container(
-                color: Colors.grey.shade300,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
-                      const SizedBox(height: 8),
-                      Text('Add ${path.split('/').last} to assets', style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12)),
-                    ],
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  path,
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, error, stack) => Container(
+                    color: Colors.grey.shade300,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
+                          const SizedBox(height: 8),
+                          Text('Add ${path.split('/').last} to assets', style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12)),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      'SPONSORED',
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       );
     }
 
-    return FarmingCard(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Sponsored',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: AppTheme.primaryAccent,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 200,
-            child: BannerCarousel(items: banners),
-          ),
-        ],
-      ),
+    return SizedBox(
+      height: 180,
+      child: BannerCarousel(items: banners),
     );
   }
 
