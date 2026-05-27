@@ -54,3 +54,16 @@ class TermsOfServicePage extends StatelessWidget {
               '5. User Responsibilities',
               'You are entirely responsible for maintaining the accuracy of your plot data (location, planting dates) to ensure the AI provides relevant and timely advice.',
             ),
+            ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSection(BuildContext context, String title, String content) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
