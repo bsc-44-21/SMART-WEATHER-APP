@@ -38,3 +38,9 @@ class TermsOfServicePage extends StatelessWidget {
               context,
               '2. Description of Service',
               'Smart Weather App provides Malawian farmers with weather forecasting tools, AI-based crop advisory (for Maize, Tomato, and Groundnuts), pest detection via image analysis, and farm activity logging.',
+ ),
+            _buildSection(
+              context,
+              '3. AI Advisory Disclaimer',
+              'The Gemini AI Advisory and pest detection results are provided for informational purposes only. The app shall not be held liable for any crop yield losses or agricultural damages resulting from the use of the service. Always exercise local agricultural best practices.',
+            ),
