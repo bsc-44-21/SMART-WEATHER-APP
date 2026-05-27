@@ -49,6 +49,22 @@ class PrivacyPolicyPage extends StatelessWidget {
               '4. Payment Processing',
               'Premium subscriptions are processed securely through Paychangu. We do not directly collect or store your full credit card details or mobile money PINs on our servers.',
             ),
+             _buildSection(
+              context,
+              '5. Data Security',
+              'We secure your data using Firebase Authentication and Firestore rules to prevent unauthorized access to your farm logs and plot data.',
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'If you have any questions about this Privacy Policy or your data, please contact our support team.',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic, color: AppTheme.textMuted),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
 
 
 
