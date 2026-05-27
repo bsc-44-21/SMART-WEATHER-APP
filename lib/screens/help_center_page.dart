@@ -82,3 +82,13 @@ if (context.mounted) {
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
                                 child: const Text('OK'),
+ ),
+                            ],
+                          ),
+                        );
+                      }
+                    }
+                  }
+                },
+                icon: const Icon(Icons.email),
+                label: const Text('Contact Support'),
