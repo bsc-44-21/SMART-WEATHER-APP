@@ -67,3 +67,6 @@ class TermsOfServicePage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+title,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
+          ),
