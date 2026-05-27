@@ -5,6 +5,7 @@ import '../widgets/common_widgets.dart';
 import '../services/auth_service.dart';
 import 'dashboard_screen.dart';
 import 'sign_up_screen.dart';
+import 'forgot_password_screen.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -63,7 +64,29 @@ class _AuthScreenState extends State<AuthScreen> {
                         });
                       },
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ForgotPasswordScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Forgot Password?',
+                            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
                     Consumer<AuthService>(
                       builder: (context, authService, child) {
                         return ElevatedButton(

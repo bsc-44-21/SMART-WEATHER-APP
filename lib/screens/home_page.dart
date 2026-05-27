@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
@@ -140,21 +141,12 @@ class HomePage extends StatelessWidget {
 
           const SizedBox(height: 32),
 
-          // 2. Global Local Weather
-          if (weatherService.isLoadingWeather && currentWeather == null) ...[
-            const Center(child: CircularProgressIndicator()),
-            const SizedBox(height: 24),
-          ] else if (weatherService.weatherError != null && currentWeather == null) ...[
-            _buildWeatherErrorCard(
-              context,
-              error: weatherService.weatherError!,
-              onRetry: weatherService.fetchWeatherForLocation,
-            ),
-            const SizedBox(height: 24),
-          ] else if (currentWeather != null) ...[
-            _buildLocalWeatherCard(context, currentWeather),
-            const SizedBox(height: 24),
-          ],
+          // 2. Banner Ads (replaces the Local Weather section)
+          // Place your banner images under `assets/banners/` and update
+          // `pubspec.yaml` to include them. This widget will gracefully
+          // fall back to a placeholder if an asset isn't found.
+          _buildBannerAds(context),
+          const SizedBox(height: 24),
 
           // 3. Farm Analytics
           Row(
@@ -588,6 +580,201 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBannerAds(BuildContext context) {
+    final weatherService = context.watch<WeatherSmartService>();
+    final current = weatherService.currentWeather;
+    final currentNow = current != null ? current['current'] as Map<String, dynamic>? : null;
+
+    // If we don't have weather yet, attempt a fetch (use microtask to avoid calling during build sync)
+    if (currentNow == null && !weatherService.isLoadingWeather) {
+      Future.microtask(() => weatherService.fetchWeatherForLocation());
+    }
+
+    // Build a list of widgets: first one is a dynamic weather banner, followed by image banners
+    final List<Widget> banners = [];
+
+    // Weather banner (first)
+    banners.add(
+      ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppTheme.primaryAccent, AppTheme.terracotta.withValues(alpha: 0.15)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: currentNow != null
+              ? Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Local Weather', style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.white70)),
+                          const SizedBox(height: 6),
+                          Text(
+                            '${currentNow['temperature_2m'] ?? '-'}°',
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            WeatherLocationService.getWeatherDescription(currentNow['weather_code'] ?? 0),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      WeatherLocationService.getWeatherEmoji(currentNow['weather_code'] ?? 0),
+                      style: const TextStyle(fontSize: 48),
+                    ),
+                  ],
+                )
+              : Center(
+                  child: Text(
+                    'Weather unavailable. Turn on location or data.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+        ),
+      ),
+    );
+
+    // Add existing asset banners after the weather banner
+    final List<String> assetBanners = [
+      'assets/banners/banner1.png',
+      'assets/banners/banner2.png',
+      'assets/banners/banner3.png',
+    ];
+
+    for (final path in assetBanners) {
+      banners.add(
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            color: Colors.grey.shade200,
+            child: Image.asset(
+              path,
+              fit: BoxFit.cover,
+              errorBuilder: (ctx, error, stack) => Container(
+                color: Colors.grey.shade300,
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(LucideIcons.image, size: 36, color: Colors.grey.shade600),
+                      const SizedBox(height: 8),
+                      Text('Add ${path.split('/').last} to assets', style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 12)),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return FarmingCard(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Sponsored',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppTheme.primaryAccent,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 200,
+            child: BannerCarousel(items: banners),
+          ),
+        ],
+      ),
+    );
+  }
+
+}
+
+class BannerCarousel extends StatefulWidget {
+  final List<Widget> items;
+  final Duration interval;
+  const BannerCarousel({super.key, required this.items, this.interval = const Duration(seconds: 8)});
+
+  @override
+  State<BannerCarousel> createState() => _BannerCarouselState();
+}
+
+class _BannerCarouselState extends State<BannerCarousel> {
+  late final PageController _controller;
+  Timer? _timer;
+  int _current = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(initialPage: 0);
+    if (widget.items.length > 1) {
+      _timer = Timer.periodic(widget.interval, (_) {
+        final next = (_current + 1) % widget.items.length;
+        if (mounted) {
+          _controller.animateToPage(next, duration: const Duration(milliseconds: 1000), curve: Curves.easeInOut);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: widget.items.length,
+            onPageChanged: (p) => setState(() => _current = p),
+            itemBuilder: (context, index) {
+              return widget.items[index];
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(widget.items.length, (i) {
+            final bool active = i == _current;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: active ? 18 : 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: active ? AppTheme.primaryAccent : Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(8),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

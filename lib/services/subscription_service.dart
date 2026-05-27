@@ -80,7 +80,7 @@ class SubscriptionService extends ChangeNotifier {
       return true;
     }
 
-    return _userProfile!.pestScansThisMonth < maxFreePestScansMonth;
+    return _userProfile!.pestScansThisMonth < maxFreePestScansMonth; 
   }
 
   Future<void> incrementPestScan() async {
