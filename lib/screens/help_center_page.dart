@@ -36,4 +36,8 @@ class HelpCenterPage extends StatelessWidget {
               'How do I use Pest Detection?', 
               'Navigate to the Detect tab and capture an image of the affected plant. Our AI will identify the pest and provide natural and chemical control recommendations suitable for Malawi, while factoring in the current weather.'
             ),
+_buildFaqItem(
+              context,
+              'How do I log a farm activity?', 
+              'Go to the Activity Log tab and tap "Log Activity". Select your plot, date, and describe the activity (e.g., "Apply fertilizer"). The AI will advise if the timing and weather are suitable.'
 
