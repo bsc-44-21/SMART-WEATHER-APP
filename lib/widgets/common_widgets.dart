@@ -27,10 +27,10 @@ class FarmingCard extends StatelessWidget {
       decoration: decoration ?? BoxDecoration(
         color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -88,7 +88,7 @@ class AppLogo extends StatelessWidget {
         child: Center(
           child: Icon(
             LucideIcons.sprout,
-            color: backgroundColor != null ? AppTheme.primaryAccent : Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
             size: size * 0.5,
           ),
         ),
