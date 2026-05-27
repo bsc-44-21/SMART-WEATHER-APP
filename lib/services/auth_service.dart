@@ -52,7 +52,7 @@ class AuthService extends ChangeNotifier {
       return false;
     } catch (e) {
       _setLoading(false);
-      _setError("An unexpected error occurred.");
+      _setError("Oops! Something went wrong on our end. Please check your connection and try again.");
       return false;
     }
   }
@@ -71,7 +71,7 @@ class AuthService extends ChangeNotifier {
       return false;
     } catch (e) {
       _setLoading(false);
-      _setError("An unexpected error occurred.");
+      _setError("Oops! Something went wrong on our end. Please check your connection and try again.");
       return false;
     }
   }
@@ -100,7 +100,7 @@ class AuthService extends ChangeNotifier {
       return false;
     } catch (e) {
       _setLoading(false);
-      _setError("Failed to send reset email. Try again.");
+      _setError("We couldn't send the reset email. Please make sure you're connected and try again.");
       return false;
     }
   }
@@ -109,21 +109,21 @@ class AuthService extends ChangeNotifier {
   String _getFriendlyErrorMessage(String code) {
     switch (code) {
       case 'user-not-found':
-        return 'No user found for that email.';
+        return "We couldn't find a farmer account with that email.";
       case 'wrong-password':
-        return 'Wrong password provided.';
+        return "The password you entered is incorrect. Let's try again!";
       case 'invalid-email':
-        return 'The email address is badly formatted.';
+        return "Please check your email address. It doesn't look quite right.";
       case 'user-disabled':
-        return 'This user account has been disabled.';
+        return "Your farm account has been temporarily disabled. Please contact support.";
       case 'email-already-in-use':
-        return 'An account already exists for that email.';
+        return "An account with this email already exists. Try logging in instead.";
       case 'weak-password':
-        return 'The password provided is too weak.';
+        return "Your password is a bit too weak. Try adding numbers or symbols for better security.";
       case 'invalid-credential':
-        return 'Invalid credentials. Please check your email and password.';
+        return "We couldn't log you in. Please check your email and password and try again.";
       default:
-        return 'Authentication failed. Please try again. ($code)';
+        return "Something went wrong while checking your details. Please try again.";
     }
   }
 }

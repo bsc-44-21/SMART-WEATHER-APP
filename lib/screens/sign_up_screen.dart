@@ -114,7 +114,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       _confirmPasswordController.text) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                        content: Text('Passwords do not match'),
+                                        content: Text("The passwords you entered don't match. Please try repeating it carefully."),
                                         backgroundColor: Colors.red,
                                       ),
                                     );
@@ -138,7 +138,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text(
-                                          'Account created! Plase log in again.',
+                                          "Welcome! Your account is ready. Please log in to continue.",
                                         ),
                                         backgroundColor: Colors.green,
                                       ),
