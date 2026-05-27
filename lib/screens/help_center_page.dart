@@ -48,3 +48,7 @@ _buildFaqItem(
 const SizedBox(height: 32),
             Center(
 
+ child: ElevatedButton.icon(
+                onPressed: () async {
+                  final Uri emailLaunchUri = Uri(
+                    scheme: 'mailto',
