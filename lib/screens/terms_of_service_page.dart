@@ -74,6 +74,9 @@ class PrivacyPolicyPage extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
           ),
+           const SizedBox(height: 8),
+          Text(
+            content,
 
 
 
