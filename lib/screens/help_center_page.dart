@@ -31,4 +31,9 @@ class HelpCenterPage extends StatelessWidget {
               'How does the AI Advisory work?', 
               'The AI Advisory analyzes your specific crop (Maize, Tomato, or Groundnuts) alongside hourly and daily weather forecasts to provide tailored farming advice. Free plan users get 3 AI queries per day.'
             ),
+             _buildFaqItem(
+              context,
+              'How do I use Pest Detection?', 
+              'Navigate to the Detect tab and capture an image of the affected plant. Our AI will identify the pest and provide natural and chemical control recommendations suitable for Malawi, while factoring in the current weather.'
+            ),
 
