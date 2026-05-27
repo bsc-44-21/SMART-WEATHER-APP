@@ -49,3 +49,8 @@ class TermsOfServicePage extends StatelessWidget {
               '4. Premium Subscriptions via Paychangu',
               'Certain features, such as unlimited AI queries, require a premium subscription. By subscribing, you agree to pay the fees associated with the premium plan via the Paychangu payment gateway. Subscriptions are non-refundable.',
             ),
+             _buildSection(
+              context,
+              '5. User Responsibilities',
+              'You are entirely responsible for maintaining the accuracy of your plot data (location, planting dates) to ensure the AI provides relevant and timely advice.',
+            ),
