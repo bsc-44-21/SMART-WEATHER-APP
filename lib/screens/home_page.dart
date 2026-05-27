@@ -14,6 +14,7 @@ import '../widgets/create_plot_sheet.dart';
 import 'notifications_page.dart';
 import 'log_page.dart';
 import '../models/notification_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -150,7 +151,7 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 24),
           ] else if (currentWeather != null) ...[
-            HeroBannerSegment(weatherData: currentWeather),
+            _buildLocalWeatherCard(context, currentWeather),
             const SizedBox(height: 24),
           ],
 
@@ -318,8 +319,93 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Removed _buildLocalWeatherCard from here as it was migrated inside HeroBannerSegment
+  Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather, {Key? key}) {
+    final current = weather['current'];
+    if (current == null) return SizedBox.shrink(key: key);
 
+    final temp = current['temperature_2m'];
+    final weatherCode = current['weather_code'];
+    final emoji = WeatherLocationService.getWeatherEmoji(weatherCode);
+    final desc = WeatherLocationService.getWeatherDescription(weatherCode);
+
+    return FarmingCard(
+      key: key,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppTheme.primaryAccent, Color(0xFF1B3F1A)], // Lush Green to Deep Green
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryAccent.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Local Weather',
+                      style: GoogleFonts.inter(
+                        color: Colors.white70,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$temp°',
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            height: 1.0,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            desc,
+                            style: GoogleFonts.inter(
+                              color: Colors.white70,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Text(
+                emoji,
+                style: const TextStyle(fontSize: 48),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildWeatherErrorCard(BuildContext context, {required String error, required VoidCallback onRetry}) {
     return FarmingCard(
@@ -485,400 +571,6 @@ class HomePage extends StatelessWidget {
             Icon(LucideIcons.chevronRight, color: Colors.grey.shade300, size: 20),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class HeroBannerSegment extends StatefulWidget {
-  final Map<String, dynamic> weatherData;
-
-  const HeroBannerSegment({super.key, required this.weatherData});
-
-  @override
-  State<HeroBannerSegment> createState() => _HeroBannerSegmentState();
-}
-
-class _HeroBannerSegmentState extends State<HeroBannerSegment> {
-  int _currentIndex = 0;
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    // Toggle between weather and ads every 5 seconds
-    _timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      if (mounted) {
-        setState(() {
-          _currentIndex = (_currentIndex + 1) % 3;
-        });
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget currentWidget;
-    switch (_currentIndex) {
-      case 0:
-        currentWidget = _buildLocalWeatherCard(context, widget.weatherData, key: const ValueKey('weather'));
-        break;
-      case 1:
-        currentWidget = _buildAdCard(context, key: const ValueKey('ad_pesticide'));
-        break;
-      case 2:
-      default:
-        currentWidget = _buildFertiliserAdCard(context, key: const ValueKey('ad_fertiliser'));
-        break;
-    }
-
-    return SizedBox(
-      height: 230,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 800),
-        switchInCurve: Curves.easeInOut,
-        switchOutCurve: Curves.easeInOut,
-        transitionBuilder: (Widget child, Animation<double> animation) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        child: currentWidget,
-      ),
-    );
-  }
-
-  Widget _buildAdCard(BuildContext context, {Key? key}) {
-    return FarmingCard(
-      key: key,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.orange.shade600, Colors.deepOrange.shade800],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.shade700.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'SPONSORED',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 24,
-                          height: 24,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          clipBehavior: Clip.hardEdge,
-                          child: Image.asset(
-                            'assets/images/farmers_hope.png',
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              LucideIcons.shoppingBag,
-                              size: 14,
-                              color: Colors.orange.shade800,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Farmers Hope Supplies',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            height: 1.1,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      '+265 992 935 586 / +265 885 724 794\ninfo@farmershope.mw',
-                      style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 10,
-                        height: 1.3,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Shop Now',
-                            style: GoogleFonts.inter(
-                              color: Colors.deepOrange.shade900,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(LucideIcons.arrowRight, size: 14, color: Colors.deepOrange.shade900),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather, {Key? key}) {
-    final current = weather['current'];
-    if (current == null) return SizedBox.shrink(key: key);
-
-    final temp = current['temperature_2m'];
-    final weatherCode = current['weather_code'];
-    final emoji = WeatherLocationService.getWeatherEmoji(weatherCode);
-    final desc = WeatherLocationService.getWeatherDescription(weatherCode);
-
-    return FarmingCard(
-      key: key,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryAccent, Color(0xFF1B3F1A)], // Lush Green to Deep Green
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryAccent.withValues(alpha: 0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Local Weather',
-                      style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '$temp°',
-                          style: GoogleFonts.inter(
-                            color: Colors.white,
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            height: 1.0,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: Text(
-                            desc,
-                            style: GoogleFonts.inter(
-                              color: Colors.white70,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                emoji,
-                style: const TextStyle(fontSize: 48),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFertiliserAdCard(BuildContext context, {Key? key}) {
-    return FarmingCard(
-      key: key,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.teal.shade700, Colors.green.shade900], // Rich earthy/vibrant gradient
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.teal.shade700.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        'SPONSORED',
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Cropia Nutrients',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Boost your yield by 40%',
-                      style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Order Now',
-                            style: GoogleFonts.inter(
-                              color: Colors.teal.shade900,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Icon(LucideIcons.arrowRight, size: 14, color: Colors.teal.shade900),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ]
-                ),
-                child: Center(
-                  child: Icon(
-                    LucideIcons.leaf,
-                    size: 32,
-                    color: Colors.teal.shade800,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }
