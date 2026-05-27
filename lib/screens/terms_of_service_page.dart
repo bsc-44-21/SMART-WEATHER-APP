@@ -23,3 +23,12 @@ class TermsOfServicePage extends StatelessWidget {
               'Terms and Conditions',
               style: Theme.of(context).textTheme.displayMedium,
             ),
+             const SizedBox(height: 16),
+            Text(
+              'Last updated: May 2026',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            const SizedBox(height: 24),
+            _buildSection(
+              context,
+              '1. Acceptance of Terms',
