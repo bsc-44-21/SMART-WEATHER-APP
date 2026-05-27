@@ -78,3 +78,7 @@ if (context.mounted) {
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               textAlign: TextAlign.center,
                             ),  
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('OK'),
