@@ -28,4 +28,7 @@ class HelpCenterPage extends StatelessWidget {
             const SizedBox(height: 24),
             _buildFaqItem(
               context,
+              'How does the AI Advisory work?', 
+              'The AI Advisory analyzes your specific crop (Maize, Tomato, or Groundnuts) alongside hourly and daily weather forecasts to provide tailored farming advice. Free plan users get 3 AI queries per day.'
+            ),
 
