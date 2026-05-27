@@ -102,3 +102,10 @@ if (context.mounted) {
 
   Widget _buildFaqItem(BuildContext context, String question, String answer) {
     return Container(
+       margin: const EdgeInsets.only(bottom: 16.0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.primaryAccent.withValues(alpha: 0.1)),
+      ),
+
