@@ -16,3 +16,9 @@ class HelpCenterPage extends StatelessWidget {
         elevation: 0,
         iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color),
       ),
+ body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
