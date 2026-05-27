@@ -622,7 +622,7 @@ class _HeroBannerSegmentState extends State<HeroBannerSegment> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Farmers Hope Agri Supplies',
+                          'Farmers Hope Supplies',
                           style: GoogleFonts.inter(
                             color: Colors.white,
                             fontSize: 22,
