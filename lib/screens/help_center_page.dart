@@ -115,4 +115,9 @@ iconColor: AppTheme.primaryAccent,
         childrenPadding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
         expandedCrossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
+Text(answer, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppTheme.textMuted)),
+        ],
+      ),
+    );
+  }
+}
