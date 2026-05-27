@@ -32,3 +32,9 @@ class TermsOfServicePage extends StatelessWidget {
             _buildSection(
               context,
               '1. Acceptance of Terms',
+'By accessing and using the Smart Weather App, you accept and agree to be bound by the terms and provision of this agreement.',
+            ),
+            _buildSection(
+              context,
+              '2. Description of Service',
+              'Smart Weather App provides Malawian farmers with weather forecasting tools, AI-based crop advisory (for Maize, Tomato, and Groundnuts), pest detection via image analysis, and farm activity logging.',
