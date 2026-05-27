@@ -40,4 +40,9 @@ _buildFaqItem(
               context,
               'How do I log a farm activity?', 
               'Go to the Activity Log tab and tap "Log Activity". Select your plot, date, and describe the activity (e.g., "Apply fertilizer"). The AI will advise if the timing and weather are suitable.'
+ _buildFaqItem(
+              context,
+              'How do I upgrade to Premium?', 
+              'Go to your Profile Preferences and tap the "Upgrade" button. Payments are processed securely via Paychangu. Premium gives you unlimited AI queries.'
+            ),
 
