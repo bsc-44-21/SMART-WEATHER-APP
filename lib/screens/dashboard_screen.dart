@@ -84,8 +84,8 @@ class _MainLayoutState extends State<MainLayout> {
           onTap: (index) => navigationService.setIndex(index),
           selectedFontSize: 10,
           unselectedFontSize: 10,
-          selectedItemColor: AppTheme.primaryAccent,
-          unselectedItemColor: AppTheme.textMuted,
+          selectedItemColor: Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
+          unselectedItemColor: Theme.of(context).bottomNavigationBarTheme.unselectedItemColor,
         ),
       ),
     );
@@ -98,7 +98,7 @@ class _MainLayoutState extends State<MainLayout> {
       icon: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryAccent.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected ? Theme.of(context).colorScheme.primary.withOpacity(0.12) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Icon(icon, size: 24),

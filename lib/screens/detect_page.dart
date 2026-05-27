@@ -272,13 +272,14 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
   }
 
   void _showInvalidImageDialog(String reason) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            Icon(LucideIcons.alertTriangle, color: AppTheme.primaryAccent),
+            Icon(LucideIcons.alertTriangle, color: theme.colorScheme.primary),
             const SizedBox(width: 10),
              Text(
               'Invalid Image',
@@ -288,12 +289,12 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
         ),
         content: Text(
           reason,
-          style: GoogleFonts.inter(color: Colors.black87),
+          style: GoogleFonts.inter(color: theme.textTheme.bodyLarge?.color),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey.shade600)),
+            child: Text('Cancel', style: TextStyle(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75))),
           ),
           ElevatedButton(
             onPressed: () {
@@ -301,7 +302,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
               _scanPest(); // Trigger scan again
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryAccent,
+              backgroundColor: theme.colorScheme.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('Try Again', style: TextStyle(color: Colors.white)),
@@ -313,12 +314,15 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Pest Detection',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -329,9 +333,12 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Identify pests instantly by scanning your crops.',
-              style: TextStyle(fontSize: 14, color: Colors.black54),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontSize: 14,
+                color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75),
+              ),
             ),
             const SizedBox(height: 24),
             _buildScanCard(context),
@@ -349,7 +356,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                   onPressed: () {},
                   child: Text(
                     'View All',
-                    style: TextStyle(color: AppTheme.primaryAccent),
+                    style: TextStyle(color: theme.colorScheme.primary),
                   ),
                 ),
               ],
@@ -364,6 +371,8 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
   }
 
   Widget _buildScanCard(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Card(
       margin: EdgeInsets.zero,
       child: ClipRRect(
@@ -390,13 +399,13 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryAccent.withValues(alpha: 0.05),
+                        color: theme.colorScheme.primary.withOpacity(0.08),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         LucideIcons.scanLine,
                         size: 56,
-                        color: AppTheme.primaryAccent,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -404,7 +413,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                       'Scan Crop or Pest',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: AppTheme.primaryAccent,
+                        color: theme.colorScheme.primary,
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
                       ),
@@ -414,7 +423,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                       'Keep your crops healthy and safe',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        color: Colors.grey.shade600,
+                        color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75),
                         fontSize: 14,
                       ),
                     ),
@@ -425,8 +434,8 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                       label: const Text('Tap to Scan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: AppTheme.primaryAccent,
-                        disabledBackgroundColor: AppTheme.primaryAccent.withValues(alpha: 0.5),
+                        backgroundColor: theme.colorScheme.primary,
+                        disabledBackgroundColor: theme.colorScheme.primary.withOpacity(0.5),
                         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30), 
@@ -456,12 +465,12 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
                                 decoration: BoxDecoration(
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppTheme.primaryAccent.withValues(alpha: 0.5),
+                                      color: theme.colorScheme.primary.withOpacity(0.5),
                                       blurRadius: 10,
                                       spreadRadius: 2,
                                     ),
                                   ],
-                                  color: AppTheme.primaryAccent,
+                                  color: theme.colorScheme.primary,
                                 ),
                               ),
                             ),
@@ -482,6 +491,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
   }
 
   Widget _buildHistoryStream(BuildContext context) {
+    final theme = Theme.of(context);
     final authService = Provider.of<AuthService>(context, listen: false);
     final firestoreService = Provider.of<FirestoreService>(context, listen: false);
     final userId = authService.user?.uid;
@@ -495,9 +505,9 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
           return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Text('No scans yet.', style: TextStyle(color: Colors.black54)),
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text('No scans yet.', style: theme.textTheme.bodyMedium?.copyWith(color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75))),
           );
         }
 

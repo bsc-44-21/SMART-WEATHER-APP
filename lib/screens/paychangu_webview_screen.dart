@@ -5,9 +5,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../core/theme.dart';
 
 class PaychanguWebViewScreen extends StatefulWidget {
-  final String htmlContent;
+  final String checkoutUrl;
 
-  const PaychanguWebViewScreen({super.key, required this.htmlContent});
+  const PaychanguWebViewScreen({super.key, required this.checkoutUrl});
 
   @override
   State<PaychanguWebViewScreen> createState() => _PaychanguWebViewScreenState();
@@ -71,7 +71,7 @@ class _PaychanguWebViewScreenState extends State<PaychanguWebViewScreen> {
           },
         ),
       )
-      ..loadHtmlString(widget.htmlContent);
+      ..loadRequest(Uri.parse(widget.checkoutUrl));
   }
 
   @override
