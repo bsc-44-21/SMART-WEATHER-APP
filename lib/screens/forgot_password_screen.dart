@@ -111,3 +111,73 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ],
                 ),
               ),
+              ] else ...[
+              FarmingCard(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 48,
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      LucideIcons.checkCircle2,
+                      size: 80,
+                      color: Colors.green,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Check Your Email!',
+                      style: Theme.of(context).textTheme.displaySmall,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'We sent a password reset link to:',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _emailController.text,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Click the link in your email to reset your password. The link expires in 1 hour.',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 40),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(LucideIcons.arrowLeft),
+                      label: const Text('Back to Login'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _emailSent = false;
+                          _emailController.clear();
+                        });
+                      },
+                      child: const Text("Didn't receive the email? Try another"),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
+}
