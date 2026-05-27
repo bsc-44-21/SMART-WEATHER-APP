@@ -44,3 +44,8 @@ class TermsOfServicePage extends StatelessWidget {
               '3. AI Advisory Disclaimer',
               'The Gemini AI Advisory and pest detection results are provided for informational purposes only. The app shall not be held liable for any crop yield losses or agricultural damages resulting from the use of the service. Always exercise local agricultural best practices.',
             ),
+             _buildSection(
+              context,
+              '4. Premium Subscriptions via Paychangu',
+              'Certain features, such as unlimited AI queries, require a premium subscription. By subscribing, you agree to pay the fees associated with the premium plan via the Paychangu payment gateway. Subscriptions are non-refundable.',
+            ),
