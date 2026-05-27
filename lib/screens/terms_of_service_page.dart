@@ -23,4 +23,16 @@ class PrivacyPolicyPage extends StatelessWidget {
               'Privacy Policy',
               style: Theme.of(context).textTheme.displayMedium,
             ),
+            const SizedBox(height: 16),
+            Text(
+              'Last updated: May 2026',
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            const SizedBox(height: 24),
+            _buildSection(
+              context,
+              '1. Information We Collect',
+              'We collect information you provide directly to us when creating an account, including your email and display name.',
+            ),
+
 
