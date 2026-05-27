@@ -4,7 +4,8 @@ import '../core/theme.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
   const PrivacyPolicyPage({super.key});
- @override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -34,12 +35,12 @@ class PrivacyPolicyPage extends StatelessWidget {
               '1. Information We Collect',
               'We collect information you provide directly to us when creating an account, including your email and display name.',
             ),
-             _buildSection(
+            _buildSection(
               context,
               '2. Farm and Location Data',
               'To provide hyper-local weather forecasts and accurate AI advice, we collect data about your farm plots. This includes the plot latitude and longitude coordinates, crop types (Maize, Tomato, or Groundnuts), and planting dates.',
             ),
-             _buildSection(
+            _buildSection(
               context,
               '3. Images and AI Analysis',
               'When you use the Pest Detection feature, the images you capture are temporarily sent to the Google Gemini AI for analysis. We do not permanently store these images or use them for training other models.',
@@ -49,7 +50,7 @@ class PrivacyPolicyPage extends StatelessWidget {
               '4. Payment Processing',
               'Premium subscriptions are processed securely through Paychangu. We do not directly collect or store your full credit card details or mobile money PINs on our servers.',
             ),
-             _buildSection(
+            _buildSection(
               context,
               '5. Data Security',
               'We secure your data using Firebase Authentication and Firestore rules to prevent unauthorized access to your farm logs and plot data.',
@@ -64,17 +65,18 @@ class PrivacyPolicyPage extends StatelessWidget {
       ),
     );
   }
-   Widget _buildSection(BuildContext context, String title, String content) {
+
+  Widget _buildSection(BuildContext context, String title, String content) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 24.0),
       child: Column(
-         crossAxisAlignment: CrossAxisAlignment.start,
-         children: [
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Text(
             title,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
           ),
-           const SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             content,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.6),
@@ -84,11 +86,3 @@ class PrivacyPolicyPage extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
