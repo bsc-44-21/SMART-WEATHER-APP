@@ -108,4 +108,6 @@ if (context.mounted) {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppTheme.primaryAccent.withValues(alpha: 0.1)),
       ),
+      child: ExpansionTile(
+        title: Text(question, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
 
