@@ -16,8 +16,8 @@ class AppTheme {
   // Dark Color Palette - Midnight Meadow
   static const Color darkBackground = Color(0xFF081408); // Deep Midnight Forest
   static const Color darkSurface = Color(0xFF122312); // Dark Moss Surface
-  static const Color darkTextPrimary = Color(0xFFE8F5E9); // Minty White
-  static final Color darkTextMuted = const Color(0xFFE8F5E9).withValues(alpha: 0.70);
+  static const Color darkTextPrimary = Color(0xFFFFFFFF); // Pure White for best contrast
+  static final Color darkTextMuted = const Color(0xFFFFFFFF).withValues(alpha: 0.70);
   static const Color darkInputBorder = Color(0xFF1B301B);
   static const Color darkPrimaryAccent = Color(0xFF81C784); // Bright Sprout Green
   static const Color creamSurface = Color(0xFFF7F2E8); // Light cream for cards/buttons
@@ -196,6 +196,16 @@ class AppTheme {
           side: BorderSide(color: Colors.black.withOpacity(0.12)),
         ),
       ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: darkSurface,
+        foregroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.white),
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        elevation: 0,
+      ),
+      iconTheme: const IconThemeData(color: Colors.white),
+      primaryIconTheme: const IconThemeData(color: Colors.white),
+
       textTheme: TextTheme(
         displayLarge: GoogleFonts.outfit(
           fontSize: 36,
@@ -292,6 +302,8 @@ class AppTheme {
         backgroundColor: darkSurface,
         selectedItemColor: darkPrimaryAccent,
         unselectedItemColor: darkTextMuted,
+        selectedIconTheme: const IconThemeData(color: Colors.white),
+        unselectedIconTheme: IconThemeData(color: Colors.white.withOpacity(0.75)),
         type: BottomNavigationBarType.fixed,
         elevation: 10,
         selectedLabelStyle: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),

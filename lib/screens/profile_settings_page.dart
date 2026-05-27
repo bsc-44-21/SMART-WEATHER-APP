@@ -10,6 +10,9 @@ import 'notifications_page.dart';
 import '../services/notification_service.dart';
 import '../services/subscription_service.dart';
 import 'payment_screen.dart';
+import 'help_center_page.dart';
+import 'terms_of_service_page.dart';
+import 'privacy_policy_page.dart';
 
 class ProfileSettingsPage extends StatelessWidget {
   const ProfileSettingsPage({super.key});
@@ -52,9 +55,15 @@ class ProfileSettingsPage extends StatelessWidget {
           Text('Support', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
           _buildSettingsSection([
-            _SettingsTile(icon: LucideIcons.helpCircle, title: 'Help Center', onTap: () {}),
-            _SettingsTile(icon: LucideIcons.fileText, title: 'Terms of Service', onTap: () {}),
-            _SettingsTile(icon: LucideIcons.shield, title: 'Privacy Policy', onTap: () {}),
+            _SettingsTile(icon: LucideIcons.helpCircle, title: 'Help Center', onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpCenterPage()));
+            }),
+            _SettingsTile(icon: LucideIcons.fileText, title: 'Terms of Reference', onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsOfServicePage()));
+            }),
+            _SettingsTile(icon: LucideIcons.shield, title: 'Privacy Support', onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()));
+            }),
           ]),
            const SizedBox(height: 32),
           SizedBox(
