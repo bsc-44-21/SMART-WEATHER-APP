@@ -71,6 +71,8 @@ class PrivacyPolicyPage extends StatelessWidget {
          crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
+          ),
             title
 
 
