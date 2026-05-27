@@ -12,6 +12,7 @@ import '../services/notification_service.dart';
 import '../widgets/create_plot_sheet.dart';
 import 'notifications_page.dart';
 import 'log_page.dart';
+import 'detect_page.dart';
 import '../models/notification_model.dart';
 
 class HomePage extends StatelessWidget {
@@ -195,6 +196,19 @@ class HomePage extends StatelessWidget {
             title: 'Add New Plot',
             subtitle: 'Register a new field',
             onTap: () => showCreatePlotBottomSheet(context),
+          ),
+          const SizedBox(height: 12),
+          _buildQuickAction(
+            context,
+            icon: LucideIcons.camera,
+            title: 'Detect',
+            subtitle: 'Scan field for pests',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DetectPage()),
+              );
+            },
           ),
           const SizedBox(height: 12),
           _buildQuickAction(
