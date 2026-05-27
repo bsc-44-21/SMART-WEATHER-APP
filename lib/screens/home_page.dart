@@ -327,6 +327,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather, {Key? key}) {
+    final colorScheme = Theme.of(context).colorScheme;
     final current = weather['current'];
     if (current == null) return SizedBox.shrink(key: key);
 

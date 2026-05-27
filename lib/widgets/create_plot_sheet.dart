@@ -7,6 +7,7 @@ import '../services/auth_service.dart';
 import '../services/subscription_service.dart';
 import '../models/plot.dart';
 import '../services/notification_service.dart';
+import 'free_tier_limit_modal.dart';
 
 void showCreatePlotBottomSheet(BuildContext context, {PlotModel? existingPlot}) {
   // Keep a reference to the parent context so we can show SnackBars
@@ -228,12 +229,10 @@ final bool isEditing = existingPlot != null;
                                   if (!subscriptionService.canAddPlot(weatherService.plots.length)) {
                                     setModalState(() => isSaving = false);
                                     if (context.mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Free tier limit reached (1 plot). Upgrade to Premium for unlimited plots.'),
-                                          backgroundColor: Colors.orange,
-                                          duration: Duration(seconds: 4),
-                                        ),
+                                      showFreeTierLimitModal(
+                                        context,
+                                        featureName: 'adding plots',
+                                        limitText: '1 plot',
                                       );
                                     }
                                     return;

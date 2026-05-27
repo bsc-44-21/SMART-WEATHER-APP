@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:provider/provider.dart';
 import '../widgets/common_widgets.dart';
+import '../widgets/free_tier_limit_modal.dart';
 import '../services/weather_smart_service.dart';
+import '../services/subscription_service.dart';
 
 class AdvicePage extends StatefulWidget {
   const AdvicePage({super.key});
@@ -136,6 +138,15 @@ class _AdvicePageState extends State<AdvicePage> {
                       onPressed: isGenerating ? null : () {
                         final query = _questionController.text.trim();
                         if (query.isNotEmpty) {
+                          final subscriptionService = context.read<SubscriptionService>();
+                          if (!subscriptionService.canQueryAI()) {
+                            showFreeTierLimitModal(
+                              context,
+                              featureName: 'AI queries',
+                              limitText: '3 queries/day',
+                            );
+                            return;
+                          }
                           context.read<WeatherSmartService>().askAIQuestion(query);
                         }
                       },
