@@ -92,3 +92,13 @@ if (context.mounted) {
                 },
                 icon: const Icon(Icons.email),
                 label: const Text('Contact Support'),
+                  ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFaqItem(BuildContext context, String question, String answer) {
+    return Container(
