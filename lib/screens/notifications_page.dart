@@ -12,8 +12,11 @@ class NotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textScheme = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: AppTheme.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -66,7 +69,7 @@ class NotificationsPage extends StatelessWidget {
                           ),
                           onPressed: () => notificationService.markAllAsRead(),
                           style: TextButton.styleFrom(
-                            foregroundColor: AppTheme.primaryAccent.withValues(alpha: 0.6),
+                            foregroundColor: colorScheme.primary.withOpacity(0.6),
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                           ),
                         );
@@ -92,20 +95,20 @@ class NotificationsPage extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.all(32),
                               decoration: BoxDecoration(
-                                color: AppTheme.primaryAccent.withValues(alpha: 0.04),
+                                color: colorScheme.primary.withOpacity(0.04),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 LucideIcons.bellRing,
                                 size: 56,
-                                color: AppTheme.primaryAccent.withValues(alpha: 0.2),
+                                color: colorScheme.primary.withOpacity(0.2),
                               ),
                             ),
                             const SizedBox(height: 24),
                             Text(
                               "You're all caught up!",
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: AppTheme.primaryAccent.withValues(alpha: 0.8),
+                                color: colorScheme.primary.withOpacity(0.8),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -114,7 +117,7 @@ class NotificationsPage extends StatelessWidget {
                               "Your farming schedule is perfectly on track.",
                               textAlign: TextAlign.center,
                               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: AppTheme.textMuted,
+                                color: Theme.of(context).textTheme.labelSmall?.color,
                               ),
                             ),
                           ],
@@ -182,6 +185,7 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     Color stripColor;
@@ -212,18 +216,18 @@ class _NotificationCard extends StatelessWidget {
     }
 
     return Container(
-      decoration: BoxDecoration(
-        color: isDark ? AppTheme.darkSurface : Colors.white,
+                            decoration: BoxDecoration(
+        color: isDark ? AppTheme.darkSurface : colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: AppTheme.primaryAccent.withValues(alpha: isDark ? 0.2 : 0.08),
+          color: colorScheme.primary.withOpacity(isDark ? 0.2 : 0.08),
           width: 1,
         ),
         boxShadow: notification.isRead
             ? []
             : [
                 BoxShadow(
-                  color: (isDark ? Colors.black : AppTheme.primaryAccent).withValues(alpha: 0.04),
+                  color: (isDark ? Colors.black : colorScheme.primary).withOpacity(0.04),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -237,7 +241,7 @@ class _NotificationCard extends StatelessWidget {
             // Status Strip
             Container(
               width: 6,
-              color: notification.isRead ? stripColor.withValues(alpha: 0.3) : stripColor,
+              color: notification.isRead ? stripColor.withOpacity(0.3) : stripColor,
             ),
             
             Expanded(
@@ -260,7 +264,9 @@ class _NotificationCard extends StatelessWidget {
                             style: TextStyle(
                               fontWeight: notification.isRead ? FontWeight.w600 : FontWeight.w800,
                               fontSize: 14,
-                              color: notification.isRead ? AppTheme.textMuted : AppTheme.textPrimary,
+                              color: notification.isRead
+                                  ? Theme.of(context).textTheme.labelSmall?.color
+                                  : colorScheme.onBackground,
                             ),
                           ),
                         ),
@@ -280,7 +286,9 @@ class _NotificationCard extends StatelessWidget {
                       notification.message,
                       style: TextStyle(
                         fontSize: 13,
-                        color: notification.isRead ? AppTheme.textMuted : AppTheme.textPrimary.withValues(alpha: 0.8),
+                        color: notification.isRead
+                            ? Theme.of(context).textTheme.labelSmall?.color
+                            : colorScheme.onBackground.withOpacity(0.8),
                         height: 1.5,
                       ),
                     ),
@@ -311,9 +319,9 @@ class _NotificationCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
-                          color: stripColor.withValues(alpha: 0.05),
+                          color: stripColor.withOpacity(0.05),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: stripColor.withValues(alpha: 0.1)),
+                          border: Border.all(color: stripColor.withOpacity(0.1)),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +335,7 @@ class _NotificationCard extends StatelessWidget {
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   fontStyle: FontStyle.italic,
-                                  color: stripColor.withValues(alpha: 0.8),
+                                  color: stripColor.withOpacity(0.8),
                                   height: 1.4,
                                 ),
                               ),
@@ -365,8 +373,8 @@ class _NotificationCard extends StatelessWidget {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.primaryAccent,
-                              foregroundColor: Colors.white,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               minimumSize: const Size(120, 40),
                               padding: const EdgeInsets.symmetric(horizontal: 20),
                               shape: RoundedRectangleBorder(
@@ -421,7 +429,7 @@ class _NotificationCard extends StatelessWidget {
                         child: Text(
                           notification.actionLabel!,
                           style: TextStyle(
-                            color: AppTheme.primaryAccent,
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                           ),
@@ -437,7 +445,7 @@ class _NotificationCard extends StatelessWidget {
                           timeago.format(notification.timestamp),
                           style: TextStyle(
                             fontSize: 11,
-                            color: AppTheme.textMuted.withValues(alpha: 0.6),
+                            color: Theme.of(context).textTheme.labelSmall?.color?.withOpacity(0.6),
                             fontWeight: FontWeight.w500,
                           ),
                         ),

@@ -25,6 +25,7 @@ class WeatherSmartService extends ChangeNotifier {
   Map<String, dynamic>? _currentWeather;
   final Map<String, Map<String, dynamic>> _plotWeather = {};
   bool _isLoadingWeather = false;
+  bool _isFetchingWeather = false;
   String? _weatherError;
   
   // AI Advice data
@@ -121,8 +122,7 @@ class WeatherSmartService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      debugPrint('[Weather] Starting location fetch (3s delay for safety)...');
-      await Future.delayed(const Duration(seconds: 3));
+      debugPrint('[Weather] Starting location fetch...');
       final position = await WeatherLocationService.getLocationWithPermission();
       
       if (position == null) {

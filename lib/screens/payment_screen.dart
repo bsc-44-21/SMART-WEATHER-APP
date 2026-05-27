@@ -6,8 +6,6 @@ import '../core/theme.dart';
 import '../services/auth_service.dart';
 import '../services/paychangu_service.dart';
 import '../services/firestore_service.dart';
-import 'package:uuid/uuid.dart';
-import '../core/secrets.dart';
 import 'paychangu_webview_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -34,114 +32,44 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() => _isLoading = true);
 
     try {
-      _lastTxRef = 'tx-${const Uuid().v4().substring(0, 8)}';
-      final String publicKey = AppSecrets.paychanguPublicKey;
+      debugPrint('Starting payment for user: ${user.email}');
       
-      final htmlContent = '''
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://in.paychangu.com/js/popup.js"></script>
-  <style>
-    body { 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      height: 100vh; 
-      margin: 0; 
-      background-color: #ffffff; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    .loading-container {
-      text-align: center;
-    }
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #E65C4F;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 2s linear infinite;
-      margin: 0 auto 20px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    button { 
-      padding: 16px 32px; 
-      font-size: 16px; 
-      font-weight: bold; 
-      background-color: #E65C4F; 
-      color: white; 
-      border: none; 
-      border-radius: 12px; 
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
-<body>
-  <div class="loading-container" id="loading-ui">
-    <div class="loader"></div>
-    <p>Preparing secure payment...</p>
-    <button type="button" id="pay-button" style="display:none;" onClick="makePayment()">Pay Now</button>
-  </div>
-  
-  <div id="wrapper"></div>
+      // Create payment session via Paychangu API to get checkout URL
+      final paymentResponse = await PaychanguService.createPaymentSession(
+        email: user.email ?? 'user@weathersmart.com',
+        firstName: user.displayName?.split(' ').first ?? 'Smart',
+        lastName: user.displayName?.split(' ').last ?? 'Farmer',
+        amount: 2500.0,
+      );
 
-  <script>
-    function makePayment(){
-      try {
-        PaychanguCheckout({
-          "public_key": "$publicKey",
-          "tx_ref": "$_lastTxRef",
-          "amount": 2500,
-          "currency": "MWK",
-          "callback_url": "https://smartweather.app/success",
-          "return_url": "https://smartweather.app/success",
-          "customer":{
-            "email": "${user.email ?? 'user@weathersmart.com'}",
-            "first_name": "${user.displayName?.split(' ').first ?? 'Smart'}",
-            "last_name": "${user.displayName?.split(' ').last ?? 'Farmer'}"
-          },
-          "customization": {
-            "title": "Smart Weather Premium",
-            "description": "Payment for Premium Subscription"
-          },
-          "meta": {
-            "uuid": "${const Uuid().v4()}",
-            "source": "flutter_app"
-          }
-        });
-      } catch (e) {
-        console.error("Paychangu Error:", e);
-        document.getElementById('loading-ui').innerHTML = '<p style="color:red">Error initializing payment. Please try again.</p>';
+      debugPrint('Payment response received: $paymentResponse');
+
+      _lastTxRef = paymentResponse.txRef;
+      final checkoutUrl = paymentResponse.checkoutUrl;
+
+      debugPrint('Checkout URL: $checkoutUrl');
+
+      if (checkoutUrl == null || checkoutUrl.isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Payment gateway unavailable. Please try again later.'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 5),
+            ),
+          );
+          setState(() => _isLoading = false);
+        }
+        return;
       }
-    }
-
-    // Automatically trigger payment when page loads
-    window.onload = function() {
-      // Give a small delay to ensure script is ready
-      setTimeout(function() {
-        makePayment();
-        // Show button only if it doesn't auto-open after 3 seconds
-        setTimeout(function() {
-          document.getElementById('pay-button').style.display = 'block';
-        }, 3000);
-      }, 500);
-    };
-  </script>
-</body>
-</html>
-''';
 
       if (mounted) {
+        setState(() => _isLoading = false);
+        
         final bool? success = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
-            builder: (context) => PaychanguWebViewScreen(htmlContent: htmlContent),
+            builder: (context) => PaychanguWebViewScreen(checkoutUrl: checkoutUrl),
           ),
         );
 
@@ -152,7 +80,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
           } else {
             setState(() {
               _isVerifying = true;
-              _isLoading = false;
             });
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -164,9 +91,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
         }
       }
     } catch (e) {
+      debugPrint('Payment error: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text('Payment Error: $e'), 
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 6),
+          ),
         );
         setState(() => _isLoading = false);
       }

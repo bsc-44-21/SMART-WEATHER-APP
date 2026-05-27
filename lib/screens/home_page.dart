@@ -40,6 +40,8 @@ class HomePage extends StatelessWidget {
       totalArea += double.tryParse(plot.fieldSize) ?? 0;
     }
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
       child: Column(
@@ -57,7 +59,7 @@ class HomePage extends StatelessWidget {
                     _getGreeting(),
                     style: GoogleFonts.inter(
                       fontSize: 14,
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.9),
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
                     ),
@@ -66,7 +68,7 @@ class HomePage extends StatelessWidget {
                   Text(
                     username,
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: AppTheme.primaryAccent,
+                      color: colorScheme.primary,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -1,
                     ),
@@ -81,11 +83,11 @@ class HomePage extends StatelessWidget {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Colors.black.withOpacity(0.03),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -93,7 +95,7 @@ class HomePage extends StatelessWidget {
                         ),
                         child: IconButton(
                           icon: const Icon(LucideIcons.bell),
-                          color: AppTheme.primaryAccent,
+                          color: colorScheme.primary,
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -201,7 +203,7 @@ class HomePage extends StatelessWidget {
           Builder(builder: (context) {
             final notifications = context.watch<NotificationService>().notifications;
             final recentNotifs = notifications.take(3).toList();
-            if (recentNotifs.isEmpty) return const SizedBox.shrink();
+          if (recentNotifs.isEmpty) return const SizedBox.shrink();
             
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +211,7 @@ class HomePage extends StatelessWidget {
                 Text(
                   'Recent Notifications',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppTheme.primaryAccent,
+                    color: colorScheme.primary,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -224,13 +226,13 @@ class HomePage extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: AppTheme.primaryAccent.withValues(alpha: 0.1),
+                            color: colorScheme.primary.withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             notif.type == NotificationType.weather || notif.type == NotificationType.pest || notif.type == NotificationType.system ? LucideIcons.alertTriangle : LucideIcons.bell, 
                             size: 16, 
-                            color: AppTheme.primaryAccent
+                            color: colorScheme.primary,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -249,7 +251,7 @@ class HomePage extends StatelessWidget {
                               Text(
                                 notif.message,
                                 style: GoogleFonts.inter(
-                                  color: Colors.grey.shade600,
+                                  color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.9),
                                   fontSize: 11,
                                   height: 1.4,
                                 ),
@@ -259,14 +261,14 @@ class HomePage extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.all(12),
                                   decoration: BoxDecoration(
-                                    color: AppTheme.terracotta.withValues(alpha: 0.08),
+                                    color: AppTheme.terracotta.withOpacity(0.08),
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: AppTheme.terracotta.withValues(alpha: 0.15)),
+                                    border: Border.all(color: AppTheme.terracotta.withOpacity(0.15)),
                                   ),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(LucideIcons.sparkles, size: 14, color: AppTheme.terracotta),
+                                      Icon(LucideIcons.sparkles, size: 14, color: AppTheme.terracotta),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
@@ -310,6 +312,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather) {
+    final colorScheme = Theme.of(context).colorScheme;
     final current = weather['current'];
     if (current == null) return const SizedBox.shrink();
 
@@ -321,15 +324,15 @@ class HomePage extends StatelessWidget {
     return FarmingCard(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.primaryAccent, Color(0xFF1B3F1A)], // Lush Green to Deep Green
+        gradient: LinearGradient(
+          colors: [colorScheme.primary, const Color(0xFF1B3F1A)], // Lush Green to Deep Green
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryAccent.withValues(alpha: 0.2),
+            color: colorScheme.primary.withOpacity(0.2),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -349,7 +352,7 @@ class HomePage extends StatelessWidget {
                     Text(
                       'Local Weather',
                       style: GoogleFonts.inter(
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.9),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
@@ -362,7 +365,7 @@ class HomePage extends StatelessWidget {
                         Text(
                           '$temp°',
                           style: GoogleFonts.inter(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onPrimary,
                             fontSize: 40,
                             fontWeight: FontWeight.bold,
                             height: 1.0,
@@ -374,7 +377,7 @@ class HomePage extends StatelessWidget {
                           child: Text(
                             desc,
                             style: GoogleFonts.inter(
-                              color: Colors.white70,
+                              color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.85),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -407,8 +410,8 @@ class HomePage extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+                BoxShadow(
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -418,13 +421,13 @@ class HomePage extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
+                Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
+                  color: Colors.white.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.cloudOff, color: Colors.white, size: 24),
+                child: Icon(LucideIcons.cloudOff, color: Theme.of(context).colorScheme.onPrimary, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -435,7 +438,7 @@ class HomePage extends StatelessWidget {
                       'Weather Offline',
                       style: GoogleFonts.inter(
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         fontSize: 16,
                       ),
                     ),
@@ -444,7 +447,7 @@ class HomePage extends StatelessWidget {
                       error,
                       style: GoogleFonts.inter(
                         fontSize: 12,
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.9),
                       ),
                     ),
                   ],
@@ -460,8 +463,8 @@ class HomePage extends StatelessWidget {
               label: const Text('Try Refreshing'),
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.grey.shade900,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -474,36 +477,37 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildAnalyticCard(BuildContext context, {required String title, required String value, required IconData icon}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppTheme.primaryAccent.withValues(alpha: 0.08)),
+        border: Border.all(color: colorScheme.primary.withOpacity(0.08)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: AppTheme.primaryAccent.withValues(alpha: 0.5), size: 20),
+          Icon(icon, color: colorScheme.primary.withOpacity(0.5), size: 20),
           const SizedBox(height: 12),
           Text(
             value,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: AppTheme.primaryAccent,
+              color: colorScheme.primary,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             title,
-            style: GoogleFonts.inter(
-              color: Colors.grey.shade500,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-            ),
+              style: GoogleFonts.inter(
+                color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.9),
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
           ),
         ],
       ),
@@ -511,16 +515,17 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildQuickAction(BuildContext context, {required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+    final colorScheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: AppTheme.primaryAccent.withValues(alpha: 0.08)),
+          border: Border.all(color: colorScheme.primary.withOpacity(0.08)),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 4)),
+            BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
           ],
         ),
         child: Row(
@@ -528,10 +533,10 @@ class HomePage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.primaryAccent.withValues(alpha: 0.08),
+                color: colorScheme.primary.withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: AppTheme.primaryAccent, size: 20),
+              child: Icon(icon, color: colorScheme.primary, size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -542,7 +547,7 @@ class HomePage extends StatelessWidget {
                     title,
                     style: GoogleFonts.inter(
                       fontWeight: FontWeight.w700,
-                      color: AppTheme.primaryAccent,
+                      color: colorScheme.primary,
                       fontSize: 14,
                     ),
                   ),
@@ -550,14 +555,14 @@ class HomePage extends StatelessWidget {
                   Text(
                     subtitle,
                     style: GoogleFonts.inter(
-                      color: Colors.grey.shade500,
+                      color: Theme.of(context).textTheme.bodySmall?.color?.withOpacity(0.9),
                       fontSize: 11,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(LucideIcons.chevronRight, color: Colors.grey.shade300, size: 20),
+            Icon(LucideIcons.chevronRight, color: Theme.of(context).dividerColor, size: 20),
           ],
         ),
       ),

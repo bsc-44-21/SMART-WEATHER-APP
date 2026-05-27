@@ -20,8 +20,13 @@ class WeatherLocationService {
 
       if (permission == LocationPermission.deniedForever) return null;
 
+      final lastPosition = await Geolocator.getLastKnownPosition();
+      if (lastPosition != null) {
+        return lastPosition;
+      }
+
       return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        desiredAccuracy: LocationAccuracy.medium,
         timeLimit: const Duration(seconds: 10),
       );
     } catch (e) {
@@ -41,24 +46,60 @@ class WeatherLocationService {
       final Uri url = Uri.parse(
           'https://api.open-meteo.com/v1/forecast?'
           'latitude=${latitude.toStringAsFixed(4)}&longitude=${longitude.toStringAsFixed(4)}'
-          '&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m'
-          '&hourly=temperature_2m,precipitation_probability,weather_code'
-          '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum'
-          '&forecast_days=$maxDays');
+          '&current_weather=true'
+          '&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,weathercode'
+          '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum'
+          '&forecast_days=$maxDays'
+          '&timezone=auto');
 
       debugPrint('[Weather] Fetching from Open-Meteo: $url');
 
       final response = await http.get(url).timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        
+        final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+        final currentWeather = jsonResponse['current_weather'] as Map<String, dynamic>?;
+
+        final Map<String, dynamic>? current = currentWeather != null
+            ? {
+                'temperature_2m': currentWeather['temperature'],
+                'weather_code': currentWeather['weathercode'],
+                'wind_speed_10m': currentWeather['windspeed'],
+                'time': currentWeather['time'],
+              }
+            : null;
+
+        // Normalize hourly keys (Open-Meteo returns 'weathercode' not 'weather_code')
+        final hourlyRaw = (jsonResponse['hourly'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+        final Map<String, dynamic> hourly = {};
+        for (final entry in hourlyRaw.entries) {
+          var key = entry.key;
+          var value = entry.value;
+          if (key == 'weathercode') key = 'weather_code';
+          if (key == 'relativehumidity_2m') key = 'relative_humidity_2m';
+          hourly[key] = value;
+        }
+        // Ensure expected lists exist to avoid null -> List errors in the UI
+        hourly.putIfAbsent('temperature_2m', () => <dynamic>[]);
+        hourly.putIfAbsent('weather_code', () => <dynamic>[]);
+
+        // Normalize daily keys
+        final dailyRaw = (jsonResponse['daily'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+        final Map<String, dynamic> daily = {};
+        for (final entry in dailyRaw.entries) {
+          var key = entry.key;
+          var value = entry.value;
+          if (key == 'weathercode') key = 'weather_code';
+          daily[key] = value;
+        }
+        daily.putIfAbsent('weather_code', () => <dynamic>[]);
+
         return {
           'latitude': latitude,
           'longitude': longitude,
-          'current': jsonResponse['current'],
-          'hourly': jsonResponse['hourly'],
-          'daily': jsonResponse['daily'],
+          'current': current,
+          'hourly': hourly,
+          'daily': daily,
         };
       } else {
         debugPrint('[Weather] Open-Meteo Error: ${response.statusCode}');
