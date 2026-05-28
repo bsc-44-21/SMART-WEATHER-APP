@@ -1,6 +1,6 @@
 class AiConfig {
   // ⚠️ Put your actual API key here
-  static const String apiKey = "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";
+  static const String apiKey = String.fromEnvironment('OPENROUTER_API_KEY', defaultValue: '');
 
   static String get normalizedApiKey {
     final key = apiKey.trim();
