@@ -12,6 +12,7 @@ import '../services/auth_service.dart';
 import '../services/ai_advisory_service.dart';
 import '../services/subscription_service.dart';
 import '../services/firestore_service.dart';
+import '../widgets/free_tier_limit_modal.dart';
 import '../models/pest_detection.dart';
 import '../models/plot.dart';
 import '../services/weather_location_service.dart';
@@ -88,11 +89,10 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
 
     final subscriptionService = Provider.of<SubscriptionService>(context, listen: false);
     if (!subscriptionService.canScanPest()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Free limit reached (3 scans/month). Upgrade to Premium for unlimited scans.'),
-          backgroundColor: Colors.orange,
-        ),
+      showFreeTierLimitModal(
+        context,
+        featureName: 'pest scans',
+        limitText: '3 scans/month',
       );
       return;
     }

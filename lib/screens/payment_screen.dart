@@ -7,6 +7,8 @@ import '../services/auth_service.dart';
 import '../services/paychangu_service.dart';
 import '../services/firestore_service.dart';
 import 'paychangu_webview_screen.dart';
+import '../widgets/payment_verification_modal.dart';
+
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({super.key});
@@ -76,17 +78,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
         if (mounted) {
           if (success == true) {
             // Auto-verify if we detected a success return URL
-            await _verifyPayment();
+            await _verifyPayment(showModal: true);
           } else {
-            setState(() {
-              _isVerifying = true;
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Please click Verify if you have completed the payment.'),
-                duration: Duration(seconds: 5),
-              ),
-            );
+            // Even if not auto-detected, show the verification modal as the next logical step
+            await _verifyPayment(showModal: true);
           }
         }
       }
@@ -105,31 +100,72 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-  Future<void> _verifyPayment() async {
+  Future<void> _verifyPayment({bool showModal = true}) async {
     if (_lastTxRef == null) return;
     
     final user = context.read<AuthService>().user;
     if (user == null) return;
 
-    setState(() => _isLoading = true);
+    if (showModal) {
+      // Show the initial "Prompt" or "Error" modal
+      showPaymentVerificationModal(
+        context,
+        txRef: _lastTxRef!,
+        amount: 2500.0,
+        errorMessage: _isVerifying ? 'Payment not verified' : null,
+        onVerify: () {
+          Navigator.pop(context); // Close current modal
+          _verifyPayment(showModal: false); // Re-run WITHOUT modal check to trigger verification
+        },
+        onCancel: () => Navigator.pop(context),
+      );
+      return; 
+    }
+
+    // This part runs when called with showModal: false (or after the first call returns)
+    // Actually, I'll modify the logic to handle the "Verification Progress" state.
+    
+    setState(() {
+      _isLoading = true;
+      _isVerifying = true;
+    });
+
+    // Show a loading version of the modal
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => PaymentVerificationModal(
+        txRef: _lastTxRef!,
+        amount: 2500.0,
+        isLoading: true,
+        onVerify: () {},
+        onCancel: () {},
+      ),
+    );
 
     try {
       final isSuccess = await PaychanguService.verifyTransaction(_lastTxRef!, expectedAmount: 2500.0);
       
+      Navigator.pop(context); // Close the loading modal
+
       if (isSuccess) {
         await _handleSuccessfulPayment(user.uid);
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Payment not yet verified. Please ensure you have completed the transaction.'),
-              backgroundColor: Colors.orange,
-            ),
-          );
+           // Show the error modal
+           showPaymentVerificationModal(
+              context,
+              txRef: _lastTxRef!,
+              amount: 2500.0,
+              errorMessage: 'Payment not verified',
+              onVerify: () => _verifyPayment(showModal: false),
+              onCancel: () => Navigator.pop(context),
+            );
         }
       }
     } catch (e) {
       if (mounted) {
+        Navigator.pop(context); // Close loading modal
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Verification error: $e'), backgroundColor: Colors.red),
         );

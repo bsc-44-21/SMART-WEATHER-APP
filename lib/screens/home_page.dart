@@ -13,6 +13,7 @@ import '../services/notification_service.dart';
 import '../widgets/create_plot_sheet.dart';
 import 'notifications_page.dart';
 import 'log_page.dart';
+import 'detect_page.dart';
 import '../models/notification_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -192,6 +193,19 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 12),
           _buildQuickAction(
             context,
+            icon: LucideIcons.camera,
+            title: 'Detect',
+            subtitle: 'Scan field for pests',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const DetectPage()),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildQuickAction(
+            context,
             icon: LucideIcons.clipboardList,
             title: 'Log Activity',
             subtitle: 'Record farm tasks & events',
@@ -313,6 +327,7 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _buildLocalWeatherCard(BuildContext context, Map<String, dynamic> weather, {Key? key}) {
+    final colorScheme = Theme.of(context).colorScheme;
     final current = weather['current'];
     if (current == null) return SizedBox.shrink(key: key);
 
