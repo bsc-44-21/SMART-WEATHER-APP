@@ -121,3 +121,78 @@ class PaymentVerificationModal extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
+            // Action Buttons
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isLoading ? null : onVerify,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text(
+                        'Verify Payment',
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: isLoading ? null : onCancel,
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.inter(
+                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: GoogleFonts.inter(fontSize: 14, color: Colors.grey)),
+        Text(value, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
+}
+
+void showPaymentVerificationModal(
+  BuildContext context, {
+  required String txRef,
+  required double amount,
+  required VoidCallback onVerify,
+  required VoidCallback onCancel,
+  bool isLoading = false,
+  String? errorMessage,
+}) {
+  showDialog(
+    context: context,
+    barrierDismissible: !isLoading,
+    builder: (context) => PaymentVerificationModal(
+      txRef: txRef,
+      amount: amount,
+      onVerify: onVerify,
+      onCancel: onCancel,
+      isLoading: isLoading,
+      errorMessage: errorMessage,
+    ),
+  );
+}
+
