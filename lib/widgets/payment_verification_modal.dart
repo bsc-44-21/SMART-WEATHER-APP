@@ -10,3 +10,13 @@ class PaymentVerificationModal extends StatelessWidget {
   final VoidCallback onCancel;
   final bool isLoading;
   final String? errorMessage;
+
+  const PaymentVerificationModal({
+    super.key,
+    required this.txRef,
+    required this.amount,
+    required this.onVerify,
+    required this.onCancel,
+    this.isLoading = false,
+    this.errorMessage,
+  });
