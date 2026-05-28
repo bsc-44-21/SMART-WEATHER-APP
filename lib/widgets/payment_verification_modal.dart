@@ -42,3 +42,20 @@ class PaymentVerificationModal extends StatelessWidget {
             ),
           ],
         ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Status Icon
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: (errorMessage != null ? Colors.orange : AppTheme.primaryAccent).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                errorMessage != null ? LucideIcons.alertCircle : LucideIcons.refreshCw,
+                color: errorMessage != null ? Colors.orange : AppTheme.primaryAccent,
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 24),
