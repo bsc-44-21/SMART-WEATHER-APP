@@ -69,8 +69,8 @@ class OpenRouterAiService {
         return 'Empty response from model';
       }
 
-      if (response.statusCode == 401) {
-        return 'Unauthorized (401): missing or invalid API key. Ensure OPENROUTER_API_KEY is set and valid.';
+      if (response.statusCode == 401 || response.statusCode == 403 || response.body.contains('suspended')) {
+        return 'AI service is currently busy or undergoing maintenance. Please try again later.';
       }
 
       return 'HTTP ${response.statusCode}: ${response.body}';
@@ -193,8 +193,8 @@ class OpenRouterAiService {
         }
       }
 
-      if (response.statusCode == 401) {
-        return 'Unauthorized (401): missing or invalid API key. Ensure OPENROUTER_API_KEY is set and valid.';
+      if (response.statusCode == 401 || response.statusCode == 403 || response.body.contains('suspended')) {
+        return 'AI service is currently busy. Please try again.';
       }
 
       return 'HTTP ${response.statusCode}: ${response.body}';

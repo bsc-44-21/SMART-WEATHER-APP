@@ -17,9 +17,11 @@ class AiAdvisoryService {
         if (attempt >= maxRetries) {
           final errorString = e.toString();
           if (errorString.contains('503') || errorString.contains('unavailable') || errorString.contains('demand')) {
-            throw Exception('Google AI servers are currently experiencing high demand. Please try again in a few moments.');
+            throw Exception('Google AI services are currently experiencing high demand. Please try again in a few moments.');
           } else if (errorString.contains('quota') || errorString.contains('429')) {
             throw Exception('API limit reached. Please wait a minute and try again, or check your API key billing details.');
+          } else if (errorString.contains('suspended') || errorString.contains('permission denied')) {
+            throw Exception('Service is temporarily unavailable. Please try again later or contact support.');
           }
           rethrow;
         }
