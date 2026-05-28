@@ -9,7 +9,7 @@ class SubscriptionService extends ChangeNotifier {
   StreamSubscription? _profileSub;
     
   // Rate Limits
-  static const int maxFreePlots = 1;
+  static const int maxFreePlots = 2;
   static const int maxFreeAiQueriesToday = 3;
   static const int maxFreePestScansMonth = 3;
 

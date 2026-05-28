@@ -232,7 +232,7 @@ final bool isEditing = existingPlot != null;
                                       showFreeTierLimitModal(
                                         context,
                                         featureName: 'adding plots',
-                                        limitText: '1 plot',
+                                        limitText: '2 plots',
                                       );
                                     }
                                     return;
