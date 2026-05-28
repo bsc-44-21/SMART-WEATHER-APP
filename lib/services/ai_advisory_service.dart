@@ -52,7 +52,7 @@ class AiAdvisoryService {
                 description: 'Whether the activity is recommended based on the weather.',
               ),
               'feedback_message': Schema.string(
-                description: 'Explanation for recommendation or warning, using specific weather data context.',
+                description: 'Explanation for recommendation or warning. You MUST explicitly state the absolute best day and time within the next 7 days to perform this activity based on the weather.',
               ),
             },
             requiredProperties: ['is_recommended', 'feedback_message'],
@@ -87,8 +87,9 @@ CRITICAL WEATHER ANALYSIS INSTRUCTION:
 The weather data provided above contains both "hourly" and "daily" arrays. 
 - If the user specifies a specific time of day in their activity or date (e.g., "4:30 PM", "tonight"), you MUST look at the specific hours in the "hourly" array to ensure conditions (rain, temperature) are safe at that exact time for "$cropName".
 - If they specify a broader timeframe like "tomorrow", "day after tomorrow", or "next week", use the "daily" (24hrs/weekly) predictions. 
+- After providing your primary analysis, evaluate the entire 7-day forecast. You MUST recommend the absolute best day and time within the next 7 days for this specific activity.
 
-Analyze the weather and determine if it is safe, optimal, or risky to perform this agricultural activity for this crop.
+Analyze the weather and determine if it is safe, optimal, or risky to perform this agricultural activity for this crop. Keep the user fully informed of their 7-day optimal window.
 ''';
 
       final content = [Content.text(prompt)];
