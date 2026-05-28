@@ -4,7 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 
 
 class AiAdvisoryService {
-  static const String _apiKey = 'AIzaSyAH_GIUQHTqp4MUK0vpfzlmScY56bmxd7E';
+  static const String _apiKey = String.fromEnvironment('AI_ADVISORY_GEMINI_KEY', defaultValue: '');
 
   static Future<GenerateContentResponse> _generateContentWithRetry(
       GenerativeModel model, List<Content> content, {int maxRetries = 3}) async {
