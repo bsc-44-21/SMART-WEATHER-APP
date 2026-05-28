@@ -230,7 +230,7 @@ class _AddActivitySheetState extends State<_AddActivitySheet> {
       setState(() => _isAnalyzing = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Free limit reached (3 AI Queries/day). Upgrade to Premium.'),
+          content: Text('Free limit reached (2 AI Queries/day). Upgrade to Premium.'),
           backgroundColor: Colors.orange,
         ),
       );

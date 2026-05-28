@@ -92,7 +92,7 @@ class _DetectPageState extends State<DetectPage> with SingleTickerProviderStateM
       showFreeTierLimitModal(
         context,
         featureName: 'pest scans',
-        limitText: '3 scans/month',
+        limitText: '2 scans/month',
       );
       return;
     }

@@ -10,8 +10,8 @@ class SubscriptionService extends ChangeNotifier {
     
   // Rate Limits
   static const int maxFreePlots = 2;
-  static const int maxFreeAiQueriesToday = 3;
-  static const int maxFreePestScansMonth = 3;
+  static const int maxFreeAiQueriesToday = 2;
+  static const int maxFreePestScansMonth = 2;
 
   SubscriptionService() {
     FirebaseAuth.instance.authStateChanges().listen((user) {
