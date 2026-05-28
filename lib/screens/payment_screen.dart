@@ -41,7 +41,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         email: user.email ?? 'user@weathersmart.com',
         firstName: user.displayName?.split(' ').first ?? 'Smart',
         lastName: user.displayName?.split(' ').last ?? 'Farmer',
-        amount: 2500.0,
+        amount: 200.0,
       );
 
       debugPrint('Payment response received: $paymentResponse');
@@ -111,7 +111,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       showPaymentVerificationModal(
         context,
         txRef: _lastTxRef!,
-        amount: 2500.0,
+        amount: 200.0,
         errorMessage: _isVerifying ? 'Payment not verified' : null,
         onVerify: () {
           Navigator.pop(context); // Close current modal
@@ -136,7 +136,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       barrierDismissible: false,
       builder: (context) => PaymentVerificationModal(
         txRef: _lastTxRef!,
-        amount: 2500.0,
+        amount: 200.0,
         isLoading: true,
         onVerify: () {},
         onCancel: () {},
@@ -144,7 +144,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
 
     try {
-      final isSuccess = await PaychanguService.verifyTransaction(_lastTxRef!, expectedAmount: 2500.0);
+      final isSuccess = await PaychanguService.verifyTransaction(_lastTxRef!, expectedAmount: 200.0);
       
       Navigator.pop(context); // Close the loading modal
 
@@ -153,10 +153,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
       } else {
         if (mounted) {
            // Show the error modal
-           showPaymentVerificationModal(
+            showPaymentVerificationModal(
               context,
               txRef: _lastTxRef!,
-              amount: 2500.0,
+              amount: 200.0,
               errorMessage: 'Payment not verified',
               onVerify: () => _verifyPayment(showModal: false),
               onCancel: () => Navigator.pop(context),
@@ -224,7 +224,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'MWK 2,500 / month',
+                      'MWK 200 / month',
                       style: GoogleFonts.inter(fontSize: 18, color: Colors.white70),
                     ),
                   ],
