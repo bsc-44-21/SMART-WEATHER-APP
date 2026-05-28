@@ -59,3 +59,65 @@ class PaymentVerificationModal extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
+            // Title
+            Text(
+              'Verify Payment',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: theme.textTheme.titleLarge?.color,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Description / Transaction Info
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.dividerColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  _buildInfoRow('Amount', 'MWK ${amount.toStringAsFixed(0)}'),
+                  const SizedBox(height: 8),
+                  _buildInfoRow('Ref', txRef.length > 15 ? '${txRef.substring(0, 12)}...' : txRef),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // The specific message requested by the user
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: (errorMessage != null ? Colors.red : Colors.orange).withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: (errorMessage != null ? Colors.red : Colors.orange).withOpacity(0.4),
+                  width: 2,
+                ),
+              ),
+              child: Column(
+                children: [
+                   Icon(
+                    errorMessage != null ? LucideIcons.alertTriangle : LucideIcons.info,
+                    color: errorMessage != null ? Colors.red : Colors.orange,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'payment not verified .please ensure you have completed  the transaction',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: errorMessage != null ? Colors.red.shade900 : Colors.orange.shade900,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
